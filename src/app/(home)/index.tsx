@@ -261,7 +261,7 @@ export default function Index() {
           <ActivityIndicator
             size="large"
             //color="#0000ff"
-            //className="mt-10 self-center"
+            //className="mt-10 self-center" styling
           />
         </View>
       ) : (
