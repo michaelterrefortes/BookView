@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    FlatList,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BookList from "../../../components/BookList";
-import SearchBar from "../../../components/SearchBar";
-import { fetchSearch } from "../../../services/api";
+import BookList from "../../../../components/BookList";
+import SearchBar from "../../../../components/SearchBar";
+import { fetchSearch } from "../../../../services/api";
 
 const ModalList = () => {
   const [books, setBooks] = useState([]);

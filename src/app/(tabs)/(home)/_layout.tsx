@@ -7,8 +7,9 @@ export default function HomeLayout() {
         name="index"
         options={{
           headerBackTitle: "",
-          headerShown: false,
+          headerShown: true,
           headerTitle: "Home",
+          headerLargeTitleEnabled: true,
         }}
       />
 

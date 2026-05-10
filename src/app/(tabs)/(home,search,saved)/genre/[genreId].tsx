@@ -9,8 +9,8 @@ import {
   View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import BookCard from "../../../../components/BookCard";
-import { fetchBooksSubject } from "../../../../services/api";
+import BookCard from "../../../../../components/BookCard";
+import { fetchBooksSubject } from "../../../../../services/api";
 
 const Genre = () => {
   const { name, data } = useLocalSearchParams();
@@ -76,7 +76,11 @@ const Genre = () => {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-                contentContainerStyle={{ paddingHorizontal: 8 }}
+                contentContainerStyle={{
+                  paddingHorizontal: 8,
+                  alignItems: "flex-end",
+                  gap: 16,
+                }}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
                   <BookCard
@@ -112,7 +116,7 @@ const styles = StyleSheet.create({
   },
   scrollview: {
     flex: 1,
-    paddingTop: 100,
+    //paddingTop: 100,
   },
   bigTitle: {
     paddingTop: 10,

@@ -1,4 +1,5 @@
-import { Link, useIsFocused, useLocalSearchParams } from "expo-router";
+import { useIsFocused, useLocalSearchParams, useRouter } from "expo-router";
+import { SymbolView } from "expo-symbols";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -11,13 +12,36 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import AuthorCard from "../../../../components/AuthorCard";
-import BookCard from "../../../../components/BookCard";
-import { fetchBookDetails, fetchBookEditions } from "../../../../services/api";
-import { getBook, removeBook } from "../../../../services/localData";
+import { getColors } from "react-native-image-colors";
+import AuthorCard from "../../../../../components/AuthorCard";
+import BookCard from "../../../../../components/BookCard";
+import {
+  fetchBookDetails,
+  fetchBookEditions,
+} from "../../../../../services/api";
+import {
+  getBook,
+  removeBook,
+  storeBook,
+} from "../../../../../services/localData";
+
+const getTextColor = (backgroundColor) => {
+  // Simple check for hex colors, expand for rgb/hsl if needed
+
+  if (backgroundColor.startsWith("#")) {
+    const r = parseInt(backgroundColor.substr(1, 2), 16);
+    const g = parseInt(backgroundColor.substr(3, 2), 16);
+    const b = parseInt(backgroundColor.substr(5, 2), 16);
+    const brightness = Math.round((r * 299 + g * 587 + b * 114) / 1000);
+
+    // Threshold 150 works well, but can be adjusted
+    return brightness < 150 ? "#FFFFFF" : "#000000";
+  }
+  return "#000000"; // Default
+};
 
 const BookDetails = () => {
+  const router = useRouter();
   const { key } = useLocalSearchParams();
   const cover = key?.split("_")[1];
   const id = key?.split("_")[0];
@@ -31,6 +55,21 @@ const BookDetails = () => {
   const [added, setAdded] = useState(false);
 
   const isFocused = useIsFocused();
+
+  const [colors, setColors] = useState(null);
+
+  const [colorText, setColorText] = useState("black");
+
+  useEffect(() => {
+    const url = `https://covers.openlibrary.org/b/id/${cover}-M.jpg`;
+    getColors(url, {
+      fallback: "#228B22",
+      cache: true,
+      key: url,
+    }).then(setColors);
+    console.log(colors);
+    setColorText(getTextColor(colors?.background));
+  }, []);
 
   useEffect(() => {
     const loadBooksDetails = async () => {
@@ -72,7 +111,10 @@ const BookDetails = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={{ backgroundColor: colors?.background }}
+      contentContainerStyle={[styles.scrollContent]}
+    >
       <View style={styles.container}>
         <View
           style={{
@@ -86,7 +128,7 @@ const BookDetails = () => {
                 uri: `https://covers.openlibrary.org/b/id/${cover}-M.jpg`,
               }}
               style={styles.coverImage}
-              resizeMode="cover"
+              resizeMode="contain"
             />
           ) : (
             <View style={styles.noImage}>
@@ -105,28 +147,28 @@ const BookDetails = () => {
           </View>
         ) : (
           <>
-            <Text style={styles.titleName}>{details.title}</Text>
+            <Text style={[styles.titleName, { color: colorText }]}>
+              {details.title}
+            </Text>
             {!added ? (
               <TouchableOpacity
                 style={styles.buttonAdd}
                 onPress={async () => {
                   //console.log("\n\n\n");
-                  /*const res = await storeBook(
+                  const res = await storeBook(
                     id,
                     details.title,
                     details.authorDetails.map((a) => a.name).join(", "),
                     cover,
                   );
-                  setAdded(res.saved);*/
+                  setAdded(res.saved);
                   Alert.alert("Adding book", "Add Book?");
                   //console.log("saved", res.saved);
                   //await clearAll();
                 }}
               >
-                <Text style={{ fontSize: 16 }}>
-                  <Ionicons name={"add-outline"} size={16} />
-                  Add to library
-                </Text>
+                <SymbolView name={"plus"} tintColor={"black"} size={20} />
+                <Text style={{ fontSize: 16 }}>Add to library</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
@@ -139,18 +181,19 @@ const BookDetails = () => {
                   //console.log("removed", res.removed);
                 }}
               >
-                <Text style={{ fontSize: 16 }}>
-                  <Ionicons name={"remove-circle-outline"} size={16} />
-                  Remove from library
-                </Text>
+                <SymbolView name={"minus"} tintColor={"black"} size={16} />
+                <Text style={{ fontSize: 16 }}>Remove</Text>
               </TouchableOpacity>
             )}
-            <Text style={styles.keyText}>{details.description}</Text>
-            <Text style={styles.title}>Author</Text>
+            <Text style={[styles.keyText, { color: colorText }]}>
+              {details?.description}
+            </Text>
+            <Text style={[styles.title, { color: colorText }]}>Author</Text>
             <FlatList
               data={details.authorDetails}
               horizontal
               showsHorizontalScrollIndicator={true}
+              style={{ marginBottom: 25 }}
               //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
               contentContainerStyle={{ paddingHorizontal: 8 }}
               keyExtractor={(item, index) => index.toString()}
@@ -165,12 +208,17 @@ const BookDetails = () => {
           </>
         )}
 
-        <Link href={`/moreBooks/editions_${id}`} asChild>
-          <Text style={styles.title}>
-            Editions
-            <Ionicons name={"chevron-forward-outline"} size={25} />
-          </Text>
-        </Link>
+        <TouchableOpacity
+          onPress={() => router.push(`/moreBooks/editions_${id}`)}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            alignContent: "center",
+          }}
+        >
+          <Text style={[styles.title, { color: colorText }]}>Editions</Text>
+          <SymbolView name={"chevron.right"} tintColor={colorText} size={18} />
+        </TouchableOpacity>
         {loadingEditions ? (
           <View>
             <ActivityIndicator
@@ -183,9 +231,13 @@ const BookDetails = () => {
           <FlatList
             data={editions}
             horizontal
-            showsHorizontalScrollIndicator={true}
+            showsHorizontalScrollIndicator={false}
             //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-            contentContainerStyle={{ paddingHorizontal: 16 }}
+            contentContainerStyle={{
+              paddingHorizontal: 8,
+              alignItems: "flex-end",
+              gap: 16,
+            }}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <BookCard
@@ -210,30 +262,23 @@ const BookDetails = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //backgroundColor: "#121212", // dark background
-    //paddingTop: 60,
-    //paddingHorizontal: 16,
   },
   scrollContent: {
-    paddingBottom: 80,
-    //paddingHorizontal: 16,
+    //paddingBottom: 80,
   },
   imageContainer: {
-    marginTop: 16,
-    marginBottom: 24,
-    borderRadius: 12,
+    width: 180,
+    height: 270,
+    //backgroundColor: "red",
+    borderRadius: 8,
     overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#aaa", //backgroundColor: "#333", // fallback bg if no image
-    width: 150, // smaller width
-    aspectRatio: 200 / 350, // original width / height
-
     alignSelf: "center",
+    marginBottom: 20,
   },
   coverImage: {
     width: "100%",
     height: "100%",
+    //backgroundColor: "blue",
   },
   noImage: {
     flex: 1,
@@ -241,32 +286,30 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   noImageText: {
-    //color: "#414040", //"#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    //color: "#fff",
-    marginBottom: 8,
+
     paddingLeft: 16,
   },
   titleName: {
     fontSize: 28,
     fontWeight: "bold",
-    //color: "#fff",
+
     marginBottom: 8,
     textAlign: "center",
   },
   keyText: {
     fontSize: 16,
-    //color: "#ccc",
-    paddingLeft: 16,
+
+    paddingHorizontal: 16,
+    marginBottom: 25,
   },
 
   buttonAdd: {
-    //width: 160,
     alignItems: "center",
     backgroundColor: "#71bdff",
     borderRadius: 100,
@@ -281,13 +324,13 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: 10,
     marginBottom: 18,
+    flexDirection: "row",
     //shadowOffset: { width: 0, height: 2 },
     //shadowOpacity: 0.1,
     //shadowRadius: 4,
     //elevation: 3,
   },
   buttonRemove: {
-    //width: 10,
     alignItems: "center",
     backgroundColor: "#c1c1c1",
     borderRadius: 100,
@@ -302,6 +345,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: 10,
     marginBottom: 18,
+    flexDirection: "row",
+
     //shadowOffset: { width: 0, height: 2 },
     //shadowOpacity: 0.1,
     //shadowRadius: 4,

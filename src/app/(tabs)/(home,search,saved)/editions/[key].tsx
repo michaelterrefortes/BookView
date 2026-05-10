@@ -1,14 +1,14 @@
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
-import { fetchBookDetails } from "../../../../services/api";
+import { fetchBookDetails } from "../../../../../services/api";
 
 const BookEditionDetails = () => {
   const { key } = useLocalSearchParams();

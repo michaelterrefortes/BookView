@@ -7,9 +7,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BookList from "../../../components/BookList";
-import SearchBar from "../../../components/SearchBar";
-import { fetchSearch } from "../../../services/api";
+import BookList from "../../../../components/BookList";
+import SearchBar from "../../../../components/SearchBar";
+import { fetchSearch } from "../../../../services/api";
 
 const Search = () => {
   const [books, setBooks] = useState([]);
@@ -65,7 +65,6 @@ const Search = () => {
 
   return (
     <SafeAreaView style={styles.safeview} edges={["top", "left", "right"]}>
-      <Text style={styles.title}>Search</Text>
       <View
         style={{
           //marginVertical: 20,
@@ -138,6 +137,7 @@ const styles = StyleSheet.create({
   },
   safeview: {
     flex: 1,
+    marginTop: 100,
     marginLeft: 15,
     marginRight: 15,
   },

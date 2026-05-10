@@ -1,6 +1,7 @@
-import { Link, useRouter } from "expo-router";
-import React from "react";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { getColors } from "react-native-image-colors";
 
 interface Book {
   itemKey: String;
@@ -22,34 +23,50 @@ const BookCard = ({
   //console.log(itemKey, coverId, urlPoster);
   //console.log(authorName);
   const router = useRouter();
+
+  const [colors, setColors] = useState(null);
+
+  useEffect(() => {
+    const url = urlPoster;
+    getColors(url, {
+      fallback: "#f2f2f2",
+      cache: true,
+      key: url,
+    }).then(setColors);
+  }, []);
+
   return (
-    <Link href={`${routeUrl}${itemKey.split("/")[2]}_${coverId}`} asChild>
-      <TouchableOpacity
-        style={styles.card}
-        //onPress={() =>
-        //  router.push(`${routeUrl}${itemKey.split("/")[2]}_${coverId}`)
-        //}
-      >
-        {coverId ? (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() =>
+        router.push(`${routeUrl}${itemKey.split("/")[2]}_${coverId}`)
+      }
+    >
+      {coverId ? (
+        <View style={styles.coverContainer}>
           <Image
+            resizeMode="contain"
             source={{
-              uri: urlPoster, //`https://covers.openlibrary.org/b/id/${item.cover_i}-M.jpg`,
+              uri: urlPoster,
             }}
+            //borderRadius={60}
             style={styles.cover}
           />
-        ) : (
-          <View style={[styles.cover, styles.placeholder]}>
-            <Text style={{ color: "#ffffff" }}>No Image</Text>
-          </View>
-        )}
+        </View>
+      ) : (
+        <View style={[styles.coverContainer, styles.placeholder]}>
+          <Text style={{ color: "#ffffff" }}>No Image</Text>
+        </View>
+      )}
+      <View style={{ height: 50, marginTop: 5 }}>
         <Text style={styles.title} numberOfLines={2}>
           {title}
         </Text>
         <Text style={styles.author} numberOfLines={1}>
           {authorName?.join(", ")}
         </Text>
-      </TouchableOpacity>
-    </Link>
+      </View>
+    </TouchableOpacity>
   );
 };
 
@@ -67,19 +84,25 @@ const styles = StyleSheet.create({
     //shadowRadius: 5,
     //elevation: 3,
   },
+  coverContainer: {
+    width: 120,
+    height: 180,
+    backgroundColor: "#f2f2f2",
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+
   cover: {
     width: "100%",
-    height: 160,
-    borderRadius: 8,
-    marginBottom: 8,
-    resizeMode: "cover",
-    backgroundColor: "#aaa",
+    height: "100%",
   },
+
   placeholder: {
     backgroundColor: "#aaa",
     alignItems: "center",
     justifyContent: "center",
   },
+
   title: {
     fontWeight: "bold",
     fontSize: 14,

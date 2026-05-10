@@ -5,7 +5,12 @@ export default function SearchLayout() {
     <Stack>
       <Stack.Screen
         name="search"
-        options={{ headerBackTitle: "", headerShown: false, title: "Search" }}
+        options={{
+          headerBackTitle: "",
+          headerShown: true,
+          title: "Search",
+          headerLargeTitleEnabled: true,
+        }}
       />
       <Stack.Screen
         name="books/[key]"

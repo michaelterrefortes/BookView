@@ -1,17 +1,17 @@
 import { Link, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    FlatList,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import BookCard from "../../../../components/BookCard";
-import { fetchAuthor, fetchAuthorWorks } from "../../../../services/api";
+import BookCard from "../../../../../components/BookCard";
+import { fetchAuthor, fetchAuthorWorks } from "../../../../../services/api";
 
 const AuthorDetails = () => {
   const { key } = useLocalSearchParams();

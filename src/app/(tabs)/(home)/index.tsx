@@ -12,10 +12,9 @@ import {
   View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import AuthorCard from "../../../components/AuthorCard";
-import BookCard from "../../../components/BookCard";
-import { icons } from "../../../constants/icons";
-import { fetchBooksSubject } from "../../../services/api";
+import AuthorCard from "../../../../components/AuthorCard";
+import BookCard from "../../../../components/BookCard";
+import { icons } from "../../../../constants/icons";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -150,8 +149,8 @@ export default function Index() {
 
   const loadBooks = async (setLoading, setData, endpoint) => {
     setLoading(true);
-    const result = await fetchBooksSubject(endpoint);
-    setData(result);
+    //const result = await fetchBooksSubject(endpoint);
+    //setData(result);
     setLoading(false);
   };
 
@@ -173,7 +172,6 @@ export default function Index() {
       style={styles.scrollview}
     >
       <FlatList
-        style={{ paddingTop: 25, paddingBottom: 10 }}
         data={subjects}
         horizontal
         keyExtractor={(item, index) => index.toString()}
@@ -193,6 +191,7 @@ export default function Index() {
             }
             style={{
               paddingTop: 10,
+              marginVertical: 10,
               paddingBottom: 10,
               paddingRight: 10,
               paddingLeft: 10,
@@ -302,7 +301,8 @@ const styles = StyleSheet.create({
   },
   scrollview: {
     flex: 1,
-    paddingTop: 50,
+    //paddingTop: 50,
+    //backgroundColor: "red",
   },
   safeview: {
     //paddingLeft: 15,

@@ -31,7 +31,7 @@ export const storeBook = async (workId, title, author, cover) => {
       return { saved: true };
     } else {
       // Data does not exist (null)
-      console.log("Item not found");
+      //console.log("Item not found");
       const jsonValue = JSON.stringify({
         works: {
           [workId]: {
@@ -79,7 +79,7 @@ export const getBook = async (workId) => {
       }
     } else {
       // Data does not exist (null)
-      console.log("Item not found");
+      //console.log("Item not found");
 
       return { saved: false };
     }
