@@ -37,10 +37,10 @@ const Saved = () => {
             <BookCard
               itemKey={`/works/${item.key}`}
               coverId={item.cover}
-              urlPoster={`${COVER_URL}/b/id/${item.cover}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/id/${item.cover}-L.jpg`}
               authorName={[item.author]}
               title={item.title}
-              routeUrl={"books/"}
+              routeUrl={"books"}
             />
           )}
           ListHeaderComponent={

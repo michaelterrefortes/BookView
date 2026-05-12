@@ -1,32 +1,40 @@
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { COVER_URL } from "../constants/urls";
 
 interface Author {
-  authorKey: String;
+  authorId: String;
   name: String;
-  routeUrl: String;
 }
 
-const AuthorCard = ({ authorKey, name, routeUrl }: Author) => {
-  const authorId = authorKey?.split("/")[2];
+const AuthorCard = ({ authorId, name }: Author) => {
+  const router = useRouter();
+
+  //console.log(authorId);
+
   const imageUrl = authorId
     ? `${COVER_URL}/a/olid/${authorId}-L.jpg`
     : "https://via.placeholder.com/80";
 
   //console.log(authorId);
   return (
-    <Link href={`${routeUrl}${authorId}`} asChild>
-      <TouchableOpacity style={styles.authorCard}>
-        <Image
-          source={{ uri: imageUrl }}
-          style={styles.authorImage}
-          resizeMode="cover"
-        />
-        <Text style={styles.authorName}>{name || "Unknown"}</Text>
-      </TouchableOpacity>
-    </Link>
+    <TouchableOpacity
+      style={styles.authorCard}
+      onPress={() =>
+        router.push({
+          pathname: `/authors/${authorId}`,
+          params: { authorId: authorId },
+        })
+      }
+    >
+      <Image
+        source={{ uri: imageUrl }}
+        style={styles.authorImage}
+        resizeMode="cover"
+      />
+      <Text style={[styles.authorName]}>{name || "Unknown"}</Text>
+    </TouchableOpacity>
   );
 };
 

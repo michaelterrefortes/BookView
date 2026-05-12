@@ -69,6 +69,20 @@ export default function HomeLayout() {
           headerBackTitle: "",
         }}
       />
+
+      <Stack.Screen
+        name="moreInfo/info"
+        options={{
+          headerBackTitle: "",
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "More",
+          //headerShadowVisible: false,
+          headerBlurEffect: "none",
+
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }

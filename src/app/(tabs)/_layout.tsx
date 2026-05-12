@@ -1,23 +1,7 @@
 import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/unstable";
 import { withLayoutContext } from "expo-router";
 import React from "react";
-import { Platform, View } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
-
-const TabIcon = ({ focused, icon, title }) => (
-  <View
-    style={{
-      width: "100%", // size-full width
-      height: "100%", // size-full height
-      justifyContent: "center", // vertically center
-      alignItems: "center", // horizontally center
-      marginTop: 10, // mt-4 (~16px in RN)
-      //borderRadius: 9999, // fully rounded
-    }}
-  >
-    <Ionicons name={focused ? icon : `${icon}-outline`} size={25} />
-  </View>
-);
+import { Platform } from "react-native";
 
 const Tab = createNativeBottomTabNavigator();
 const Tabs = withLayoutContext(Tab.Navigator);

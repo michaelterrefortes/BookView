@@ -1,4 +1,5 @@
-import { Link, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { SymbolView } from "expo-symbols";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,14 +8,15 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import BookCard from "../../../../../components/BookCard";
 import { COVER_URL } from "../../../../../constants/urls";
 import { fetchAuthor, fetchAuthorWorks } from "../../../../../services/api";
 
 const AuthorDetails = () => {
+  const router = useRouter();
   const { key } = useLocalSearchParams();
 
   //console.log(key);
@@ -55,40 +57,57 @@ const AuthorDetails = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.container}>
-        <View style={{ height: 100 }} />
-
         <View style={styles.imageContainer}>
           {authorInfo.photos ? (
             <Image
               source={{
-                uri: `${COVER_URL}/b/id/${authorInfo.photos[0]}-M.jpg`,
+                uri: `${COVER_URL}/b/id/${authorInfo.photos[0]}-L.jpg`,
               }}
               style={styles.coverImage}
               resizeMode="cover"
             />
           ) : (
             <View style={styles.noImage}>
-              <Text style={styles.noImageText}>No Image Available</Text>
+              <Text style={{ color: "white" }}>No Image</Text>
             </View>
           )}
         </View>
         {!loadingAuthor && authorInfo ? (
           <>
             <Text style={styles.title}>{authorInfo.name}</Text>
-            <Text style={styles.keyText}>
+
+            <Text style={styles.keyText} numberOfLines={4}>
               {typeof authorInfo.bio === "string"
                 ? authorInfo.bio
                 : authorInfo.bio?.value || "No biography available"}
             </Text>
+
+            <TouchableOpacity
+              style={{ alignSelf: "flex-end", paddingRight: 16 }}
+              onPress={() =>
+                router.push({
+                  pathname: "/moreInfo/info",
+                  params: {
+                    description:
+                      typeof authorInfo.bio === "string"
+                        ? authorInfo.bio
+                        : authorInfo.bio?.value || "No biography available",
+                  },
+                })
+              }
+            >
+              <Text style={{ fontWeight: "600" }}>MORE</Text>
+            </TouchableOpacity>
           </>
         ) : null}
 
-        <Link href={`/moreBooks/author_${key}`} asChild>
+        <TouchableOpacity style={{ justifyContent: "center" }}>
           <Text style={styles.title2}>
             Books
-            <Ionicons name={"chevron-forward-outline"} size={25} />
+            <SymbolView name={"chevron.right"} size={20} tintColor={"black"} />
           </Text>
-        </Link>
+        </TouchableOpacity>
+
         {loadingBooks ? (
           <View style={styles.containerLoading}>
             <ActivityIndicator
@@ -100,19 +119,20 @@ const AuthorDetails = () => {
         ) : (
           <FlatList
             data={authorBooks}
+            style={{ paddingLeft: 6 }}
             horizontal
             showsHorizontalScrollIndicator={false}
-            //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-            contentContainerStyle={{ paddingHorizontal: 16 }}
+            ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
+            //contentContainerStyle={{ paddingHorizontal: 16 }}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <BookCard
                 itemKey={item.key}
                 coverId={item.covers?.[0]}
-                urlPoster={`${COVER_URL}/b/id/${item.covers?.[0]}-M.jpg`}
+                urlPoster={`${COVER_URL}/b/id/${item.covers?.[0]}-L.jpg`}
                 authorName={[""]}
                 title={item.title}
-                routeUrl={"books/"}
+                routeUrl={"books"}
               />
             )}
           />
@@ -188,6 +208,6 @@ const styles = StyleSheet.create({
   keyText: {
     fontSize: 16,
     //color: "#ccc",
-    paddingLeft: 16,
+    paddingHorizontal: 16,
   },
 });

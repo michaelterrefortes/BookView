@@ -1,4 +1,5 @@
-import { Link, Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { SymbolView } from "expo-symbols";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -6,9 +7,9 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import BookCard from "../../../../../components/BookCard";
 import { COVER_URL } from "../../../../../constants/urls";
 import { fetchBooksSubject } from "../../../../../services/api";
@@ -60,12 +61,22 @@ const Genre = () => {
       <ScrollView style={styles.scrollview}>
         {sections.map((item) => (
           <View key={item.name}>
-            <Link href={`/moreBooks/subject_${item.name}_${item.url}`} asChild>
+            <TouchableOpacity
+              style={{
+                marginTop: 10,
+                marginBottom: 10,
+                //backgroundColor: "red",
+              }}
+            >
               <Text style={styles.bigTitle}>
                 {item.name}
-                <Ionicons name={"chevron-forward-outline"} size={25} />
+                <SymbolView
+                  name={"chevron.right"}
+                  size={20}
+                  tintColor={"black"}
+                />
               </Text>
-            </Link>
+            </TouchableOpacity>
 
             {bookData[item.name]?.loading ? (
               <View style={styles.containerLoading}>
@@ -87,14 +98,14 @@ const Genre = () => {
                   <BookCard
                     itemKey={item.key}
                     coverId={item.cover_id}
-                    urlPoster={`${COVER_URL}/b/id/${item.cover_id}-M.jpg`}
+                    urlPoster={`${COVER_URL}/b/id/${item.cover_id}-L.jpg`}
                     authorName={
                       item.authors
                         ?.map((author) => author.name)
                         .filter(Boolean) || []
                     }
                     title={item.title}
-                    routeUrl={"books/"}
+                    routeUrl={"books"}
                   />
                 )}
               />
@@ -120,8 +131,8 @@ const styles = StyleSheet.create({
     //paddingTop: 100,
   },
   bigTitle: {
-    paddingTop: 10,
-    paddingBottom: 5,
+    //paddingTop: 10,
+    //paddingBottom: 5,
     fontSize: 32,
     paddingLeft: 16,
     fontWeight: "bold",

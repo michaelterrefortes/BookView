@@ -1,6 +1,6 @@
 import { Stack, useRouter } from "expo-router";
-import { Alert, TouchableOpacity } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { SymbolView } from "expo-symbols";
+import { TouchableOpacity } from "react-native";
 
 export default function SavedLayout() {
   const router = useRouter();
@@ -18,9 +18,9 @@ export default function SavedLayout() {
           headerRight: () => (
             <TouchableOpacity
               style={{ justifyContent: "center", alignItems: "center" }}
-              onPress={() => router.push("/modalList")}
+              onPress={() => router.push("/(tabs)/(search)/search")}
             >
-              <Ionicons name="add" size={25} />
+              <SymbolView name="plus" size={25} tintColor={"black"} />
             </TouchableOpacity>
           ),
         }}
@@ -82,32 +82,16 @@ export default function SavedLayout() {
       />
 
       <Stack.Screen
-        name="modalList"
+        name="moreInfo/info"
         options={{
+          headerBackTitle: "",
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "Create Book List",
-          headerShadowVisible: false,
-          headerBackTitle: "",
+          headerTitle: "More",
+          //headerShadowVisible: false,
+          headerBlurEffect: "none",
+
           presentation: "modal",
-
-          headerRight: () => (
-            <TouchableOpacity
-              style={{ justifyContent: "center", alignItems: "center" }}
-              onPress={() => Alert.alert("pressed", "pressed add")}
-            >
-              <Ionicons name="checkmark" size={25} />
-            </TouchableOpacity>
-          ),
-
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ justifyContent: "center", alignItems: "center" }}
-              onPress={() => router.back()}
-            >
-              <Ionicons name="close" size={25} />
-            </TouchableOpacity>
-          ),
         }}
       />
     </Stack>

@@ -14,7 +14,9 @@ const MoreBooks = () => {
 
   //console.log(key.split("_"));
 
-  const endpoint = key.split("_")[0];
+  const endpoint = key;
+
+  //console.log("More Editions", key);
 
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,16 +34,13 @@ const MoreBooks = () => {
         result = await fetchBooksSubject("/trending/weekly.json?limit=20");
         setSection(0);
       } else if (endpoint === "author") {
-        point = key.split("_")[1];
-        result = await fetchAuthorWorks(point);
+        result = await fetchAuthorWorks(key);
         setSection(1);
       } else if (endpoint === "subject") {
-        point = key.split("_")[2];
-        result = await fetchBooksSubject(`/subjects/${point}.json?limit=20`);
+        result = await fetchBooksSubject(`/subjects/${key}.json?limit=20`);
         setSection(3);
       } else {
-        point = key.split("_")[1];
-        result = await fetchBookEditions(point, 0);
+        result = await fetchBookEditions(key, 0);
         setSection(2);
       }
 
@@ -75,10 +74,10 @@ const MoreBooks = () => {
             <BookCard
               itemKey={item.key}
               coverId={item.editions.docs[0].cover_i}
-              urlPoster={`${COVER_URL}/b/id/${item.editions.docs[0].cover_i}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/id/${item.editions.docs[0].cover_i}-L.jpg`}
               authorName={item.author_name}
               title={item.title}
-              routeUrl={"books/"}
+              routeUrl={"books"}
             />
           )}
           ListFooterComponent={<View style={styles.endContainer} />}
@@ -96,10 +95,10 @@ const MoreBooks = () => {
             <BookCard
               itemKey={item.key}
               coverId={item.key.split("/")[2]}
-              urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-L.jpg`}
               authorName={[""]}
               title={item.title}
-              routeUrl={"editions/"}
+              routeUrl={"editions"}
             />
           )}
           //onEndReached={loadBooksEditions}
@@ -120,10 +119,10 @@ const MoreBooks = () => {
             <BookCard
               itemKey={item.key}
               coverId={item.covers?.[0]}
-              urlPoster={`${COVER_URL}/b/id/${item.covers?.[0]}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/id/${item.covers?.[0]}-L.jpg`}
               authorName={[""]}
               title={item.title}
-              routeUrl={"books/"}
+              routeUrl={"books"}
             />
           )}
           ListFooterComponent={<View style={styles.endContainer} />}
@@ -141,12 +140,12 @@ const MoreBooks = () => {
             <BookCard
               itemKey={item.key}
               coverId={item.cover_id}
-              urlPoster={`${COVER_URL}/b/id/${item.cover_id}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/id/${item.cover_id}-L.jpg`}
               authorName={
                 item.authors?.map((author) => author.name).filter(Boolean) || []
               }
               title={item.title}
-              routeUrl={"books/"}
+              routeUrl={"books"}
             />
           )}
           ListFooterComponent={<View style={styles.endContainer} />}

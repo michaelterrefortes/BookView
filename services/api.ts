@@ -20,7 +20,7 @@ export const fetchBooksSubject = async (path: String) => {
   // /trending/now.json?&sort=trending&limit=10
   const endpoint = `${BASE_URL}${path}`;
 
-  console.log(endpoint);
+  //console.log(endpoint);
 
   const response = await fetch(endpoint);
 
@@ -35,10 +35,10 @@ export const fetchBooksSubject = async (path: String) => {
 };
 
 export const fetchBookDetails = async (workId: String, type: String) => {
-  //console.log(workId);
+  //console.log("api", workId);
   const endpoint = `${BASE_URL}/works/${workId}.json`; //https://openlibrary.org/works/OL82563W.json
 
-  console.log(endpoint);
+  //console.log(endpoint);
 
   const response = await fetch(endpoint);
 

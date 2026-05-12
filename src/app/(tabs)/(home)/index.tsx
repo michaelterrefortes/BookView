@@ -1,4 +1,4 @@
-import { Link, useNavigation, useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import AuthorCard from "../../../../components/AuthorCard";
 import BookCard from "../../../../components/BookCard";
 import { icons } from "../../../../constants/icons";
@@ -218,12 +217,9 @@ export default function Index() {
           </TouchableOpacity>
         )}
       />
-      <Link href={`/moreBooks/trending_weekly`} asChild>
-        <Text style={styles.bigTitle}>
-          Trending Weekly
-          <Ionicons name={"chevron-forward-outline"} size={25} />
-        </Text>
-      </Link>
+      <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text style={styles.bigTitle}>Trending Weekly</Text>
+      </TouchableOpacity>
 
       {loadingTrending ? (
         <View style={styles.containerLoading}>
@@ -245,10 +241,10 @@ export default function Index() {
             <BookCard
               itemKey={item.key}
               coverId={item.editions.docs[0].cover_i}
-              urlPoster={`${COVER_URL}/b/id/${item.editions.docs[0].cover_i}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/id/${item.editions.docs[0].cover_i}-L.jpg`}
               authorName={item.author_name}
               title={item.title}
-              routeUrl={"books/"}
+              routeUrl={"books"}
             />
           )}
         />
@@ -277,9 +273,8 @@ export default function Index() {
               {item.author_key.map((key, index) => (
                 <AuthorCard
                   key={key}
-                  authorKey={`/authors/${key}`}
+                  authorId={key}
                   name={item.author_name[index]}
-                  routeUrl={"authors/"}
                 />
               ))}
             </>

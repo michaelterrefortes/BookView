@@ -19,26 +19,12 @@ import {
   fetchBookEditions,
 } from "../../../../../services/api";
 
-const getTextColor = (backgroundColor) => {
-  // Simple check for hex colors, expand for rgb/hsl if needed
-
-  if (backgroundColor.startsWith("#")) {
-    const r = parseInt(backgroundColor.substr(1, 2), 16);
-    const g = parseInt(backgroundColor.substr(3, 2), 16);
-    const b = parseInt(backgroundColor.substr(5, 2), 16);
-    const brightness = Math.round((r * 299 + g * 587 + b * 114) / 1000);
-
-    // Threshold 150 works well, but can be adjusted
-    return brightness < 150 ? "#FFFFFF" : "#000000";
-  }
-  return "#000000"; // Default
-};
-
 const BookDetails = () => {
   const router = useRouter();
-  const { key } = useLocalSearchParams();
-  const cover = key?.split("_")[1];
-  const id = key?.split("_")[0];
+  const { itemKey, coverId, urlPoster, title, authorName } =
+    useLocalSearchParams();
+
+  //console.log("Details", itemKey, coverId, urlPoster, title, authorName);
 
   const [details, setDetails] = useState([]);
   const [editions, setEditions] = useState([]);
@@ -50,21 +36,11 @@ const BookDetails = () => {
 
   const isFocused = useIsFocused();
 
-  const [colors, setColors] = useState(null);
+  //console.log(bgColor);
 
   const [colorText, setColorText] = useState("black");
 
   useEffect(() => {
-    const loadBooksDetails = async () => {
-      //console.log("books/", id);
-      setLoadingDetails(true);
-      const result = await fetchBookDetails(id, "works");
-
-      setDetails(result);
-      //console.log(details, "aqui");
-      setLoadingDetails(false);
-    };
-
     loadBooksDetails();
   }, []);
 
@@ -72,24 +48,27 @@ const BookDetails = () => {
     loadBooksEditions();
   }, []);
 
+  const loadBooksDetails = async () => {
+    //console.log("books/", id);
+    setLoadingDetails(true);
+    const result = await fetchBookDetails(itemKey.split("/")[2], "works");
+
+    setDetails(result);
+    //console.log(details, "aqui");
+    setLoadingDetails(false);
+  };
+
   const loadBooksEditions = async () => {
     if (loadingEditions) return;
     setLoadingEditions(true);
-    const result = await fetchBookEditions(id, offset);
+    const result = await fetchBookEditions(itemKey.split("/")[2], offset);
     setEditions([...editions, ...result]);
     setLoadingEditions(false);
     setOffset(10 + offset);
   };
 
-  const renderFooter = () => {
-    return loadingEditions ? <ActivityIndicator size="large" /> : null;
-  };
-
   return (
-    <ScrollView
-      style={{ backgroundColor: colors?.background }}
-      contentContainerStyle={[styles.scrollContent]}
-    >
+    <ScrollView contentContainerStyle={[styles.scrollContent]}>
       <View style={styles.container}>
         <View
           style={{
@@ -97,17 +76,17 @@ const BookDetails = () => {
           }}
         />
         <View style={styles.imageContainer}>
-          {cover ? (
+          {coverId ? (
             <Image
               source={{
-                uri: `${COVER_URL}/b/id/${cover}-M.jpg`,
+                uri: urlPoster,
               }}
               style={styles.coverImage}
               resizeMode="contain"
             />
           ) : (
             <View style={styles.noImage}>
-              <Text style={styles.noImageText}>No Image Available</Text>
+              <Text style={{ color: "#ffffff" }}>No Image</Text>
             </View>
           )}
         </View>
@@ -151,9 +130,25 @@ const BookDetails = () => {
                 <Text style={{ fontSize: 16 }}>Remove</Text>
               </TouchableOpacity>
             )}
-            <Text style={[styles.keyText, { color: colorText }]}>
+            <Text
+              numberOfLines={4}
+              style={[styles.keyText, { color: colorText }]}
+            >
               {details?.description}
             </Text>
+            <TouchableOpacity
+              style={{ alignSelf: "flex-end", paddingRight: 16 }}
+              onPress={() =>
+                router.push({
+                  pathname: "/moreInfo/info",
+                  params: {
+                    description: details?.description,
+                  },
+                })
+              }
+            >
+              <Text style={{ fontWeight: "600" }}>MORE</Text>
+            </TouchableOpacity>
             <Text style={[styles.title, { color: colorText }]}>Author</Text>
             <FlatList
               data={details.authorDetails}
@@ -165,9 +160,8 @@ const BookDetails = () => {
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
                 <AuthorCard
-                  authorKey={item.key}
+                  authorId={item.key.split("/")[2]}
                   name={item.name}
-                  routeUrl={"authors/"}
                 />
               )}
             />
@@ -175,7 +169,7 @@ const BookDetails = () => {
         )}
 
         <TouchableOpacity
-          onPress={() => router.push(`/moreBooks/editions_${id}`)}
+          onPress={() => router.push(`/moreBooks/${itemKey.split("/")[2]}`)}
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -209,10 +203,10 @@ const BookDetails = () => {
               <BookCard
                 itemKey={item.key}
                 coverId={item.key.split("/")[2]}
-                urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-M.jpg`}
+                urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-L.jpg`}
                 authorName={[""]}
                 title={item.title}
-                routeUrl={"editions/"}
+                routeUrl={"editions"}
               />
             )}
             //onEndReached={loadBooksEditions}
@@ -250,6 +244,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    width: 180,
+    height: 270,
+    backgroundColor: "#aaa",
+    borderRadius: 8,
+    overflow: "hidden",
+    alignSelf: "center",
+    marginBottom: 20,
   },
   noImageText: {
     fontSize: 18,
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
 
     paddingHorizontal: 16,
-    marginBottom: 25,
+    //marginBottom: 25,
   },
 
   buttonAdd: {

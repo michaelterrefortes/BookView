@@ -42,7 +42,7 @@ const BookEditionDetails = () => {
           {cover ? (
             <Image
               source={{
-                uri: `${COVER_URL}/b/olid/${cover}-M.jpg`,
+                uri: `${COVER_URL}/b/olid/${cover}-L.jpg`,
               }}
               style={styles.coverImage}
               resizeMode="cover"

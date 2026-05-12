@@ -67,6 +67,20 @@ export default function SearchLayout() {
           headerBackTitle: "",
         }}
       />
+
+      <Stack.Screen
+        name="moreInfo/info"
+        options={{
+          headerBackTitle: "",
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "More",
+          //headerShadowVisible: true,
+          headerBlurEffect: "none",
+
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }

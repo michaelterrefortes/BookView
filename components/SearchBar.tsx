@@ -1,6 +1,6 @@
+import { SymbolView } from "expo-symbols";
 import React from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 
 interface Props {
   placeholder: string;
@@ -19,7 +19,7 @@ const SearchBar = ({
 }: Props) => {
   return (
     <View style={styles.container}>
-      <Ionicons name="search-outline" size={20} style={styles.icon} />
+      <SymbolView name="magnifyingglass" size={20} tintColor={"gray"} />
       <TextInput
         onPressIn={onPress}
         placeholder={placeholder}
@@ -31,7 +31,7 @@ const SearchBar = ({
 
       {camera ? (
         <TouchableOpacity>
-          <Ionicons name="barcode-outline" size={21} />
+          <SymbolView name="barcode.viewfinder" size={21} tintColor={"black"} />
         </TouchableOpacity>
       ) : null}
     </View>

@@ -14,7 +14,7 @@ export const storeBook = async (workId, title, author, cover) => {
       // 2. Parse the item
       const existingList = JSON.parse(jsonValue);
 
-      console.log("Items in storage", existingList);
+      //console.log("Items in storage", existingList);
 
       // 3. Append the new item
 
@@ -26,7 +26,7 @@ export const storeBook = async (workId, title, author, cover) => {
       };
       const jsonNewValue = JSON.stringify(existingList);
       await AsyncStorage.setItem("@saved", jsonNewValue);
-      console.log("Book", workId, "saved, storage is:", existingList);
+      //console.log("Book", workId, "saved, storage is:", existingList);
 
       return { saved: true };
     } else {
@@ -43,7 +43,7 @@ export const storeBook = async (workId, title, author, cover) => {
         },
       });
       await AsyncStorage.setItem("@saved", jsonValue);
-      console.log("Book", workId, "saved, storage is:", jsonValue);
+      //console.log("Book", workId, "saved, storage is:", jsonValue);
       return { saved: true };
     }
   } catch (e) {
@@ -68,7 +68,7 @@ export const getBook = async (workId) => {
       // 2. Parse the item
       const existingList = JSON.parse(jsonValue);
 
-      console.log("Items in storage", existingList);
+      //console.log("Items in storage", existingList);
 
       // 3. Append the new item
 
@@ -113,7 +113,7 @@ export const removeBook = async (workId) => {
 
       const jsonNewValue = JSON.stringify(existingList);
       await AsyncStorage.setItem("@saved", jsonNewValue);
-      console.log("Book", workId, "removed, current storage is:", jsonNewValue);
+      //console.log("Book", workId, "removed, current storage is:", jsonNewValue);
 
       return { removed: true };
     } else {
@@ -133,10 +133,10 @@ export const clearAll = async () => {
   try {
     await AsyncStorage.clear();
 
-    console.log("Cleared storage");
+    //console.log("Cleared storage");
   } catch (e) {
     // clear error
-    console.error("Error clearing storage:", e);
+    //console.error("Error clearing storage:", e);
   }
 };
 

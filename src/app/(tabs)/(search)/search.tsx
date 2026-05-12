@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BookList from "../../../../components/BookList";
+import BookCard from "../../../../components/BookCard";
 import SearchBar from "../../../../components/SearchBar";
 import { COVER_URL } from "../../../../constants/urls";
 import { fetchSearch } from "../../../../services/api";
@@ -92,13 +92,14 @@ const Search = () => {
         data={books}
         ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
         renderItem={({ item }) => (
-          <BookList
+          <BookCard
             itemKey={item.key}
             coverId={item.cover_i}
-            urlPoster={`${COVER_URL}/b/id/${item.cover_i}-M.jpg`}
+            urlPoster={`${COVER_URL}/b/id/${item.cover_i}-L.jpg`}
             authorName={item.author_name}
             title={item.title}
-            routeUrl={"books/"}
+            routeUrl={"books"}
+            orientation={"v"}
           />
         )}
         keyExtractor={(item) => item.key.toString()}
