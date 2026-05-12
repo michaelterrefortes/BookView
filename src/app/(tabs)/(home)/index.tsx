@@ -15,6 +15,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import AuthorCard from "../../../../components/AuthorCard";
 import BookCard from "../../../../components/BookCard";
 import { icons } from "../../../../constants/icons";
+import { COVER_URL } from "../../../../constants/urls";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -244,7 +245,7 @@ export default function Index() {
             <BookCard
               itemKey={item.key}
               coverId={item.editions.docs[0].cover_i}
-              urlPoster={`https://covers.openlibrary.org/b/id/${item.editions.docs[0].cover_i}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/id/${item.editions.docs[0].cover_i}-M.jpg`}
               authorName={item.author_name}
               title={item.title}
               routeUrl={"books/"}

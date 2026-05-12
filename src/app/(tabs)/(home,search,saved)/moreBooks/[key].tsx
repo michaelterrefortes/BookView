@@ -2,10 +2,11 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import BookCard from "../../../../../components/BookCard";
+import { COVER_URL } from "../../../../../constants/urls";
 import {
-    fetchAuthorWorks,
-    fetchBookEditions,
-    fetchBooksSubject,
+  fetchAuthorWorks,
+  fetchBookEditions,
+  fetchBooksSubject,
 } from "../../../../../services/api";
 
 const MoreBooks = () => {
@@ -74,7 +75,7 @@ const MoreBooks = () => {
             <BookCard
               itemKey={item.key}
               coverId={item.editions.docs[0].cover_i}
-              urlPoster={`https://covers.openlibrary.org/b/id/${item.editions.docs[0].cover_i}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/id/${item.editions.docs[0].cover_i}-M.jpg`}
               authorName={item.author_name}
               title={item.title}
               routeUrl={"books/"}
@@ -95,7 +96,7 @@ const MoreBooks = () => {
             <BookCard
               itemKey={item.key}
               coverId={item.key.split("/")[2]}
-              urlPoster={`https://covers.openlibrary.org/b/olid/${item.key.split("/")[2]}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-M.jpg`}
               authorName={[""]}
               title={item.title}
               routeUrl={"editions/"}
@@ -119,7 +120,7 @@ const MoreBooks = () => {
             <BookCard
               itemKey={item.key}
               coverId={item.covers?.[0]}
-              urlPoster={`https://covers.openlibrary.org/b/id/${item.covers?.[0]}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/id/${item.covers?.[0]}-M.jpg`}
               authorName={[""]}
               title={item.title}
               routeUrl={"books/"}
@@ -140,7 +141,7 @@ const MoreBooks = () => {
             <BookCard
               itemKey={item.key}
               coverId={item.cover_id}
-              urlPoster={`https://covers.openlibrary.org/b/id/${item.cover_id}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/id/${item.cover_id}-M.jpg`}
               authorName={
                 item.authors?.map((author) => author.name).filter(Boolean) || []
               }

@@ -1,4 +1,4 @@
-const BASE_URL = "https://openlibrary.org";
+import { BASE_URL } from "../constants/urls";
 
 export const fetchBooks = async (path: String) => {
   // /trending/now.json?&sort=trending&limit=10

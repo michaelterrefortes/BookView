@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BookList from "../../../../components/BookList";
 import SearchBar from "../../../../components/SearchBar";
+import { COVER_URL } from "../../../../constants/urls";
 import { fetchSearch } from "../../../../services/api";
 
 const ModalList = () => {
@@ -95,7 +96,7 @@ const ModalList = () => {
           <BookList
             itemKey={item.key}
             coverId={item.cover_i}
-            urlPoster={`https://covers.openlibrary.org/b/id/${item.cover_i}-M.jpg`}
+            urlPoster={`${COVER_URL}/b/id/${item.cover_i}-M.jpg`}
             authorName={item.author_name}
             title={item.title}
             routeUrl={"books/"}

@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { COVER_URL } from "../constants/urls";
 
 interface Author {
   authorKey: String;
@@ -11,7 +12,7 @@ interface Author {
 const AuthorCard = ({ authorKey, name, routeUrl }: Author) => {
   const authorId = authorKey?.split("/")[2];
   const imageUrl = authorId
-    ? `https://covers.openlibrary.org/a/olid/${authorId}-L.jpg`
+    ? `${COVER_URL}/a/olid/${authorId}-L.jpg`
     : "https://via.placeholder.com/80";
 
   //console.log(authorId);

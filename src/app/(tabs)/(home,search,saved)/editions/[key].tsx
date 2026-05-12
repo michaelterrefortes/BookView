@@ -1,13 +1,14 @@
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
+import { COVER_URL } from "../../../../../constants/urls";
 import { fetchBookDetails } from "../../../../../services/api";
 
 const BookEditionDetails = () => {
@@ -41,7 +42,7 @@ const BookEditionDetails = () => {
           {cover ? (
             <Image
               source={{
-                uri: `https://covers.openlibrary.org/b/olid/${cover}-M.jpg`,
+                uri: `${COVER_URL}/b/olid/${cover}-M.jpg`,
               }}
               style={styles.coverImage}
               resizeMode="cover"

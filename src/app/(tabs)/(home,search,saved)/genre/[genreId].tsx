@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import BookCard from "../../../../../components/BookCard";
+import { COVER_URL } from "../../../../../constants/urls";
 import { fetchBooksSubject } from "../../../../../services/api";
 
 const Genre = () => {
@@ -86,7 +87,7 @@ const Genre = () => {
                   <BookCard
                     itemKey={item.key}
                     coverId={item.cover_id}
-                    urlPoster={`https://covers.openlibrary.org/b/id/${item.cover_id}-M.jpg`}
+                    urlPoster={`${COVER_URL}/b/id/${item.cover_id}-M.jpg`}
                     authorName={
                       item.authors
                         ?.map((author) => author.name)

@@ -1,15 +1,15 @@
 import { useIsFocused } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BookCard from "../../../../components/BookCard";
-import { getAllBooks } from "../../../../services/localData";
+import { COVER_URL } from "../../../../constants/urls";
 
 const Saved = () => {
   const [loading, setLoading] = useState(false);
@@ -18,36 +18,6 @@ const Saved = () => {
   const isFocused = useIsFocused();
 
   //console.log(isFocused);
-
-  const loadBooks = async () => {
-    setLoading(true);
-    const res = await getAllBooks();
-
-    //console.log(res);
-
-    const data = Object.values(res.works);
-
-    setBooks(data);
-    setLoading(false);
-    //console.log(books);
-  };
-
-  useEffect(() => {
-    loadBooks();
-  }, [isFocused]);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    const res = await getAllBooks();
-
-    //console.log(res);
-
-    const data = Object.values(res.works);
-
-    setBooks(data);
-    //console.log(books, "aquiii");
-    setRefreshing(false);
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -67,14 +37,12 @@ const Saved = () => {
             <BookCard
               itemKey={`/works/${item.key}`}
               coverId={item.cover}
-              urlPoster={`https://covers.openlibrary.org/b/id/${item.cover}-M.jpg`}
+              urlPoster={`${COVER_URL}/b/id/${item.cover}-M.jpg`}
               authorName={[item.author]}
               title={item.title}
               routeUrl={"books/"}
             />
           )}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
           ListHeaderComponent={
             <>
               <Text style={styles.title}>Your Book Lists</Text>

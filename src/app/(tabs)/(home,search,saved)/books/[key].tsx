@@ -3,7 +3,6 @@ import { SymbolView } from "expo-symbols";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Image,
   ScrollView,
@@ -12,18 +11,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { getColors } from "react-native-image-colors";
 import AuthorCard from "../../../../../components/AuthorCard";
 import BookCard from "../../../../../components/BookCard";
+import { COVER_URL } from "../../../../../constants/urls";
 import {
   fetchBookDetails,
   fetchBookEditions,
 } from "../../../../../services/api";
-import {
-  getBook,
-  removeBook,
-  storeBook,
-} from "../../../../../services/localData";
 
 const getTextColor = (backgroundColor) => {
   // Simple check for hex colors, expand for rgb/hsl if needed
@@ -61,17 +55,6 @@ const BookDetails = () => {
   const [colorText, setColorText] = useState("black");
 
   useEffect(() => {
-    const url = `https://covers.openlibrary.org/b/id/${cover}-M.jpg`;
-    getColors(url, {
-      fallback: "#228B22",
-      cache: true,
-      key: url,
-    }).then(setColors);
-    console.log(colors);
-    setColorText(getTextColor(colors?.background));
-  }, []);
-
-  useEffect(() => {
     const loadBooksDetails = async () => {
       //console.log("books/", id);
       setLoadingDetails(true);
@@ -88,14 +71,6 @@ const BookDetails = () => {
   useEffect(() => {
     loadBooksEditions();
   }, []);
-
-  useEffect(() => {
-    const checkSaved = async () => {
-      const saved = await getBook(id);
-      setAdded(saved.saved);
-    };
-    checkSaved();
-  }, [isFocused]);
 
   const loadBooksEditions = async () => {
     if (loadingEditions) return;
@@ -125,7 +100,7 @@ const BookDetails = () => {
           {cover ? (
             <Image
               source={{
-                uri: `https://covers.openlibrary.org/b/id/${cover}-M.jpg`,
+                uri: `${COVER_URL}/b/id/${cover}-M.jpg`,
               }}
               style={styles.coverImage}
               resizeMode="contain"
@@ -155,15 +130,8 @@ const BookDetails = () => {
                 style={styles.buttonAdd}
                 onPress={async () => {
                   //console.log("\n\n\n");
-                  const res = await storeBook(
-                    id,
-                    details.title,
-                    details.authorDetails.map((a) => a.name).join(", "),
-                    cover,
-                  );
-                  setAdded(res.saved);
-                  Alert.alert("Adding book", "Add Book?");
-                  //console.log("saved", res.saved);
+
+                  console.log("Book saved");
                   //await clearAll();
                 }}
               >
@@ -175,10 +143,8 @@ const BookDetails = () => {
                 style={styles.buttonRemove}
                 onPress={async () => {
                   //console.log("\n\n\n");
-                  const res = await removeBook(id);
 
-                  setAdded(!res.removed);
-                  //console.log("removed", res.removed);
+                  console.log("Book removed");
                 }}
               >
                 <SymbolView name={"minus"} tintColor={"black"} size={16} />
@@ -243,7 +209,7 @@ const BookDetails = () => {
               <BookCard
                 itemKey={item.key}
                 coverId={item.key.split("/")[2]}
-                urlPoster={`https://covers.openlibrary.org/b/olid/${item.key.split("/")[2]}-M.jpg`}
+                urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-M.jpg`}
                 authorName={[""]}
                 title={item.title}
                 routeUrl={"editions/"}

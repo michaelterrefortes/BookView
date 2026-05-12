@@ -1,16 +1,17 @@
 import { Link, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import BookCard from "../../../../../components/BookCard";
+import { COVER_URL } from "../../../../../constants/urls";
 import { fetchAuthor, fetchAuthorWorks } from "../../../../../services/api";
 
 const AuthorDetails = () => {
@@ -60,7 +61,7 @@ const AuthorDetails = () => {
           {authorInfo.photos ? (
             <Image
               source={{
-                uri: `https://covers.openlibrary.org/b/id/${authorInfo.photos[0]}-M.jpg`,
+                uri: `${COVER_URL}/b/id/${authorInfo.photos[0]}-M.jpg`,
               }}
               style={styles.coverImage}
               resizeMode="cover"
@@ -108,7 +109,7 @@ const AuthorDetails = () => {
               <BookCard
                 itemKey={item.key}
                 coverId={item.covers?.[0]}
-                urlPoster={`https://covers.openlibrary.org/b/id/${item.covers?.[0]}-M.jpg`}
+                urlPoster={`${COVER_URL}/b/id/${item.covers?.[0]}-M.jpg`}
                 authorName={[""]}
                 title={item.title}
                 routeUrl={"books/"}
