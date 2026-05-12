@@ -1,13 +1,12 @@
 import { Stack, useLocalSearchParams } from "expo-router";
-import { SymbolView } from "expo-symbols";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import BookCard from "../../../../../components/BookCard";
@@ -35,21 +34,17 @@ const Genre = () => {
       const result = await fetchBooksSubject(
         `/subjects/${item.url}.json?limit=10`,
       );
-      setBookData((prevData) => ({
-        ...prevData,
-        [item.name]: { loading: false, data: result }, // Dynamic key assignment
-      }));
+
+      if (result.success) {
+        setBookData((prevData) => ({
+          ...prevData,
+          [item.name]: { loading: false, data: result.data }, // Dynamic key assignment
+        }));
+      } else {
+        Alert.alert("Error", result.error);
+      }
     });
   }, [sections]);
-
-  //console.log(bookData);
-
-  const loadBooks = async (setLoading, setData, endpoint) => {
-    setLoading(true);
-    const result = await fetchBooksSubject(endpoint);
-    setData(result);
-    setLoading(false);
-  };
 
   return (
     <>
@@ -61,7 +56,7 @@ const Genre = () => {
       <ScrollView style={styles.scrollview}>
         {sections.map((item) => (
           <View key={item.name}>
-            <TouchableOpacity
+            {/*<TouchableOpacity
               style={{
                 marginTop: 10,
                 marginBottom: 10,
@@ -76,7 +71,21 @@ const Genre = () => {
                   tintColor={"black"}
                 />
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity>*/}
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginRight: 16,
+                alignItems: "center",
+                marginTop: 30,
+                marginBottom: 10,
+              }}
+            >
+              <Text style={styles.bigTitle}>{item.name}</Text>
+              <Text onPress={() => console.log("More Books")}>See All</Text>
+            </View>
 
             {bookData[item.name]?.loading ? (
               <View style={styles.containerLoading}>
@@ -133,9 +142,9 @@ const styles = StyleSheet.create({
   bigTitle: {
     //paddingTop: 10,
     //paddingBottom: 5,
-    fontSize: 32,
+    fontSize: 20,
     paddingLeft: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   containerLoading: {
     width: "100%",

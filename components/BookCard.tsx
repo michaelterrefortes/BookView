@@ -9,7 +9,7 @@ interface Book {
   title: String;
   authorName: String;
   routeUrl: String;
-
+  year: String;
   orientation: String;
 }
 
@@ -20,12 +20,17 @@ const BookCard = ({
   title,
   authorName,
   routeUrl,
+  year = "",
 
   orientation = "h",
 }: Book) => {
   //console.log(itemKey, coverId, urlPoster);
   //console.log(authorName);
   const router = useRouter();
+
+  //console.log(itemKey, coverId, urlPoster, title, authorName, routeUrl);
+
+  //console.log(year);
 
   if (orientation === "h") {
     return (
@@ -64,9 +69,22 @@ const BookCard = ({
           <Text style={[styles.title]} numberOfLines={2}>
             {title}
           </Text>
-          <Text style={[styles.author]} numberOfLines={1}>
-            {authorName?.join(", ")}
-          </Text>
+
+          {authorName[0].trim() !== "" ? (
+            <Text style={[styles.author]} numberOfLines={1}>
+              {authorName?.join(", ")}
+            </Text>
+          ) : null}
+
+          {typeof year === "string" && year.trim() !== "" && year !== "null" ? (
+            <Text style={[styles.author]} numberOfLines={1}>
+              {year}
+            </Text>
+          ) : typeof year === "number" ? (
+            <Text style={[styles.author]} numberOfLines={1}>
+              {year}
+            </Text>
+          ) : null}
         </View>
       </TouchableOpacity>
     );
@@ -104,9 +122,21 @@ const BookCard = ({
           <Text style={styles.title} numberOfLines={2}>
             {title}
           </Text>
-          <Text style={styles.author} numberOfLines={1}>
-            {authorName?.join(", ")}
-          </Text>
+          {authorName[0].trim() !== "" ? (
+            <Text style={[styles.author]} numberOfLines={1}>
+              {authorName?.join(", ")}
+            </Text>
+          ) : null}
+
+          {typeof year === "string" && year.trim() !== "" && year !== "null" ? (
+            <Text style={[styles.author]} numberOfLines={1}>
+              {year}
+            </Text>
+          ) : typeof year === "number" ? (
+            <Text style={[styles.author]} numberOfLines={1}>
+              {year}
+            </Text>
+          ) : null}
         </View>
       </TouchableOpacity>
     );
@@ -118,9 +148,10 @@ export default BookCard;
 const styles = StyleSheet.create({
   card: {
     width: 120,
+
     //borderRadius: 12,
     //backgroundColor: "#fff",
-    padding: 8,
+    paddingLeft: 8,
     //shadowColor: "#000",
     //shadowOpacity: 0.1,
     //shadowOffset: { width: 0, height: 2 },
@@ -149,7 +180,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 180,
     backgroundColor: "#f2f2f2",
-    borderRadius: 8,
+    //borderRadius: 8,
     overflow: "hidden",
   },
 
@@ -157,7 +188,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 90,
     backgroundColor: "#f2f2f2",
-    borderRadius: 8,
+    //borderRadius: 8,
     overflow: "hidden",
   },
 

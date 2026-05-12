@@ -3,18 +3,19 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import AuthorCard from "../../../../components/AuthorCard";
 import BookCard from "../../../../components/BookCard";
-import { icons } from "../../../../constants/icons";
+import GenreCard from "../../../../components/GenreCard";
+import SearchBar from "../../../../components/SearchBar";
 import { COVER_URL } from "../../../../constants/urls";
+import { subjects } from "../../../../constants/variables";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -23,113 +24,6 @@ export default function Index() {
   const [dataFantasy, setDataFantasy] = useState([]);
   const [dataRomance, setDataRomance] = useState([]);
   const [dataScienceFiction, setDataScienceFiction] = useState([]);
-  const subjects = [
-    {
-      key: 1,
-      name: "Arts",
-      icon: icons.arts,
-      section: [
-        { name: "Architecture", url: "architecture" },
-        { name: "Art Instruction", url: "art_instruction" },
-        { name: "Art History", url: "art_history" },
-      ],
-    },
-    {
-      key: 2,
-      name: "Animals",
-      icon: icons.animals,
-      section: [
-        { name: "Bears", url: "bears" },
-        { name: "Cats", url: "cats" },
-        { name: "Kittens", url: "kittens" },
-        { name: "Dogs", url: "dogs" },
-        { name: "Puppies", url: "puppies" },
-      ],
-    },
-    {
-      key: 3,
-      name: "Fiction",
-      icon: icons.fiction,
-      section: [
-        { name: "Fantasy", url: "fantasy" },
-        { name: "Historical Fiction", url: "historical_fiction" },
-        { name: "Horror", url: "horror" },
-        { name: "Humor", url: "humor" },
-      ],
-    },
-    {
-      key: 4,
-      name: "Science & Mathematics",
-      icon: icons.science,
-      section: [
-        { name: "Biology", url: "biology" },
-        { name: "Chemistry", url: "chemistry" },
-        { name: "Mathematics", url: "mathematics" },
-        { name: "Physics", url: "physics" },
-        { name: "Programming", url: "programming" },
-      ],
-    },
-    {
-      key: 5,
-      name: "Business & Finance",
-      icon: icons.business,
-      section: [
-        { name: "Management", url: "management" },
-        { name: "Entrepreneurship", url: "entrepreneurship" },
-      ],
-    },
-    {
-      key: 6,
-      name: "Children's",
-      icon: icons.children,
-      section: [{ name: "Kids Books", url: "kids_books" }],
-    },
-    {
-      key: 7,
-      name: "History",
-      icon: icons.history,
-      section: [{ name: "Ancient Civilization", url: "ancient_civilization" }],
-    },
-    {
-      key: 8,
-      name: "Health & Wellness",
-      icon: icons.healthcare,
-      section: [
-        { name: "Cooking", url: "cooking" },
-        { name: "Cookbooks", url: "cookbooks" },
-      ],
-    },
-    {
-      key: 9,
-      name: "Biography",
-      icon: icons.biography,
-      section: [{ name: "Autobiographies", url: "autobiographies" }],
-    },
-    {
-      key: 8,
-      name: "Social Sciences",
-      icon: icons.socialScience,
-      section: [{ name: "Anthropology", url: "anthropology" }],
-    },
-    {
-      key: 9,
-      name: "Places",
-      icon: icons.place,
-      section: [{ name: "Brazil", url: "brazil" }],
-    },
-    {
-      key: 10,
-      name: "Textbooks",
-      icon: icons.textbooks,
-      section: [{ name: "History", url: "history" }],
-    },
-    {
-      key: 11,
-      name: "Books by Language",
-      icon: icons.language,
-      section: [{ name: "English", url: "english" }],
-    },
-  ];
 
   const [loadingTrending, setLoadingTrending] = useState(false);
   const [loadingFantasy, setLoadingFantasy] = useState(false);
@@ -171,6 +65,14 @@ export default function Index() {
       //style={{ backgroundColor: "#8f5555" }}
       style={styles.scrollview}
     >
+      <View style={{ paddingHorizontal: 16 }}>
+        <SearchBar
+          onPress={() => router.push("/search")}
+          placeholder="Search for a book"
+          camera={false}
+        />
+        <Text style={{ fontSize: 16, fontWeight: "500" }}>Browse by genre</Text>
+      </View>
       <FlatList
         data={subjects}
         horizontal
@@ -178,44 +80,7 @@ export default function Index() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16 }}
         ItemSeparatorComponent={<View style={{ paddingHorizontal: 5 }} />}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() =>
-              router.push({
-                pathname: `/genre/${item.name}`,
-                params: {
-                  name: item.name,
-                  data: JSON.stringify(item.section),
-                },
-              })
-            }
-            style={{
-              paddingTop: 10,
-              marginVertical: 10,
-              paddingBottom: 10,
-              paddingRight: 10,
-              paddingLeft: 10,
-              backgroundColor: "#fff",
-              borderRadius: 50,
-              shadowOffset: {
-                width: 0, // Centered horizontally
-                height: 2, // Cast 2 points downward
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-
-              flexDirection: "row",
-              alignItems: "center",
-              //elevation: 1,
-            }}
-          >
-            <Image
-              source={item.icon}
-              style={{ width: 25, height: 25, marginRight: 8 }}
-            />
-            <Text style={{ fontWeight: "bold" }}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => <GenreCard item={item} />}
       />
       <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }}>
         <Text style={styles.bigTitle}>Trending Weekly</Text>
@@ -297,6 +162,7 @@ const styles = StyleSheet.create({
   },
   scrollview: {
     flex: 1,
+    //marginLeft: 10,
     //paddingTop: 50,
     //backgroundColor: "red",
   },
@@ -318,9 +184,9 @@ const styles = StyleSheet.create({
   bigTitle: {
     paddingTop: 10,
     paddingBottom: 5,
-    fontSize: 32,
+    fontSize: 20,
     paddingLeft: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   endContainer: {
     height: 110,

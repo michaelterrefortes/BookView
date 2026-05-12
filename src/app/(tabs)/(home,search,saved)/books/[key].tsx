@@ -3,6 +3,7 @@ import { SymbolView } from "expo-symbols";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Image,
   ScrollView,
@@ -18,6 +19,7 @@ import {
   fetchBookDetails,
   fetchBookEditions,
 } from "../../../../../services/api";
+import { getYear } from "../../../../../services/functions";
 
 const BookDetails = () => {
   const router = useRouter();
@@ -53,7 +55,12 @@ const BookDetails = () => {
     setLoadingDetails(true);
     const result = await fetchBookDetails(itemKey.split("/")[2], "works");
 
-    setDetails(result);
+    if (result?.success) {
+      setDetails(result.data);
+    } else {
+      Alert.alert("Error", result.error);
+    }
+
     //console.log(details, "aqui");
     setLoadingDetails(false);
   };
@@ -61,20 +68,23 @@ const BookDetails = () => {
   const loadBooksEditions = async () => {
     if (loadingEditions) return;
     setLoadingEditions(true);
-    const result = await fetchBookEditions(itemKey.split("/")[2], offset);
-    setEditions([...editions, ...result]);
+    const result = await fetchBookEditions(itemKey.split("/")[2], 3, 0);
+
+    if (result?.success) {
+      setEditions([...editions, ...result.data]);
+      setOffset(10 + offset);
+    } else {
+      Alert.alert("Error", result.error);
+    }
+
     setLoadingEditions(false);
-    setOffset(10 + offset);
   };
+
+  //console.log(details);
 
   return (
     <ScrollView contentContainerStyle={[styles.scrollContent]}>
       <View style={styles.container}>
-        <View
-          style={{
-            height: 60,
-          }}
-        />
         <View style={styles.imageContainer}>
           {coverId ? (
             <Image
@@ -104,32 +114,32 @@ const BookDetails = () => {
             <Text style={[styles.titleName, { color: colorText }]}>
               {details.title}
             </Text>
-            {!added ? (
-              <TouchableOpacity
-                style={styles.buttonAdd}
-                onPress={async () => {
-                  //console.log("\n\n\n");
 
-                  console.log("Book saved");
-                  //await clearAll();
-                }}
-              >
-                <SymbolView name={"plus"} tintColor={"black"} size={20} />
-                <Text style={{ fontSize: 16 }}>Add to library</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={styles.buttonRemove}
-                onPress={async () => {
-                  //console.log("\n\n\n");
+            <TouchableOpacity
+              style={styles.buttonAdd}
+              onPress={() => {
+                //console.log("\n\n\n");
 
-                  console.log("Book removed");
-                }}
-              >
-                <SymbolView name={"minus"} tintColor={"black"} size={16} />
-                <Text style={{ fontSize: 16 }}>Remove</Text>
-              </TouchableOpacity>
-            )}
+                console.log("Book saved");
+                router.push({
+                  pathname: "/shelfLists",
+                  params: { bookId: itemKey },
+                });
+                //await clearAll();
+              }}
+            >
+              <SymbolView
+                name={"plus"}
+                tintColor={"white"}
+                weight={"semibold"}
+                size={16}
+                style={{ marginRight: 5 }}
+              />
+              <Text style={{ fontSize: 14, fontWeight: "600", color: "white" }}>
+                {!added ? "Add" : "Remove"}
+              </Text>
+            </TouchableOpacity>
+
             <Text
               numberOfLines={4}
               style={[styles.keyText, { color: colorText }]}
@@ -168,17 +178,24 @@ const BookDetails = () => {
           </>
         )}
 
-        <TouchableOpacity
-          onPress={() => router.push(`/moreBooks/${itemKey.split("/")[2]}`)}
+        <View
           style={{
             flexDirection: "row",
+            justifyContent: "space-between",
+            marginRight: 16,
             alignItems: "center",
-            alignContent: "center",
+            //marginTop: 5,
+            marginBottom: 10,
           }}
         >
           <Text style={[styles.title, { color: colorText }]}>Editions</Text>
-          <SymbolView name={"chevron.right"} tintColor={colorText} size={18} />
-        </TouchableOpacity>
+          <Text
+            onPress={() => router.push(`/moreBooks/${itemKey.split("/")[2]}`)}
+          >
+            See All
+          </Text>
+        </View>
+
         {loadingEditions ? (
           <View>
             <ActivityIndicator
@@ -207,13 +224,15 @@ const BookDetails = () => {
                 authorName={[""]}
                 title={item.title}
                 routeUrl={"editions"}
+                year={getYear(item.publish_date)}
               />
             )}
             //onEndReached={loadBooksEditions}
             //onEndReachedThreshold={0.5} // Trigger when 50% from bottom
-            //ListFooterComponent={renderFooter}
+            ListFooterComponent={<View style={{ height: 20 }} />}
           />
         )}
+        <View style={{ height: 20 }} />
       </View>
     </ScrollView>
   );
@@ -230,7 +249,7 @@ const styles = StyleSheet.create({
     width: 180,
     height: 270,
     //backgroundColor: "red",
-    borderRadius: 8,
+    //borderRadius: 8,
     overflow: "hidden",
     alignSelf: "center",
     marginBottom: 20,
@@ -247,7 +266,7 @@ const styles = StyleSheet.create({
     width: 180,
     height: 270,
     backgroundColor: "#aaa",
-    borderRadius: 8,
+    //borderRadius: 8,
     overflow: "hidden",
     alignSelf: "center",
     marginBottom: 20,
@@ -257,15 +276,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontWeight: "600",
 
     paddingLeft: 16,
   },
   titleName: {
     fontSize: 28,
     fontWeight: "bold",
-
+    paddingHorizontal: 16,
     marginBottom: 8,
     textAlign: "center",
   },
@@ -278,7 +297,7 @@ const styles = StyleSheet.create({
 
   buttonAdd: {
     alignItems: "center",
-    backgroundColor: "#71bdff",
+    backgroundColor: "#1b95ff",
     borderRadius: 100,
     paddingVertical: 8,
     shadowColor: "#000",
@@ -292,6 +311,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 18,
     flexDirection: "row",
+    width: "40%",
+
     //shadowOffset: { width: 0, height: 2 },
     //shadowOpacity: 0.1,
     //shadowRadius: 4,

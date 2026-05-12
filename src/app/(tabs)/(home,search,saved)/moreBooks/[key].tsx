@@ -1,6 +1,12 @@
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  StyleSheet,
+  View,
+} from "react-native";
 import BookCard from "../../../../../components/BookCard";
 import { COVER_URL } from "../../../../../constants/urls";
 import {
@@ -8,6 +14,7 @@ import {
   fetchBookEditions,
   fetchBooksSubject,
 } from "../../../../../services/api";
+import { getYear } from "../../../../../services/functions";
 
 const MoreBooks = () => {
   const { key } = useLocalSearchParams();
@@ -45,7 +52,13 @@ const MoreBooks = () => {
       }
 
       //console.log(result[0]);
-      setBooks(result);
+
+      if (result.success) {
+        setBooks(result.data);
+      } else {
+        Alert.alert("Error", result.error);
+      }
+
       setLoading(false);
     };
 
@@ -68,7 +81,7 @@ const MoreBooks = () => {
           numColumns={3}
           showsHorizontalScrollIndicator={false}
           //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
+          contentContainerStyle={{ paddingHorizontal: 10 }}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <BookCard
@@ -78,42 +91,51 @@ const MoreBooks = () => {
               authorName={item.author_name}
               title={item.title}
               routeUrl={"books"}
+              year={getYear(item.publish_date)}
             />
           )}
           ListFooterComponent={<View style={styles.endContainer} />}
           ListHeaderComponent={<View style={styles.startContainer} />}
         />
       ) : section === 2 ? (
-        <FlatList
-          data={books}
-          numColumns={3}
-          showsHorizontalScrollIndicator={true}
-          //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <BookCard
-              itemKey={item.key}
-              coverId={item.key.split("/")[2]}
-              urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-L.jpg`}
-              authorName={[""]}
-              title={item.title}
-              routeUrl={"editions"}
-            />
-          )}
-          //onEndReached={loadBooksEditions}
-          //onEndReachedThreshold={0.5} // Trigger when 50% from bottom
-          //ListFooterComponent={renderFooter}
-          ListFooterComponent={<View style={styles.endContainer} />}
-          ListHeaderComponent={<View style={styles.startContainer} />}
-        />
+        <>
+          <Stack.Screen options={{ headerTitle: "More Editions" }} />
+          <FlatList
+            data={books}
+            //numColumns={3}
+
+            showsHorizontalScrollIndicator={true}
+            //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
+            contentContainerStyle={{
+              marginHorizontal: 20,
+            }}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <BookCard
+                itemKey={item.key}
+                coverId={item.key.split("/")[2]}
+                urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-L.jpg`}
+                authorName={[""]}
+                title={item.title}
+                routeUrl={"editions"}
+                orientation={"v"}
+                year={getYear(item.publish_date)}
+              />
+            )}
+            //onEndReached={loadBooksEditions}
+            //onEndReachedThreshold={0.5} // Trigger when 50% from bottom
+            //ListFooterComponent={renderFooter}
+            ListFooterComponent={<View style={styles.endContainer} />}
+            ListHeaderComponent={<View style={styles.startContainer} />}
+          />
+        </>
       ) : section === 1 ? (
         <FlatList
           data={books}
           numColumns={3}
           showsHorizontalScrollIndicator={false}
           //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
+          contentContainerStyle={{ paddingHorizontal: 10 }}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <BookCard
@@ -123,6 +145,7 @@ const MoreBooks = () => {
               authorName={[""]}
               title={item.title}
               routeUrl={"books"}
+              year={getYear(item.publish_date)}
             />
           )}
           ListFooterComponent={<View style={styles.endContainer} />}
@@ -146,6 +169,7 @@ const MoreBooks = () => {
               }
               title={item.title}
               routeUrl={"books"}
+              year={getYear(item.publish_date)}
             />
           )}
           ListFooterComponent={<View style={styles.endContainer} />}
@@ -179,7 +203,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   startContainer: {
-    height: 110,
+    height: 120,
     width: "100%",
     //backgroundColor: "red",
     flex: 1,

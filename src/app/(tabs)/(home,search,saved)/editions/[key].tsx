@@ -2,6 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -12,9 +13,10 @@ import { COVER_URL } from "../../../../../constants/urls";
 import { fetchBookDetails } from "../../../../../services/api";
 
 const BookEditionDetails = () => {
-  const { key } = useLocalSearchParams();
-  const cover = key?.split("_")[1];
-  const id = key?.split("_")[0];
+  const { itemKey, coverId, urlPoster, title, authorName } =
+    useLocalSearchParams();
+  const cover = coverId;
+  const id = itemKey.split("/")[2];
 
   //console.log("looking at edition", cover, id);
 
@@ -26,8 +28,16 @@ const BookEditionDetails = () => {
       //console.log("editions/", id, key);
       setLoadingDetails(true);
       const result = await fetchBookDetails(id, "books");
+
       //console.log(result);
-      setDetails(result);
+
+      if (result.success) {
+        setDetails(result.data);
+      }
+      //console.log(result);
+      else {
+        Alert.alert("Error", result.error);
+      }
       setLoadingDetails(false);
     };
 

@@ -83,6 +83,20 @@ export default function HomeLayout() {
           presentation: "modal",
         }}
       />
+
+      <Stack.Screen
+        name="shelfLists/index"
+        options={{
+          headerBackTitle: "",
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "Add to Shelf or Lists",
+          //headerShadowVisible: false,
+          headerBlurEffect: "none",
+
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }

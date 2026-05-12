@@ -1,10 +1,11 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { SymbolView } from "expo-symbols";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Image,
+  Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,6 +15,7 @@ import {
 import BookCard from "../../../../../components/BookCard";
 import { COVER_URL } from "../../../../../constants/urls";
 import { fetchAuthor, fetchAuthorWorks } from "../../../../../services/api";
+import { getYear } from "../../../../../services/functions";
 
 const AuthorDetails = () => {
   const router = useRouter();
@@ -21,7 +23,7 @@ const AuthorDetails = () => {
 
   //console.log(key);
 
-  const [authorInfo, setAuthorInfo] = useState([]);
+  const [authorInfo, setAuthorInfo] = useState({});
   const [authorBooks, setAuthorBooks] = useState([]);
   const [loadingAuthor, setLoadingAuthor] = useState(false);
   const [loadingBooks, setLoadingBooks] = useState(false);
@@ -33,8 +35,16 @@ const AuthorDetails = () => {
       //console.log("books/", id);
       setLoadingAuthor(true);
       const result = await fetchAuthor(key);
+
+      //sconsole.log(result.data);
+
+      if (result?.success) {
+        setAuthorInfo(result.data);
+      } else {
+        Alert.alert("Error", result.error);
+      }
       //console.log(result.bio);
-      setAuthorInfo(result);
+
       setLoadingAuthor(false);
     };
 
@@ -48,34 +58,48 @@ const AuthorDetails = () => {
   const loadAuthorBooks = async () => {
     if (loadingBooks) return;
     setLoadingBooks(true);
-    const result = await fetchAuthorWorks(key);
-    setAuthorBooks([...authorBooks, ...result]);
+    const result = await fetchAuthorWorks(key, 3);
+
+    if (result?.success) {
+      setAuthorBooks([...authorBooks, ...result.data]);
+
+      setOffset(10 + offset);
+    } else {
+      Alert.alert("Error", result.error);
+    }
+
     setLoadingBooks(false);
-    setOffset(10 + offset);
   };
+
+  //console.log(authorBooks[1]);
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.container}>
-        <View style={styles.imageContainer}>
-          {authorInfo.photos ? (
-            <Image
-              source={{
-                uri: `${COVER_URL}/b/id/${authorInfo.photos[0]}-L.jpg`,
-              }}
-              style={styles.coverImage}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.noImage}>
-              <Text style={{ color: "white" }}>No Image</Text>
-            </View>
-          )}
+        <View style={{ flexDirection: "row", paddingHorizontal: 16 }}>
+          <View style={styles.imageContainer}>
+            {authorInfo.photos ? (
+              <Image
+                source={{
+                  uri: `${COVER_URL}/b/id/${authorInfo.photos[0]}-L.jpg`,
+                }}
+                style={styles.coverImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={styles.noImage}>
+                <Text style={{ color: "white" }}>No Image</Text>
+              </View>
+            )}
+          </View>
+          {!loadingAuthor && authorInfo ? (
+            <>
+              <Text style={styles.title}>{authorInfo.name}</Text>
+            </>
+          ) : null}
         </View>
         {!loadingAuthor && authorInfo ? (
           <>
-            <Text style={styles.title}>{authorInfo.name}</Text>
-
             <Text style={styles.keyText} numberOfLines={4}>
               {typeof authorInfo.bio === "string"
                 ? authorInfo.bio
@@ -101,12 +125,20 @@ const AuthorDetails = () => {
           </>
         ) : null}
 
-        <TouchableOpacity style={{ justifyContent: "center" }}>
-          <Text style={styles.title2}>
-            Books
-            <SymbolView name={"chevron.right"} size={20} tintColor={"black"} />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginRight: 16,
+            alignItems: "center",
+            marginTop: 5,
+          }}
+        >
+          <Text style={styles.title2}>Books</Text>
+          <Text onPress={() => console.log("More Books by Author")}>
+            See All
           </Text>
-        </TouchableOpacity>
+        </View>
 
         {loadingBooks ? (
           <View style={styles.containerLoading}>
@@ -133,9 +165,71 @@ const AuthorDetails = () => {
                 authorName={[""]}
                 title={item.title}
                 routeUrl={"books"}
+                year={String(getYear(item.first_publish_date))}
               />
             )}
           />
+        )}
+
+        {loadingBooks && authorInfo.length !== 0 ? (
+          <View style={styles.containerLoading}>
+            <ActivityIndicator
+              size="large"
+              //color="#0000ff"
+              //className="mt-10 self-center"
+            />
+          </View>
+        ) : (
+          <View
+            style={{
+              //smarginRight: 16,
+              //alignItems: "center",
+              marginTop: 5,
+            }}
+          >
+            <Text style={[styles.title2, { marginBottom: 20 }]}>About</Text>
+
+            <View
+              style={{
+                backgroundColor: "white",
+                marginHorizontal: 16,
+                paddingHorizontal: 15,
+                borderRadius: 10,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  paddingVertical: 20,
+                  borderBottomColor: "lightgray",
+                  //borderBottomWidth: "50%",
+                  borderBottomWidth: 0.2,
+                }}
+              >
+                <Text style={{ width: "30%", fontWeight: "700" }}>Born</Text>
+                <Text>{authorInfo.birth_date}</Text>
+              </View>
+
+              <View style={{ flexDirection: "row", paddingVertical: 20 }}>
+                <Text style={{ width: "30%", fontWeight: "700" }}>Website</Text>
+
+                <Text
+                  style={{ color: "blue", flex: 1, flexWrap: "wrap" }}
+                  onPress={() => {
+                    const url = authorInfo?.links?.[0]?.url;
+
+                    if (url) {
+                      Linking.openURL(url);
+                    } else {
+                      Alert.alert("No website available");
+                    }
+                  }}
+                >
+                  {authorInfo?.links?.[0]?.url || "No website"}
+                </Text>
+              </View>
+            </View>
+          </View>
         )}
       </View>
     </ScrollView>
@@ -170,8 +264,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#aaa", //backgroundColor: "#333", // fallback bg if no image
-    height: 150,
-    width: 150,
+    height: 100,
+    width: 100,
     alignSelf: "center",
   },
   coverImage: {
@@ -189,8 +283,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontWeight: "700",
+    marginLeft: 15,
     //color: "#fff",
     marginBottom: 8,
     justifyContent: "center",
@@ -198,8 +293,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   title2: {
-    fontSize: 28,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontWeight: "600",
     //color: "#fff",
     marginBottom: 8,
     marginTop: 8,

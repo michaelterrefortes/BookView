@@ -45,8 +45,6 @@ const Saved = () => {
           )}
           ListHeaderComponent={
             <>
-              <Text style={styles.title}>Your Book Lists</Text>
-
               {!loading && books?.length === 0 && (
                 <View
                   style={{

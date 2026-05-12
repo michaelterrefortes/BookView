@@ -8,12 +8,13 @@ export const fetchBooks = async (path: String) => {
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to fetch books", response.statusText);
+    //throw new Error("Failed to fetch books", response.statusText);
+    return { success: false, error: "Error fetching book data" };
   }
 
   const data = await response.json();
 
-  return data.works;
+  return { success: true, data: data.works };
 };
 
 export const fetchBooksSubject = async (path: String) => {
@@ -26,17 +27,17 @@ export const fetchBooksSubject = async (path: String) => {
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to fetch books", response.statusText);
+    return { success: false, error: "Error fetching subject data" };
   }
 
   const data = await response.json();
 
-  return data.works;
+  return { success: true, data: data.works };
 };
 
 export const fetchBookDetails = async (workId: String, type: String) => {
   //console.log("api", workId);
-  const endpoint = `${BASE_URL}/works/${workId}.json`; //https://openlibrary.org/works/OL82563W.json
+  const endpoint = `${BASE_URL}/${type}/${workId}.json`; //https://openlibrary.org/works/OL82563W.json
 
   //console.log(endpoint);
 
@@ -44,10 +45,12 @@ export const fetchBookDetails = async (workId: String, type: String) => {
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to fetch books details", response.statusText);
+    return { success: false, error: "Error fetching book details data" };
   }
 
   const dataDetails = await response.json();
+
+  //console.log(dataDetails);
 
   if (type === "works") {
     const authors = [];
@@ -74,22 +77,26 @@ export const fetchBookDetails = async (workId: String, type: String) => {
 
   //console.log(dataDetails);
 
-  return dataDetails;
+  return { success: true, data: dataDetails };
 };
 
-export const fetchBookEditions = async (workId: String, offset: Number) => {
-  const endpoint = `${BASE_URL}/works/${workId}/editions.json?limit=10&offset=${offset}`; //https://openlibrary.org/works/OL82563W.json
+export const fetchBookEditions = async (
+  workId: String,
+  limit = 10,
+  offset = 0,
+) => {
+  const endpoint = `${BASE_URL}/works/${workId}/editions.json?limit=${limit}&offset=${offset}`; //https://openlibrary.org/works/OL82563W.json
 
   const response = await fetch(endpoint);
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to fetch books editions", response.statusText);
+    return { success: false, error: "Error fetching book editions data" };
   }
 
   const dataEditions = await response.json();
 
-  return dataEditions.entries;
+  return { success: true, data: dataEditions.entries };
 };
 
 export const fetchSearch = async (query: string, offset: Number) => {
@@ -102,17 +109,14 @@ export const fetchSearch = async (query: string, offset: Number) => {
 
     if (!response.ok) {
       // @ts-ignore
-      throw new Error(
-        "Failed to fetch books by search query",
-        response.statusText,
-      );
+      return { success: false, error: "Error with search" };
     }
 
     const data = await response.json();
 
-    return data.docs;
+    return { success: true, data: data.docs };
   } else {
-    return [];
+    return { success: true, data: [] };
   }
 };
 
@@ -123,25 +127,25 @@ export const fetchAuthor = async (authorId: string) => {
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to fetch author", response.statusText);
+    return { success: false, error: "Error fetching author data" };
   }
 
   const data = await response.json();
 
-  return data;
+  return { success: true, data: data };
 };
 
-export const fetchAuthorWorks = async (authorId: string) => {
-  const endpoint = `${BASE_URL}/authors/${authorId}/works.json?limit=20&offset=0`;
+export const fetchAuthorWorks = async (authorId: string, limit = 20) => {
+  const endpoint = `${BASE_URL}/authors/${authorId}/works.json?limit=${limit}&offset=0`;
 
   const response = await fetch(endpoint);
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to fetch author works", response.statusText);
+    return { success: false, error: "Error fetching author works data" };
   }
 
   const data = await response.json();
 
-  return data.entries;
+  return { success: true, data: data.entries };
 };

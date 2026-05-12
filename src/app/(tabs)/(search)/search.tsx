@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -11,6 +12,7 @@ import BookCard from "../../../../components/BookCard";
 import SearchBar from "../../../../components/SearchBar";
 import { COVER_URL } from "../../../../constants/urls";
 import { fetchSearch } from "../../../../services/api";
+import { getYear } from "../../../../services/functions";
 
 const Search = () => {
   const [books, setBooks] = useState([]);
@@ -30,8 +32,14 @@ const Search = () => {
         setLoading(true);
 
         const result = await fetchSearch(searchBook, offset);
-        setBooks(result);
-        setEntries(result.numFound);
+
+        if (result.success) {
+          setBooks(result.data);
+          setEntries(result.data.numFound);
+        } else {
+          Alert.alert("Error", result.error);
+        }
+
         setLoading(false);
         setReady(false);
       } else {
@@ -67,11 +75,13 @@ const Search = () => {
   return (
     <SafeAreaView style={styles.safeview} edges={["top", "left", "right"]}>
       <View
-        style={{
-          //marginVertical: 20,
-          paddingLeft: 15,
-          paddingRight: 15,
-        }}
+        style={
+          {
+            //marginVertical: 20,
+            //paddingLeft: 16,
+            //paddingRight: 16,
+          }
+        }
       >
         <SearchBar
           placeholder="Search books"
@@ -100,6 +110,7 @@ const Search = () => {
             title={item.title}
             routeUrl={"books"}
             orientation={"v"}
+            year={getYear(item.first_publish_year)}
           />
         )}
         keyExtractor={(item) => item.key.toString()}
@@ -144,7 +155,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   text1: {
-    fontWeight: "bold",
+    fontWeight: "600",
     fontSize: 20,
     paddingBottom: 15,
   },
@@ -152,7 +163,7 @@ const styles = StyleSheet.create({
     color: "#7d7d7d",
   },
   text3: {
-    fontWeight: "bold",
+    fontWeight: "600",
     fontSize: 20,
     paddingBottom: 15,
   },

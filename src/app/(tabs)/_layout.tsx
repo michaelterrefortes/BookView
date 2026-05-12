@@ -49,13 +49,13 @@ const _layout = () => {
       <Tabs.Screen
         name="(saved)"
         options={{
-          title: "Bookmark",
+          title: "Library",
           headerShown: false,
           tabBarIcon: ({ focused }) =>
             Platform.select({
               ios: {
                 type: "sfSymbol",
-                name: focused ? "bookmark.fill" : "bookmark",
+                name: focused ? "book.fill" : "book",
               },
             }),
         }}
