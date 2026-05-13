@@ -6,7 +6,9 @@ export function BookProvider({ children }) {
   const [reading, setReading] = useState([]);
   const [wantToRead, setWantToRead] = useState([]);
   const [notFinished, setNotFinished] = useState([]);
-  const [read, setRead] = useState([]);
+  const [finished, setFinished] = useState([]);
+
+  const [listsBooks, setListsBooks] = useState([]);
 
   return (
     <BookContext.Provider
@@ -17,8 +19,10 @@ export function BookProvider({ children }) {
         setWantToRead,
         notFinished,
         setNotFinished,
-        read,
-        setRead,
+        finished,
+        setFinished,
+        listsBooks,
+        setListsBooks,
       }}
     >
       {children}

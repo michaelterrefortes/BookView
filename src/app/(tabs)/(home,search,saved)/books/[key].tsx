@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused, useLocalSearchParams, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import BookCard from "../../../../../components/BookCard";
 import { COVER_URL } from "../../../../../constants/urls";
+import { BookContext } from "../../../../../context/BookContext";
 import {
   fetchBookDetails,
   fetchBookEditions,
@@ -26,6 +27,9 @@ const BookDetails = () => {
   const { itemKey, coverId, urlPoster, title, authorName } =
     useLocalSearchParams();
 
+  const { reading, finished, notFinished, wantToRead, listsBooks } =
+    useContext(BookContext);
+
   //console.log(
   //  "Details of work",
   //  itemKey,
@@ -34,6 +38,8 @@ const BookDetails = () => {
   //  title,
   //  authorName,
   //);
+  const [added, setAdded] = useState(0);
+  const [label, setLabel] = useState("Want to Read");
 
   const [details, setDetails] = useState([]);
   const [editions, setEditions] = useState([]);
@@ -41,13 +47,49 @@ const BookDetails = () => {
   const [loadingEditions, setLoadingEditions] = useState(false);
   const [offset, setOffset] = useState(0);
 
-  const [added, setAdded] = useState(false);
-
   const isFocused = useIsFocused();
 
   //console.log(bgColor);
 
   const [colorText, setColorText] = useState("black");
+
+  useEffect(() => {
+    const id = itemKey.split("/")[2];
+
+    //console.log(id);
+
+    wantToRead.map((item, index) => {
+      if (id === item.id) {
+        setAdded(1);
+        setLabel("Want to Read");
+        return;
+      }
+    });
+
+    reading.map((item, index) => {
+      if (id === item.id) {
+        setAdded(2);
+        setLabel("Reading");
+        return;
+      }
+    });
+
+    finished.map((item, index) => {
+      if (id === item.id) {
+        setAdded(3);
+        setLabel("Finished");
+        return;
+      }
+    });
+
+    notFinished.map((item, index) => {
+      if (id === item.id) {
+        setAdded(4);
+        setLabel("Not Finished");
+        return;
+      }
+    });
+  }, [reading, finished, notFinished, wantToRead]);
 
   useEffect(() => {
     loadBooksDetails();
@@ -159,7 +201,7 @@ const BookDetails = () => {
                   });
                 }}
               >
-                <Text style={styles.buttonText}>Want to Read</Text>
+                <Text style={styles.buttonText}>{label}</Text>
 
                 <TouchableOpacity
                   style={styles.chevron}
