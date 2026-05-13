@@ -120,7 +120,7 @@ const AuthorDetails = () => {
                 })
               }
             >
-              <Text style={{ fontWeight: "600" }}>MORE</Text>
+              <Text style={{ fontWeight: "600", color: "#7663dc" }}>more</Text>
             </TouchableOpacity>
           </>
         ) : null}
@@ -142,6 +142,7 @@ const AuthorDetails = () => {
                 params: { endpoint: "author", bookId: key },
               })
             }
+            style={{ color: "#7663dc" }}
           >
             See All
           </Text>
@@ -214,7 +215,7 @@ const AuthorDetails = () => {
                 }}
               >
                 <Text style={{ width: "30%", fontWeight: "700" }}>Born</Text>
-                <Text>{authorInfo.birth_date}</Text>
+                <Text>{authorInfo?.birth_date ?? "No Data"}</Text>
               </View>
 
               <View style={{ flexDirection: "row", paddingVertical: 20 }}>

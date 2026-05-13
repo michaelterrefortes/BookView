@@ -126,7 +126,7 @@ export const fetchBookEditions = async (
 
 export const fetchSearch = async (query: string, offset: Number) => {
   if (query.trim()) {
-    const endpoint = `${BASE_URL}/search.json?q=${query.replace(/\s+/g, "+")}&limit=10&offset=${offset}`;
+    const endpoint = `${BASE_URL}/search.json?q=${query.replace(/\s+/g, "+")}&limit=10&offset=${offset}&fields=key,title,author_name,editions,isbn,publish_year`;
 
     //console.log(endpoint);
 

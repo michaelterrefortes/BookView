@@ -69,6 +69,7 @@ export default function Index() {
         <SearchBar
           onPress={() => router.push("/search")}
           placeholder="Search for a book"
+          value=""
           camera={false}
         />
         <Text style={{ fontSize: 16, fontWeight: "500" }}>Browse by genre</Text>

@@ -1,23 +1,51 @@
 import { useIsFocused } from "expo-router";
-import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BookCard from "../../../../components/BookCard";
+import ShelfCard from "../../../../components/ShelfCard";
 import { COVER_URL } from "../../../../constants/urls";
+import { BookContext } from "../../../../context/BookContext";
 
 const Saved = () => {
+  const { reading, read, notFinished, wantToRead, setWantToRead } =
+    useContext(BookContext);
+
   const [loading, setLoading] = useState(false);
   const [books, setBooks] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
 
   //console.log(isFocused);
+
+  useEffect(() => {
+    setWantToRead([
+      {
+        id: "OL15626917W",
+      },
+      {
+        id: "OL1000854M",
+      },
+      {
+        id: "OL178496W",
+      },
+      {
+        id: "OL24200877M",
+      },
+      {
+        id: "OL12345M",
+      },
+      {
+        id: "OL23747519M",
+      },
+      {
+        id: "OL27448W",
+      },
+      {
+        id: "OL3189916W",
+      },
+    ]);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -44,19 +72,34 @@ const Saved = () => {
             />
           )}
           ListHeaderComponent={
-            <>
-              {!loading && books?.length === 0 && (
-                <View
-                  style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flex: 1,
-                  }}
-                >
-                  <Text style={{ fontSize: 20 }}>No Books Lists</Text>
-                </View>
-              )}
-            </>
+            <View>
+              <ShelfCard
+                item={wantToRead}
+                symbol={"book"}
+                colors={["#f6e8ef", "#e05651"]}
+                title={"Want to Read"}
+              />
+
+              <ShelfCard
+                item={reading}
+                symbol={"book"}
+                colors={["#f6e8ef", "#e05651"]}
+                title={"Reading"}
+              />
+
+              <ShelfCard
+                item={read}
+                symbol={"book"}
+                colors={["#f6e8ef", "#e05651"]}
+                title={"Finished"}
+              />
+              <ShelfCard
+                item={notFinished}
+                symbol={"book"}
+                colors={["#f6e8ef", "#e05651"]}
+                title={"Not Finished"}
+              />
+            </View>
           }
           style={{ flex: 1 }} // <-- crucial for full-screen scrolling
         />
@@ -72,12 +115,7 @@ const styles = StyleSheet.create({
     flex: 1,
     //sbackgroundColor: "#a94141",
   },
-  title: {
-    paddingTop: 10,
-    paddingBottom: 5,
-    fontSize: 32,
-    fontWeight: "bold",
-  },
+
   containerLoading: {
     flex: 1, // <-- fill the whole screens
     justifyContent: "center",

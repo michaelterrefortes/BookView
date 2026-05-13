@@ -86,6 +86,7 @@ const Genre = () => {
             >
               <Text style={styles.bigTitle}>{item.name}</Text>
               <Text
+                style={{ color: "#7663dc" }}
                 onPress={() =>
                   router.push({
                     pathname: `/moreBooks/${item.name}`,

@@ -1,3 +1,4 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useEffect, useState } from "react";
@@ -12,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import AuthorCard from "../../../../../components/AuthorCard";
 import BookCard from "../../../../../components/BookCard";
 import { COVER_URL } from "../../../../../constants/urls";
 import {
@@ -26,6 +26,8 @@ const BookEditionDetails = () => {
     useLocalSearchParams();
   const cover = coverId;
   const id = itemKey.split("/")[2];
+
+  //console.log(itemKey);
 
   const router = useRouter();
 
@@ -46,6 +48,7 @@ const BookEditionDetails = () => {
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [added, setAdded] = useState(false);
   const [editions, setEditions] = useState([]);
+  const [loadingEditions, setLoadingEditions] = useState(false);
 
   const [idWork, setIdWork] = useState("");
 
@@ -53,6 +56,7 @@ const BookEditionDetails = () => {
     const loadBooks = async () => {
       //console.log("editions/", id, key);
       setLoadingDetails(true);
+      setLoadingEditions(true);
       const result = await fetchBookDetails(id, "books");
 
       //console.log(result);
@@ -77,7 +81,7 @@ const BookEditionDetails = () => {
       const resultEditions = await fetchBookEditions(workId, 3, 0);
 
       if (result.success) {
-        console.log(result);
+        //console.log(result);
         setDetails(result.data);
       }
       //console.log(result);
@@ -92,6 +96,7 @@ const BookEditionDetails = () => {
       }
 
       setLoadingDetails(false);
+      setLoadingEditions(false);
     };
 
     loadBooks();
@@ -110,68 +115,116 @@ const BookEditionDetails = () => {
           </View>
         ) : (
           <>
-            <View style={styles.imageContainer}>
-              {coverId ? (
-                <Image
-                  source={{
-                    uri: urlPoster,
-                  }}
-                  style={styles.coverImage}
-                  resizeMode="contain"
-                />
-              ) : (
-                <View style={styles.noImage}>
-                  <Text style={{ color: "#ffffff" }}>No Image</Text>
-                </View>
-              )}
-            </View>
-            <Text style={[styles.titleName, { color: colorText }]}>
-              {details.title}
-            </Text>
-            <TouchableOpacity
-              style={styles.buttonAdd}
-              onPress={() => {
-                //console.log("\n\n\n");
+            <View style={styles.row}>
+              <View style={styles.imageContainer}>
+                {coverId ? (
+                  <Image
+                    source={{ uri: urlPoster }}
+                    style={styles.coverImage}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <View style={styles.noImage}>
+                    <Text style={{ color: "#fff" }}>No Image</Text>
+                  </View>
+                )}
+              </View>
 
-                //console.log("Book saved");
-                router.push({
-                  pathname: "/shelfLists",
-                  params: { bookId: itemKey },
-                });
-                //await clearAll();
+              <View style={styles.rightContent}>
+                <Text style={styles.titleName}>{details.title}</Text>
+
+                <View style={styles.authors}>
+                  {details.authorDetails?.map((item, index) => {
+                    const id = item.key.split("/")[2];
+                    const isLast = index === details.authorDetails.length - 1;
+
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() =>
+                          router.push({
+                            pathname: `/authors/${id}`,
+                            params: { authorId: id },
+                          })
+                        }
+                        style={{ flexDirection: "row" }}
+                      >
+                        <Text style={styles.authorText}>{item.name}</Text>
+                        {!isLast && <Text style={styles.authorText}>, </Text>}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            </View>
+
+            <LinearGradient
+              colors={["#9d87ed", "#7663dc"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.buttonAdd}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  router.push({
+                    pathname: "/shelfLists",
+                    params: { bookId: itemKey },
+                  });
+                }}
+              >
+                <Text style={styles.buttonText}>Want to Read</Text>
+
+                <TouchableOpacity
+                  style={styles.chevron}
+                  onPress={() => {
+                    router.push({
+                      pathname: "/shelfLists",
+                      params: { bookId: itemKey },
+                    });
+                  }}
+                >
+                  <SymbolView
+                    name={"chevron.down"}
+                    tintColor={"white"}
+                    weight={"semibold"}
+                    size={16}
+                  />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </LinearGradient>
+
+            <View
+              style={{
+                backgroundColor: "#fff",
+                marginHorizontal: 16,
+                paddingVertical: 15,
+                borderRadius: 10,
               }}
             >
-              <SymbolView
-                name={"plus"}
-                tintColor={"white"}
-                weight={"semibold"}
-                size={16}
-                style={{ marginRight: 5 }}
-              />
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "white" }}>
-                {!added ? "Add" : "Remove"}
+              <Text
+                numberOfLines={4}
+                style={[styles.keyText, { color: colorText }]}
+              >
+                {details?.description ?? "No Description"}
               </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={{ alignSelf: "flex-end", paddingRight: 16 }}
+                onPress={() =>
+                  router.push({
+                    pathname: "/moreInfo/info",
+                    params: {
+                      description: details?.description ?? "No Description",
+                    },
+                  })
+                }
+              >
+                <Text style={{ fontWeight: "600", color: "#7663dc" }}>
+                  more
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-            <Text
-              numberOfLines={4}
-              style={[styles.keyText, { color: colorText }]}
-            >
-              {details?.description}
-            </Text>
-            <TouchableOpacity
-              style={{ alignSelf: "flex-end", paddingRight: 16 }}
-              onPress={() =>
-                router.push({
-                  pathname: "/moreInfo/info",
-                  params: {
-                    description: details?.description,
-                  },
-                })
-              }
-            >
-              <Text style={{ fontWeight: "600" }}>MORE</Text>
-            </TouchableOpacity>
+            {/*
             <Text style={[styles.title, { color: colorText }]}>Author</Text>
             <FlatList
               data={details.authorDetails}
@@ -187,11 +240,11 @@ const BookEditionDetails = () => {
                   name={item.name}
                 />
               )}
-            />
+            /> */}
           </>
         )}
 
-        {loadingDetails ? null : (
+        {loadingEditions ? null : (
           <>
             <View
               style={{
@@ -201,14 +254,19 @@ const BookEditionDetails = () => {
                 alignItems: "center",
                 //marginTop: 5,
                 marginBottom: 10,
+                marginTop: 16,
               }}
             >
               <Text style={[styles.title, { color: colorText }]}>Editions</Text>
               <Text
+                style={{ color: "#7663dc" }}
                 onPress={() =>
                   router.push({
                     pathname: `/moreBooks/${idWork}`,
-                    params: { endpoint: "editions", bookId: idWork },
+                    params: {
+                      endpoint: "editions",
+                      bookId: idWork,
+                    },
                   })
                 }
               >
@@ -349,60 +407,21 @@ const BookEditionDetails = () => {
             </View>
           </View>
         )}
+        <View style={{ height: 20 }} />
       </View>
     </ScrollView>
   );
-
-  /*return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={{ height: 60 }} />
-        <View style={styles.imageContainer}>
-          {cover ? (
-            <Image
-              source={{
-                uri: `${COVER_URL}/b/olid/${cover}-L.jpg`,
-              }}
-              style={styles.coverImage}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.noImage}>
-              <Text style={styles.noImageText}>No Image Available</Text>
-            </View>
-          )}
-        </View>
-
-        {loadingDetails ? (
-          <View>
-            <ActivityIndicator
-              size="large"
-              //color="#0000ff"
-              //className="mt-10 self-center"
-            />
-          </View>
-        ) : (
-          <>
-            <Text style={styles.title}>{details.title}</Text>
-            <Text style={styles.keyText}>ISBN {details.isbn_13}</Text>
-            <Text style={styles.keyText}>Pages {details.number_of_pages}</Text>
-            <Text style={styles.keyText}>
-              Published on {details.publish_date}
-            </Text>
-            <Text style={styles.keyText}>
-              Published in {details.publish_places}
-            </Text>
-            <Text style={styles.keyText}>
-              Publisher {details.publishers.join(", ")}
-            </Text>
-          </>
-        )}
-      </ScrollView>
-    </View>
-  );*/
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+
+  scrollContent: {
+    // paddingBottom: 80,
+  },
+
   title2: {
     fontSize: 20,
     fontWeight: "600",
@@ -411,107 +430,119 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingLeft: 16,
   },
-  container: {
-    flex: 1,
+
+  // 🔥 MAIN ROW (image + content)
+  row: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    alignItems: "flex-start",
+    gap: 12,
   },
-  scrollContent: {
-    //paddingBottom: 80,
-    paddingBottom: 30,
-  },
+
+  // 📸 IMAGE
   imageContainer: {
-    width: 180,
-    height: 270,
-    //backgroundColor: "red",
+    width: 100,
+    height: 150,
     //borderRadius: 8,
     overflow: "hidden",
-    alignSelf: "center",
-    marginBottom: 20,
   },
+
   coverImage: {
     width: "100%",
     height: "100%",
-    //backgroundColor: "blue",
   },
+
   noImage: {
-    flex: 1,
+    width: 100,
+    height: 150,
+    backgroundColor: "#aaa",
     alignItems: "center",
     justifyContent: "center",
-    width: 180,
-    height: 270,
-    backgroundColor: "#aaa",
-    //borderRadius: 8,
-    overflow: "hidden",
-    alignSelf: "center",
-    marginBottom: 20,
+    borderRadius: 8,
   },
+
   noImageText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#fff",
+    textAlign: "center",
   },
+
+  // 📖 RIGHT SIDE CONTENT
+  rightContent: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "flex-start",
+  },
+
+  // 📌 TITLE
+  titleName: {
+    fontSize: 18,
+    fontWeight: "700",
+    flexWrap: "wrap",
+    color: "#000",
+  },
+
+  // ✍️ AUTHORS CONTAINER
+  authors: {
+    marginTop: 6,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    flex: 1,
+  },
+
+  authorText: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 4,
+  },
+
+  // (optional other styles kept clean)
   title: {
     fontSize: 20,
     fontWeight: "600",
-
     paddingLeft: 16,
   },
-  titleName: {
-    fontSize: 28,
-    fontWeight: "bold",
-    paddingHorizontal: 16,
-    marginBottom: 8,
-    textAlign: "center",
-  },
+
   keyText: {
     fontSize: 16,
-
     paddingHorizontal: 16,
-    //marginBottom: 25,
   },
 
   buttonAdd: {
-    alignItems: "center",
-    backgroundColor: "#1b95ff",
     borderRadius: 100,
-    paddingVertical: 8,
-    shadowColor: "#000",
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingLeft: 15,
-    paddingRight: 15,
-    justifyContent: "center",
-    alignContent: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    width: "70%",
     alignSelf: "center",
-    marginTop: 10,
+    marginTop: 18,
     marginBottom: 18,
-    flexDirection: "row",
-    width: "40%",
+    justifyContent: "center",
+    alignItems: "center",
 
-    //shadowOffset: { width: 0, height: 2 },
-    //shadowOpacity: 0.1,
-    //shadowRadius: 4,
-    //elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
-  buttonRemove: {
-    alignItems: "center",
-    backgroundColor: "#c1c1c1",
-    borderRadius: 100,
-    paddingVertical: 8,
-    shadowColor: "#000",
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingLeft: 15,
-    paddingRight: 15,
-    justifyContent: "center",
-    alignContent: "center",
-    alignSelf: "center",
-    marginTop: 10,
-    marginBottom: 18,
-    flexDirection: "row",
 
-    //shadowOffset: { width: 0, height: 2 },
-    //shadowOpacity: 0.1,
-    //shadowRadius: 4,
-    //elevation: 3,
+  buttonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "white",
+    textAlign: "center",
+  },
+
+  chevron: {
+    position: "absolute",
+    right: -75,
+    top: -5,
+    borderColor: "#fff",
+    borderWidth: 0.2,
+    borderRadius: 100,
+    padding: 5,
   },
 });
 

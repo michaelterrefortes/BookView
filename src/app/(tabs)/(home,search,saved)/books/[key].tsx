@@ -1,3 +1,4 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused, useLocalSearchParams, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useEffect, useState } from "react";
@@ -12,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import AuthorCard from "../../../../../components/AuthorCard";
 import BookCard from "../../../../../components/BookCard";
 import { COVER_URL } from "../../../../../constants/urls";
 import {
@@ -102,38 +102,56 @@ const BookDetails = () => {
           </View>
         ) : (
           <>
-            <View style={styles.imageContainer}>
-              {coverId ? (
-                <Image
-                  source={{
-                    uri: urlPoster,
-                  }}
-                  style={styles.coverImage}
-                  resizeMode="contain"
-                />
-              ) : (
-                <View style={styles.noImage}>
-                  <Text style={{ color: "#ffffff" }}>No Image</Text>
+            <View style={styles.row}>
+              <View style={styles.imageContainer}>
+                {coverId ? (
+                  <Image
+                    source={{ uri: urlPoster }}
+                    style={styles.coverImage}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <View style={styles.noImage}>
+                    <Text style={{ color: "#fff" }}>No Image</Text>
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.rightContent}>
+                <Text style={styles.titleName}>{details.title}</Text>
+
+                <View style={styles.authors}>
+                  {details.authorDetails?.map((item, index) => {
+                    const id = item.key.split("/")[2];
+                    const isLast = index === details.authorDetails.length - 1;
+
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() =>
+                          router.push({
+                            pathname: `/authors/${id}`,
+                            params: { authorId: id },
+                          })
+                        }
+                        style={{ flexDirection: "row" }}
+                      >
+                        <Text style={styles.authorText}>{item.name}</Text>
+                        {!isLast && <Text style={styles.authorText}>, </Text>}
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
-              )}
+              </View>
             </View>
-            <Text style={[styles.titleName, { color: colorText }]}>
-              {details.title}
-            </Text>
 
-            <TouchableOpacity
+            <LinearGradient
+              colors={["#9d87ed", "#7663dc"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
               style={styles.buttonAdd}
-              onPress={() => {
-                router.push({
-                  pathname: "/shelfLists",
-                  params: { bookId: itemKey },
-                });
-              }}
             >
-              <Text style={styles.buttonText}>Want to Read</Text>
-
               <TouchableOpacity
-                style={styles.chevron}
                 onPress={() => {
                   router.push({
                     pathname: "/shelfLists",
@@ -141,34 +159,59 @@ const BookDetails = () => {
                   });
                 }}
               >
-                <SymbolView
-                  name={"chevron.down"}
-                  tintColor={"white"}
-                  weight={"semibold"}
-                  size={16}
-                />
-              </TouchableOpacity>
-            </TouchableOpacity>
+                <Text style={styles.buttonText}>Want to Read</Text>
 
-            <Text
-              numberOfLines={4}
-              style={[styles.keyText, { color: colorText }]}
+                <TouchableOpacity
+                  style={styles.chevron}
+                  onPress={() => {
+                    router.push({
+                      pathname: "/shelfLists",
+                      params: { bookId: itemKey },
+                    });
+                  }}
+                >
+                  <SymbolView
+                    name={"chevron.down"}
+                    tintColor={"white"}
+                    weight={"semibold"}
+                    size={16}
+                  />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </LinearGradient>
+
+            <View
+              style={{
+                backgroundColor: "#fff",
+                marginHorizontal: 16,
+                paddingVertical: 15,
+                borderRadius: 10,
+              }}
             >
-              {details?.description}
-            </Text>
-            <TouchableOpacity
-              style={{ alignSelf: "flex-end", paddingRight: 16 }}
-              onPress={() =>
-                router.push({
-                  pathname: "/moreInfo/info",
-                  params: {
-                    description: details?.description,
-                  },
-                })
-              }
-            >
-              <Text style={{ fontWeight: "600" }}>MORE</Text>
-            </TouchableOpacity>
+              <Text
+                numberOfLines={4}
+                style={[styles.keyText, { color: colorText }]}
+              >
+                {details?.description ?? "No Description"}
+              </Text>
+              <TouchableOpacity
+                style={{ alignSelf: "flex-end", paddingRight: 16 }}
+                onPress={() =>
+                  router.push({
+                    pathname: "/moreInfo/info",
+                    params: {
+                      description: details?.description ?? "No Description",
+                    },
+                  })
+                }
+              >
+                <Text style={{ fontWeight: "600", color: "#7663dc" }}>
+                  more
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/*
             <Text style={[styles.title, { color: colorText }]}>Author</Text>
             <FlatList
               data={details.authorDetails}
@@ -184,7 +227,7 @@ const BookDetails = () => {
                   name={item.name}
                 />
               )}
-            />
+            /> */}
           </>
         )}
 
@@ -198,10 +241,12 @@ const BookDetails = () => {
                 alignItems: "center",
                 //marginTop: 5,
                 marginBottom: 10,
+                marginTop: 16,
               }}
             >
               <Text style={[styles.title, { color: colorText }]}>Editions</Text>
               <Text
+                style={{ color: "#7663dc" }}
                 onPress={() =>
                   router.push({
                     pathname: `/moreBooks/${itemKey.split("/")[2]}`,
@@ -249,72 +294,106 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+
   scrollContent: {
-    //paddingBottom: 80,
+    // paddingBottom: 80,
   },
+
+  // 🔥 MAIN ROW (image + content)
+  row: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    alignItems: "flex-start",
+    gap: 12,
+  },
+
+  // 📸 IMAGE
   imageContainer: {
-    width: 180,
-    height: 270,
-    //backgroundColor: "red",
+    width: 100,
+    height: 150,
     //borderRadius: 8,
     overflow: "hidden",
-    alignSelf: "center",
-    marginBottom: 20,
   },
+
   coverImage: {
     width: "100%",
     height: "100%",
-    //backgroundColor: "blue",
   },
+
   noImage: {
-    flex: 1,
+    width: 100,
+    height: 150,
+    backgroundColor: "#aaa",
     alignItems: "center",
     justifyContent: "center",
-    width: 180,
-    height: 270,
-    backgroundColor: "#aaa",
-    //borderRadius: 8,
-    overflow: "hidden",
-    alignSelf: "center",
-    marginBottom: 20,
+    borderRadius: 8,
   },
+
   noImageText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#fff",
+    textAlign: "center",
   },
+
+  // 📖 RIGHT SIDE CONTENT
+  rightContent: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "flex-start",
+  },
+
+  // 📌 TITLE
+  titleName: {
+    fontSize: 18,
+    fontWeight: "700",
+    flexWrap: "wrap",
+    color: "#000",
+  },
+
+  // ✍️ AUTHORS CONTAINER
+  authors: {
+    marginTop: 6,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    flex: 1,
+  },
+
+  authorText: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 4,
+  },
+
+  // (optional other styles kept clean)
   title: {
     fontSize: 20,
     fontWeight: "600",
-
     paddingLeft: 16,
   },
-  titleName: {
-    fontSize: 28,
-    fontWeight: "bold",
-    paddingHorizontal: 16,
-    marginBottom: 8,
-    textAlign: "center",
-  },
+
   keyText: {
     fontSize: 16,
-
     paddingHorizontal: 16,
-    //marginBottom: 25,
   },
 
   buttonAdd: {
-    backgroundColor: "#1b95ff",
     borderRadius: 100,
     paddingVertical: 15,
     paddingHorizontal: 15,
     width: "70%",
     alignSelf: "center",
-    marginTop: 10,
+    marginTop: 18,
     marginBottom: 18,
-
     justifyContent: "center",
     alignItems: "center",
-    position: "relative",
+
+    shadowColor: "#000",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
 
   buttonText: {
@@ -326,14 +405,12 @@ const styles = StyleSheet.create({
 
   chevron: {
     position: "absolute",
-    right: 20,
-    borderColor: "#add9ff",
-    borderWidth: 1,
-    //top: "140%",
+    right: -75,
+    top: -5,
+    borderColor: "#fff",
+    borderWidth: 0.2,
     borderRadius: 100,
     padding: 5,
-
-    //transform: [{ translateY: -8 }], // half icon height
   },
 });
 

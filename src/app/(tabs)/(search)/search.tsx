@@ -42,6 +42,8 @@ const Search = () => {
           Alert.alert("Error", result.error);
         }
 
+        //console.log(result.data[0]);
+
         setLoading(false);
         setReady(false);
       } else {
@@ -57,21 +59,22 @@ const Search = () => {
   }, [searchBook]);
 
   const loadMoreBooks = async () => {
+    if (loadingMore || loading) return;
+    if (searchBook.trim() === "") return;
     setLoadingMore(true);
-    setStopMoreBook(true);
 
-    //console.log("aquiiii", offset);
-    const result = await fetchSearch(searchBook, offset + 10);
+    const newOffset = offset + 10;
+
+    //console.log("aquiiii", newOffset);
+    const result = await fetchSearch(searchBook, newOffset);
     //console.log(result);
-    setOffset(offset + 10);
-    setBooks((prev) => [...prev, ...result]);
+    setOffset(newOffset);
+    if (result.success) {
+      setBooks((prev) => [...prev, ...result.data]);
+    } else {
+      Alert.alert("Error", result.error);
+    }
     setLoadingMore(false);
-    setReady(false);
-    setStopMoreBook(false);
-  };
-
-  const renderFooter = () => {
-    return loadingMore ? <ActivityIndicator size="large" /> : null;
   };
 
   return (
@@ -107,14 +110,16 @@ const Search = () => {
         )}
         renderItem={({ item }) => (
           <BookCard
-            itemKey={item.key}
-            coverId={item.key.split("/")[2]}
-            urlPoster={`${COVER_URL}/w/olid/${item.key.split("/")[2]}-L.jpg`}
-            authorName={item.author_name}
+            itemKey={item.editions.docs[0].key}
+            coverId={item.editions.docs[0].key.split("/")[2]}
+            urlPoster={`${COVER_URL}/b/olid/${item.editions.docs[0].key.split("/")[2]}-L.jpg`}
+            authorName={item?.author_name ?? [""]}
             title={item.title}
-            routeUrl={"books"}
+            routeUrl={"editions"}
             orientation={"v"}
-            year={getYear(item?.first_publish_year.toString())}
+            year={getYear(
+              item?.editions?.docs?.[0]?.publish_year?.[0].toString(),
+            )}
           />
         )}
         keyExtractor={(item) => item.key.toString()}
@@ -127,12 +132,19 @@ const Search = () => {
             </View>
           ) : null
         }
-        ListFooterComponent={() => (
-          <>
-            {renderFooter()}
+        onEndReached={loadMoreBooks}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          loadingMore ? (
+            <>
+              <ActivityIndicator />
+              <View style={styles.endContainer} />
+            </>
+          ) : (
             <View style={styles.endContainer} />
-          </>
-        )}
+          )
+        }
+
         /*onEndReached={
           (ready || stopMoreBook) && offset + 10 >= entries
             ? null

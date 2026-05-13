@@ -5,11 +5,13 @@ export const getYear = (dateString?: string) => {
   const parsed = new Date(dateString);
 
   if (!isNaN(parsed.getTime())) {
-    return parsed.getFullYear();
+    return parsed.getFullYear() + 1;
   }
 
   // Fallback: extract 4-digit year
   const match = dateString.match(/\b(1[0-9]{3}|20[0-9]{2})\b/);
+
+  //console.log(match, dateString);
 
   return match ? match[0] : null;
 };
