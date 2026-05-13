@@ -26,7 +26,14 @@ const BookDetails = () => {
   const { itemKey, coverId, urlPoster, title, authorName } =
     useLocalSearchParams();
 
-  //console.log("Details", itemKey, coverId, urlPoster, title, authorName);
+  //console.log(
+  //  "Details of work",
+  //  itemKey,
+  //  coverId,
+  //  urlPoster,
+  //  title,
+  //  authorName,
+  //);
 
   const [details, setDetails] = useState([]);
   const [editions, setEditions] = useState([]);
@@ -71,7 +78,7 @@ const BookDetails = () => {
     const result = await fetchBookEditions(itemKey.split("/")[2], 3, 0);
 
     if (result?.success) {
-      setEditions([...editions, ...result.data]);
+      setEditions(result.data);
       setOffset(10 + offset);
     } else {
       Alert.alert("Error", result.error);
@@ -85,22 +92,6 @@ const BookDetails = () => {
   return (
     <ScrollView contentContainerStyle={[styles.scrollContent]}>
       <View style={styles.container}>
-        <View style={styles.imageContainer}>
-          {coverId ? (
-            <Image
-              source={{
-                uri: urlPoster,
-              }}
-              style={styles.coverImage}
-              resizeMode="contain"
-            />
-          ) : (
-            <View style={styles.noImage}>
-              <Text style={{ color: "#ffffff" }}>No Image</Text>
-            </View>
-          )}
-        </View>
-
         {loadingDetails ? (
           <View>
             <ActivityIndicator
@@ -111,6 +102,21 @@ const BookDetails = () => {
           </View>
         ) : (
           <>
+            <View style={styles.imageContainer}>
+              {coverId ? (
+                <Image
+                  source={{
+                    uri: urlPoster,
+                  }}
+                  style={styles.coverImage}
+                  resizeMode="contain"
+                />
+              ) : (
+                <View style={styles.noImage}>
+                  <Text style={{ color: "#ffffff" }}>No Image</Text>
+                </View>
+              )}
+            </View>
             <Text style={[styles.titleName, { color: colorText }]}>
               {details.title}
             </Text>
@@ -118,26 +124,30 @@ const BookDetails = () => {
             <TouchableOpacity
               style={styles.buttonAdd}
               onPress={() => {
-                //console.log("\n\n\n");
-
-                console.log("Book saved");
                 router.push({
                   pathname: "/shelfLists",
                   params: { bookId: itemKey },
                 });
-                //await clearAll();
               }}
             >
-              <SymbolView
-                name={"plus"}
-                tintColor={"white"}
-                weight={"semibold"}
-                size={16}
-                style={{ marginRight: 5 }}
-              />
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "white" }}>
-                {!added ? "Add" : "Remove"}
-              </Text>
+              <Text style={styles.buttonText}>Want to Read</Text>
+
+              <TouchableOpacity
+                style={styles.chevron}
+                onPress={() => {
+                  router.push({
+                    pathname: "/shelfLists",
+                    params: { bookId: itemKey },
+                  });
+                }}
+              >
+                <SymbolView
+                  name={"chevron.down"}
+                  tintColor={"white"}
+                  weight={"semibold"}
+                  size={16}
+                />
+              </TouchableOpacity>
             </TouchableOpacity>
 
             <Text
@@ -178,59 +188,56 @@ const BookDetails = () => {
           </>
         )}
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginRight: 16,
-            alignItems: "center",
-            //marginTop: 5,
-            marginBottom: 10,
-          }}
-        >
-          <Text style={[styles.title, { color: colorText }]}>Editions</Text>
-          <Text
-            onPress={() => router.push(`/moreBooks/${itemKey.split("/")[2]}`)}
-          >
-            See All
-          </Text>
-        </View>
-
-        {loadingEditions ? (
-          <View>
-            <ActivityIndicator
-              size="large"
-              //color="#0000ff"
-              //className="mt-10 self-center"
+        {loadingEditions ? null : (
+          <>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginRight: 16,
+                alignItems: "center",
+                //marginTop: 5,
+                marginBottom: 10,
+              }}
+            >
+              <Text style={[styles.title, { color: colorText }]}>Editions</Text>
+              <Text
+                onPress={() =>
+                  router.push({
+                    pathname: `/moreBooks/${itemKey.split("/")[2]}`,
+                    params: {
+                      endpoint: "editions",
+                      bookId: itemKey.split("/")[2],
+                    },
+                  })
+                }
+              >
+                See All
+              </Text>
+            </View>
+            <FlatList
+              data={editions}
+              style={{ paddingLeft: 6 }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <BookCard
+                  itemKey={item.key}
+                  coverId={item.key.split("/")[2]}
+                  urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-L.jpg`}
+                  authorName={[""]}
+                  title={item.title}
+                  routeUrl={"editions"}
+                  year={getYear(item.publish_date)}
+                />
+              )}
+              //onEndReached={loadBooksEditions}
+              //onEndReachedThreshold={0.5} // Trigger when 50% from bottom
+              ListFooterComponent={<View style={{ height: 20 }} />}
             />
-          </View>
-        ) : (
-          <FlatList
-            data={editions}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-            contentContainerStyle={{
-              paddingHorizontal: 8,
-              alignItems: "flex-end",
-              gap: 16,
-            }}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <BookCard
-                itemKey={item.key}
-                coverId={item.key.split("/")[2]}
-                urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-L.jpg`}
-                authorName={[""]}
-                title={item.title}
-                routeUrl={"editions"}
-                year={getYear(item.publish_date)}
-              />
-            )}
-            //onEndReached={loadBooksEditions}
-            //onEndReachedThreshold={0.5} // Trigger when 50% from bottom
-            ListFooterComponent={<View style={{ height: 20 }} />}
-          />
+          </>
         )}
         <View style={{ height: 20 }} />
       </View>
@@ -296,49 +303,37 @@ const styles = StyleSheet.create({
   },
 
   buttonAdd: {
-    alignItems: "center",
     backgroundColor: "#1b95ff",
     borderRadius: 100,
-    paddingVertical: 8,
-    shadowColor: "#000",
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingLeft: 15,
-    paddingRight: 15,
-    justifyContent: "center",
-    alignContent: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    width: "70%",
     alignSelf: "center",
     marginTop: 10,
     marginBottom: 18,
-    flexDirection: "row",
-    width: "40%",
 
-    //shadowOffset: { width: 0, height: 2 },
-    //shadowOpacity: 0.1,
-    //shadowRadius: 4,
-    //elevation: 3,
-  },
-  buttonRemove: {
+    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#c1c1c1",
-    borderRadius: 100,
-    paddingVertical: 8,
-    shadowColor: "#000",
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingLeft: 15,
-    paddingRight: 15,
-    justifyContent: "center",
-    alignContent: "center",
-    alignSelf: "center",
-    marginTop: 10,
-    marginBottom: 18,
-    flexDirection: "row",
+    position: "relative",
+  },
 
-    //shadowOffset: { width: 0, height: 2 },
-    //shadowOpacity: 0.1,
-    //shadowRadius: 4,
-    //elevation: 3,
+  buttonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "white",
+    textAlign: "center",
+  },
+
+  chevron: {
+    position: "absolute",
+    right: 20,
+    borderColor: "#add9ff",
+    borderWidth: 1,
+    //top: "140%",
+    borderRadius: 100,
+    padding: 5,
+
+    //transform: [{ translateY: -8 }], // half icon height
   },
 });
 

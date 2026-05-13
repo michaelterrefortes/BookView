@@ -21,7 +21,7 @@ const AuthorDetails = () => {
   const router = useRouter();
   const { key } = useLocalSearchParams();
 
-  //console.log(key);
+  //console.log("Author details", key);
 
   const [authorInfo, setAuthorInfo] = useState({});
   const [authorBooks, setAuthorBooks] = useState([]);
@@ -81,7 +81,7 @@ const AuthorDetails = () => {
             {authorInfo.photos ? (
               <Image
                 source={{
-                  uri: `${COVER_URL}/b/id/${authorInfo.photos[0]}-L.jpg`,
+                  uri: `${COVER_URL}/a/olid/${key}-L.jpg`,
                 }}
                 style={styles.coverImage}
                 resizeMode="cover"
@@ -135,7 +135,14 @@ const AuthorDetails = () => {
           }}
         >
           <Text style={styles.title2}>Books</Text>
-          <Text onPress={() => console.log("More Books by Author")}>
+          <Text
+            onPress={() =>
+              router.push({
+                pathname: `/moreBooks/${key}`,
+                params: { endpoint: "author", bookId: key },
+              })
+            }
+          >
             See All
           </Text>
         </View>
@@ -160,8 +167,8 @@ const AuthorDetails = () => {
             renderItem={({ item }) => (
               <BookCard
                 itemKey={item.key}
-                coverId={item.covers?.[0]}
-                urlPoster={`${COVER_URL}/b/id/${item.covers?.[0]}-L.jpg`}
+                coverId={item.key.split("/")[2]}
+                urlPoster={`${COVER_URL}/w/olid/${item.key.split("/")[2]}-L.jpg`}
                 authorName={[""]}
                 title={item.title}
                 routeUrl={"books"}

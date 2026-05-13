@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import AuthorCard from "../../../../components/AuthorCard";
 import BookCard from "../../../../components/BookCard";
@@ -105,8 +105,8 @@ export default function Index() {
           renderItem={({ item }) => (
             <BookCard
               itemKey={item.key}
-              coverId={item.editions.docs[0].cover_i}
-              urlPoster={`${COVER_URL}/b/id/${item.editions.docs[0].cover_i}-L.jpg`}
+              coverId={item.key.split("/")[2]}
+              urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-L.jpg`}
               authorName={item.author_name}
               title={item.title}
               routeUrl={"books"}

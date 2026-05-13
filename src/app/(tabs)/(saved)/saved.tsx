@@ -36,8 +36,8 @@ const Saved = () => {
           renderItem={({ item }) => (
             <BookCard
               itemKey={`/works/${item.key}`}
-              coverId={item.cover}
-              urlPoster={`${COVER_URL}/b/id/${item.cover}-L.jpg`}
+              coverId={item.key}
+              urlPoster={`${COVER_URL}/w/olid/${item.key}-L.jpg`}
               authorName={[item.author]}
               title={item.title}
               routeUrl={"books"}

@@ -31,7 +31,9 @@ const Search = () => {
       if (searchBook.trim()) {
         setLoading(true);
 
-        const result = await fetchSearch(searchBook, offset);
+        const result = await fetchSearch(searchBook, 0);
+
+        setOffset(0);
 
         if (result.success) {
           setBooks(result.data);
@@ -100,17 +102,19 @@ const Search = () => {
       )}
       <FlatList
         data={books}
-        ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
+        ItemSeparatorComponent={() => (
+          <View style={{ backgroundColor: "lightgray", height: 1 }} />
+        )}
         renderItem={({ item }) => (
           <BookCard
             itemKey={item.key}
-            coverId={item.cover_i}
-            urlPoster={`${COVER_URL}/b/id/${item.cover_i}-L.jpg`}
+            coverId={item.key.split("/")[2]}
+            urlPoster={`${COVER_URL}/w/olid/${item.key.split("/")[2]}-L.jpg`}
             authorName={item.author_name}
             title={item.title}
             routeUrl={"books"}
             orientation={"v"}
-            year={getYear(item.first_publish_year)}
+            year={getYear(item?.first_publish_year.toString())}
           />
         )}
         keyExtractor={(item) => item.key.toString()}

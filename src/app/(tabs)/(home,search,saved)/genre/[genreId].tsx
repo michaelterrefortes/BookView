@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -14,6 +14,7 @@ import { COVER_URL } from "../../../../../constants/urls";
 import { fetchBooksSubject } from "../../../../../services/api";
 
 const Genre = () => {
+  const router = useRouter();
   const { name, data } = useLocalSearchParams();
 
   const sections = data ? JSON.parse(data as string) : [];
@@ -84,7 +85,16 @@ const Genre = () => {
               }}
             >
               <Text style={styles.bigTitle}>{item.name}</Text>
-              <Text onPress={() => console.log("More Books")}>See All</Text>
+              <Text
+                onPress={() =>
+                  router.push({
+                    pathname: `/moreBooks/${item.name}`,
+                    params: { endpoint: "subject", bookId: item.url },
+                  })
+                }
+              >
+                See All
+              </Text>
             </View>
 
             {bookData[item.name]?.loading ? (
@@ -106,8 +116,8 @@ const Genre = () => {
                 renderItem={({ item }) => (
                   <BookCard
                     itemKey={item.key}
-                    coverId={item.cover_id}
-                    urlPoster={`${COVER_URL}/b/id/${item.cover_id}-L.jpg`}
+                    coverId={item.key.split("/")[2]}
+                    urlPoster={`${COVER_URL}/w/olid/${item.key.split("/")[2]}-L.jpg`}
                     authorName={
                       item.authors
                         ?.map((author) => author.name)
