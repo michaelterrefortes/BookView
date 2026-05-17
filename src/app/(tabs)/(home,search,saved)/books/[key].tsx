@@ -1,6 +1,7 @@
-import { useIsFocused, useLocalSearchParams, useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -12,21 +13,31 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import AuthorCard from "../../../../../components/AuthorCard";
 import BookCard from "../../../../../components/BookCard";
 import { COVER_URL } from "../../../../../constants/urls";
+import { BookContext } from "../../../../../context/BookContext";
 import {
   fetchBookDetails,
   fetchBookEditions,
 } from "../../../../../services/api";
-import { getYear } from "../../../../../services/functions";
+import { findBookInShelve, getYear } from "../../../../../services/functions";
 
 const BookDetails = () => {
   const router = useRouter();
   const { itemKey, coverId, urlPoster, title, authorName } =
     useLocalSearchParams();
 
-  //console.log("Details", itemKey, coverId, urlPoster, title, authorName);
+  const { shelfBooks, listsBooks } = useContext(BookContext);
+
+  console.log(
+    "Details of work",
+    itemKey,
+    coverId,
+    urlPoster,
+    title,
+    authorName,
+  );
+  const [added, setAdded] = useState(0);
 
   const [details, setDetails] = useState([]);
   const [editions, setEditions] = useState([]);
@@ -34,13 +45,15 @@ const BookDetails = () => {
   const [loadingEditions, setLoadingEditions] = useState(false);
   const [offset, setOffset] = useState(0);
 
-  const [added, setAdded] = useState(false);
+  useEffect(() => {
+    const id = itemKey.split("/")[2];
 
-  const isFocused = useIsFocused();
+    const shelf = findBookInShelve(id, shelfBooks);
 
-  //console.log(bgColor);
-
-  const [colorText, setColorText] = useState("black");
+    if (shelf) {
+      setAdded(shelf);
+    }
+  }, [shelfBooks]);
 
   useEffect(() => {
     loadBooksDetails();
@@ -56,6 +69,7 @@ const BookDetails = () => {
     const result = await fetchBookDetails(itemKey.split("/")[2], "works");
 
     if (result?.success) {
+      //console.log(result.data);
       setDetails(result.data);
     } else {
       Alert.alert("Error", result.error);
@@ -71,7 +85,7 @@ const BookDetails = () => {
     const result = await fetchBookEditions(itemKey.split("/")[2], 3, 0);
 
     if (result?.success) {
-      setEditions([...editions, ...result.data]);
+      setEditions(result.data);
       setOffset(10 + offset);
     } else {
       Alert.alert("Error", result.error);
@@ -85,22 +99,6 @@ const BookDetails = () => {
   return (
     <ScrollView contentContainerStyle={[styles.scrollContent]}>
       <View style={styles.container}>
-        <View style={styles.imageContainer}>
-          {coverId ? (
-            <Image
-              source={{
-                uri: urlPoster,
-              }}
-              style={styles.coverImage}
-              resizeMode="contain"
-            />
-          ) : (
-            <View style={styles.noImage}>
-              <Text style={{ color: "#ffffff" }}>No Image</Text>
-            </View>
-          )}
-        </View>
-
         {loadingDetails ? (
           <View>
             <ActivityIndicator
@@ -111,54 +109,140 @@ const BookDetails = () => {
           </View>
         ) : (
           <>
-            <Text style={[styles.titleName, { color: colorText }]}>
-              {details.title}
-            </Text>
+            <View style={styles.row}>
+              <View style={styles.imageContainer}>
+                {coverId ? (
+                  <Image
+                    source={{ uri: urlPoster }}
+                    style={styles.coverImage}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <View style={styles.noImage}>
+                    <Text style={{ color: "#fff" }}>No Image</Text>
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.rightContent}>
+                <Text style={styles.titleName}>{details.title}</Text>
+
+                <View style={styles.authors}>
+                  {details.authorDetails?.map((item, index) => {
+                    const id = item.key.split("/")[2];
+                    const isLast = index === details.authorDetails.length - 1;
+
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() =>
+                          router.push({
+                            pathname: `/authors/${id}`,
+                            params: { authorId: id },
+                          })
+                        }
+                        style={{ flexDirection: "row" }}
+                      >
+                        <Text style={styles.authorText}>{item.name}</Text>
+                        {!isLast && <Text style={styles.authorText}>, </Text>}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            </View>
 
             <TouchableOpacity
-              style={styles.buttonAdd}
               onPress={() => {
-                //console.log("\n\n\n");
-
-                console.log("Book saved");
                 router.push({
                   pathname: "/shelfLists",
                   params: { bookId: itemKey },
                 });
-                //await clearAll();
               }}
+              activeOpacity={0.8}
             >
-              <SymbolView
-                name={"plus"}
-                tintColor={"white"}
-                weight={"semibold"}
-                size={16}
-                style={{ marginRight: 5 }}
-              />
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "white" }}>
-                {!added ? "Add" : "Remove"}
-              </Text>
+              <LinearGradient
+                colors={
+                  added === 0 ? ["#9d87ed", "#7663dc"] : ["#a4a0b1", "#9591ad"]
+                }
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[
+                  styles.buttonAdd,
+                  {
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    position: "relative",
+                    borderColor: "#a9a0da",
+                    borderWidth: 1,
+                  },
+                ]}
+              >
+                {added !== 0 ? (
+                  <SymbolView
+                    name={"checkmark.seal"}
+                    size={18}
+                    tintColor={"white"}
+                    style={{ marginRight: 10 }}
+                  />
+                ) : null}
+                <Text style={[styles.buttonText]}>
+                  {added === 0
+                    ? "Add to Library"
+                    : added === 1
+                      ? "Want to Read"
+                      : added === 2
+                        ? "Reading"
+                        : added === 3
+                          ? "Finished"
+                          : "Not Finished"}
+                </Text>
+
+                <SymbolView
+                  name="chevron.down"
+                  tintColor="white"
+                  weight="semibold"
+                  size={16}
+                  style={{ position: "absolute", right: 16 }}
+                />
+              </LinearGradient>
             </TouchableOpacity>
 
-            <Text
-              numberOfLines={4}
-              style={[styles.keyText, { color: colorText }]}
+            <View
+              style={{
+                backgroundColor: "#fff",
+                marginHorizontal: 16,
+                paddingVertical: 15,
+                borderRadius: 10,
+              }}
             >
-              {details?.description}
-            </Text>
-            <TouchableOpacity
-              style={{ alignSelf: "flex-end", paddingRight: 16 }}
-              onPress={() =>
-                router.push({
-                  pathname: "/moreInfo/info",
-                  params: {
-                    description: details?.description,
-                  },
-                })
-              }
-            >
-              <Text style={{ fontWeight: "600" }}>MORE</Text>
-            </TouchableOpacity>
+              <Text numberOfLines={4} style={[styles.keyText]}>
+                {details?.description?.value ??
+                  details?.description ??
+                  "No Description"}
+              </Text>
+              <TouchableOpacity
+                style={{ alignSelf: "flex-end", paddingRight: 16 }}
+                onPress={() =>
+                  router.push({
+                    pathname: "/moreInfo/info",
+                    params: {
+                      description:
+                        details?.description?.value ??
+                        details?.description ??
+                        "No Description",
+                    },
+                  })
+                }
+              >
+                <Text style={{ fontWeight: "600", color: "#7663dc" }}>
+                  more
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/*
             <Text style={[styles.title, { color: colorText }]}>Author</Text>
             <FlatList
               data={details.authorDetails}
@@ -174,63 +258,62 @@ const BookDetails = () => {
                   name={item.name}
                 />
               )}
-            />
+            /> */}
           </>
         )}
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginRight: 16,
-            alignItems: "center",
-            //marginTop: 5,
-            marginBottom: 10,
-          }}
-        >
-          <Text style={[styles.title, { color: colorText }]}>Editions</Text>
-          <Text
-            onPress={() => router.push(`/moreBooks/${itemKey.split("/")[2]}`)}
-          >
-            See All
-          </Text>
-        </View>
-
-        {loadingEditions ? (
-          <View>
-            <ActivityIndicator
-              size="large"
-              //color="#0000ff"
-              //className="mt-10 self-center"
+        {loadingEditions ? null : (
+          <>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginRight: 16,
+                alignItems: "center",
+                //marginTop: 5,
+                marginBottom: 10,
+                marginTop: 16,
+              }}
+            >
+              <Text style={[styles.title]}>Editions</Text>
+              <Text
+                style={{ color: "#7663dc" }}
+                onPress={() =>
+                  router.push({
+                    pathname: `/moreBooks/${itemKey.split("/")[2]}`,
+                    params: {
+                      endpoint: "editions",
+                      bookId: itemKey.split("/")[2],
+                    },
+                  })
+                }
+              >
+                See All
+              </Text>
+            </View>
+            <FlatList
+              data={editions}
+              style={{ paddingLeft: 6 }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <BookCard
+                  itemKey={item.key}
+                  coverId={item.key.split("/")[2]}
+                  urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-L.jpg`}
+                  authorName={[""]}
+                  title={item.title}
+                  routeUrl={"editions"}
+                  year={getYear(item.publish_date)}
+                />
+              )}
+              //onEndReached={loadBooksEditions}
+              //onEndReachedThreshold={0.5} // Trigger when 50% from bottom
+              ListFooterComponent={<View style={{ height: 20 }} />}
             />
-          </View>
-        ) : (
-          <FlatList
-            data={editions}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-            contentContainerStyle={{
-              paddingHorizontal: 8,
-              alignItems: "flex-end",
-              gap: 16,
-            }}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <BookCard
-                itemKey={item.key}
-                coverId={item.key.split("/")[2]}
-                urlPoster={`${COVER_URL}/b/olid/${item.key.split("/")[2]}-L.jpg`}
-                authorName={[""]}
-                title={item.title}
-                routeUrl={"editions"}
-                year={getYear(item.publish_date)}
-              />
-            )}
-            //onEndReached={loadBooksEditions}
-            //onEndReachedThreshold={0.5} // Trigger when 50% from bottom
-            ListFooterComponent={<View style={{ height: 20 }} />}
-          />
+          </>
         )}
         <View style={{ height: 20 }} />
       </View>
@@ -242,103 +325,123 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+
   scrollContent: {
-    //paddingBottom: 80,
+    // paddingBottom: 80,
   },
+
+  // 🔥 MAIN ROW (image + content)
+  row: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    alignItems: "flex-start",
+    gap: 12,
+  },
+
+  // 📸 IMAGE
   imageContainer: {
-    width: 180,
-    height: 270,
-    //backgroundColor: "red",
+    width: 100,
+    height: 150,
     //borderRadius: 8,
     overflow: "hidden",
-    alignSelf: "center",
-    marginBottom: 20,
   },
+
   coverImage: {
     width: "100%",
     height: "100%",
-    //backgroundColor: "blue",
   },
+
   noImage: {
-    flex: 1,
+    width: 100,
+    height: 150,
+    backgroundColor: "#aaa",
     alignItems: "center",
     justifyContent: "center",
-    width: 180,
-    height: 270,
-    backgroundColor: "#aaa",
-    //borderRadius: 8,
-    overflow: "hidden",
-    alignSelf: "center",
-    marginBottom: 20,
+    borderRadius: 8,
   },
+
   noImageText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#fff",
+    textAlign: "center",
   },
+
+  // 📖 RIGHT SIDE CONTENT
+  rightContent: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "flex-start",
+  },
+
+  // 📌 TITLE
+  titleName: {
+    fontSize: 18,
+    fontWeight: "700",
+    flexWrap: "wrap",
+    color: "#000",
+  },
+
+  // ✍️ AUTHORS CONTAINER
+  authors: {
+    marginTop: 6,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    flex: 1,
+  },
+
+  authorText: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 4,
+  },
+
+  // (optional other styles kept clean)
   title: {
     fontSize: 20,
     fontWeight: "600",
-
     paddingLeft: 16,
   },
-  titleName: {
-    fontSize: 28,
-    fontWeight: "bold",
-    paddingHorizontal: 16,
-    marginBottom: 8,
-    textAlign: "center",
-  },
+
   keyText: {
     fontSize: 16,
-
     paddingHorizontal: 16,
-    //marginBottom: 25,
   },
 
   buttonAdd: {
-    alignItems: "center",
-    backgroundColor: "#1b95ff",
     borderRadius: 100,
-    paddingVertical: 8,
-    shadowColor: "#000",
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingLeft: 15,
-    paddingRight: 15,
-    justifyContent: "center",
-    alignContent: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    width: "70%",
     alignSelf: "center",
-    marginTop: 10,
+    marginTop: 18,
     marginBottom: 18,
-    flexDirection: "row",
-    width: "40%",
+    justifyContent: "center",
+    alignItems: "center",
 
-    //shadowOffset: { width: 0, height: 2 },
-    //shadowOpacity: 0.1,
-    //shadowRadius: 4,
-    //elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
-  buttonRemove: {
-    alignItems: "center",
-    backgroundColor: "#c1c1c1",
-    borderRadius: 100,
-    paddingVertical: 8,
-    shadowColor: "#000",
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingLeft: 15,
-    paddingRight: 15,
-    justifyContent: "center",
-    alignContent: "center",
-    alignSelf: "center",
-    marginTop: 10,
-    marginBottom: 18,
-    flexDirection: "row",
 
-    //shadowOffset: { width: 0, height: 2 },
-    //shadowOpacity: 0.1,
-    //shadowRadius: 4,
-    //elevation: 3,
+  buttonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "white",
+    textAlign: "center",
+  },
+
+  chevron: {
+    position: "absolute",
+    right: -75,
+    top: -5,
+    borderColor: "#fff",
+    borderWidth: 0.2,
+    borderRadius: 100,
+    padding: 5,
   },
 });
 

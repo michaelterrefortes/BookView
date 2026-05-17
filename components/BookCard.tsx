@@ -94,7 +94,7 @@ const BookCard = ({
         style={styles.row}
         onPress={() =>
           router.push({
-            pathname: `/books/${itemKey.split("/")[2]}`,
+            pathname: `/${routeUrl}/${itemKey.split("/")[2]}`,
             params: {
               itemKey: itemKey,
               coverId: coverId,
@@ -115,7 +115,7 @@ const BookCard = ({
           </View>
         ) : (
           <View style={[styles.coverContainerSmall, styles.placeholder]}>
-            <Text style={{ color: "#fff" }}>No Image</Text>
+            <Text style={{ color: "#fff", textAlign: "center" }}>No Image</Text>
           </View>
         )}
         <View style={styles.info}>

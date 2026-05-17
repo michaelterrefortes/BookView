@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
@@ -17,23 +18,41 @@ const SearchBar = ({
   onChangeText,
   camera = true,
 }: Props) => {
+  const router = useRouter();
   return (
-    <View style={styles.container}>
-      <SymbolView name="magnifyingglass" size={20} tintColor={"gray"} />
-      <TextInput
-        onPressIn={onPress}
-        placeholder={placeholder}
-        value={value}
-        onChangeText={onChangeText}
-        placeholderTextColor="#6b7280"
-        style={styles.input}
-      />
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View style={styles.container}>
+        <SymbolView name="magnifyingglass" size={20} tintColor={"gray"} />
+        <TextInput
+          onPressIn={onPress}
+          placeholder={placeholder}
+          value={value}
+          onChangeText={onChangeText}
+          placeholderTextColor="#6b7280"
+          style={styles.input}
+        />
+        {value?.trim() === "" ? null : (
+          <TouchableOpacity
+            style={{ marginRight: 10 }}
+            onPress={() => onChangeText("")}
+          >
+            <SymbolView name="x.circle.fill" size={21} tintColor={"gray"} />
+          </TouchableOpacity>
+        )}
 
-      {camera ? (
-        <TouchableOpacity>
-          <SymbolView name="barcode.viewfinder" size={21} tintColor={"black"} />
-        </TouchableOpacity>
-      ) : null}
+        {camera ? (
+          <TouchableOpacity
+            style={[styles.container2]}
+            onPress={() => router.push("/(tabs)/(search)/camera")}
+          >
+            <SymbolView
+              name="barcode.viewfinder"
+              size={21}
+              tintColor={"black"}
+            />
+          </TouchableOpacity>
+        ) : null}
+      </View>
     </View>
   );
 };
@@ -56,6 +75,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
+
   icon: {
     color: "#6b7280", // soft gray
   },

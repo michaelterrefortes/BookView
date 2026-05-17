@@ -11,7 +11,7 @@ const GenreCard = ({ item }) => {
           pathname: `/genre/${item.name}`,
           params: {
             name: item.name,
-            data: JSON.stringify(item.section),
+            endpoint: item.endpoint,
           },
         })
       }

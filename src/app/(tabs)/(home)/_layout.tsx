@@ -6,6 +6,7 @@ export default function HomeLayout() {
       <Stack.Screen
         name="index"
         options={{
+          headerBackButtonDisplayMode: "minimal",
           headerBackTitle: "",
           headerShown: true,
           headerTitle: "Home",
@@ -16,6 +17,7 @@ export default function HomeLayout() {
       <Stack.Screen
         name="books/[key]"
         options={{
+          headerBackButtonDisplayMode: "minimal",
           headerBackTitle: "",
           headerShown: true,
           headerTransparent: true,
@@ -29,6 +31,7 @@ export default function HomeLayout() {
       <Stack.Screen
         name="editions/[key]"
         options={{
+          headerBackButtonDisplayMode: "minimal",
           headerBackTitle: "",
           headerShown: true,
           headerTransparent: true,
@@ -40,6 +43,7 @@ export default function HomeLayout() {
       <Stack.Screen
         name="authors/[key]"
         options={{
+          headerBackButtonDisplayMode: "minimal",
           headerBackTitle: "",
           headerShown: true,
           headerTransparent: true,
@@ -51,6 +55,7 @@ export default function HomeLayout() {
       <Stack.Screen
         name="genre/[genreId]"
         options={{
+          headerBackButtonDisplayMode: "minimal",
           headerShown: true,
           headerTransparent: true,
           headerTitle: "",
@@ -62,6 +67,7 @@ export default function HomeLayout() {
       <Stack.Screen
         name="moreBooks/[key]"
         options={{
+          headerBackButtonDisplayMode: "minimal",
           headerShown: true,
           headerTransparent: true,
           headerTitle: "More Books",
@@ -73,6 +79,7 @@ export default function HomeLayout() {
       <Stack.Screen
         name="moreInfo/info"
         options={{
+          headerBackButtonDisplayMode: "minimal",
           headerBackTitle: "",
           headerShown: true,
           headerTransparent: true,
@@ -87,6 +94,7 @@ export default function HomeLayout() {
       <Stack.Screen
         name="shelfLists/index"
         options={{
+          headerBackButtonDisplayMode: "minimal",
           headerBackTitle: "",
           headerShown: true,
           headerTransparent: true,

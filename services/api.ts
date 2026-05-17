@@ -64,7 +64,7 @@ export const fetchBookDetails = async (workId: String, type: String) => {
         const data = await response.json();
         return {
           name: data.name,
-          image: data.photos?.[0],
+          //image: data.photos?.[0],
           key: authorKey,
         }; // returns each author's JSON
       }),
@@ -73,6 +73,31 @@ export const fetchBookDetails = async (workId: String, type: String) => {
     //console.log(authorData);
 
     dataDetails["authorDetails"] = authorData;
+  }
+
+  if (type === "books") {
+    const authors = [];
+    const authorImages = [];
+    const authorData = await Promise.all(
+      dataDetails?.authors?.map(async (item) => {
+        const authorKey = item.key; // e.g., "/authors/OL23919A"
+        const endpointAuthor = `${BASE_URL}${authorKey}.json`;
+
+        const response = await fetch(endpointAuthor);
+        const data = await response.json();
+        return {
+          name: data.name,
+          //image: data.photos?.[0],
+          key: authorKey,
+        }; // returns each author's JSON
+      }) || [],
+    );
+
+    //console.log(authorData);
+
+    if (authorData.length !== 0) {
+      dataDetails["authorDetails"] = authorData;
+    }
   }
 
   //console.log(dataDetails);
@@ -101,7 +126,7 @@ export const fetchBookEditions = async (
 
 export const fetchSearch = async (query: string, offset: Number) => {
   if (query.trim()) {
-    const endpoint = `${BASE_URL}/search.json?q=${query.replace(/\s+/g, "+")}&limit=10&offset=${offset}`;
+    const endpoint = `${BASE_URL}/search.json?q=${query.replace(/\s+/g, "+")}&limit=10&offset=${offset}&fields=key,title,author_name,editions,isbn,publish_year`;
 
     //console.log(endpoint);
 
