@@ -1,7 +1,15 @@
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useNavigation } from "expo-router";
+import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ListCardAdd from "../../../../../components/ListCardAdd";
 import { BookContext } from "../../../../../context/BookContext";
@@ -41,7 +49,7 @@ const ShelfLists = () => {
     const id = bookId.split("/")[2];
     const shelf = findBookInShelve(id, shelfBooks);
 
-    console.log(shelf);
+    //console.log(shelf);
 
     if (shelf) {
       setSelectedShelf(shelf);
@@ -168,6 +176,36 @@ const ShelfLists = () => {
               selected={selectedShelf}
               value={4}
             />
+
+            <TouchableOpacity
+              onPress={() => console.log("Delete from library")}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={["#dd5656", "#d73939"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[
+                  styles.buttonAdd,
+                  {
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    position: "relative",
+                    //borderColor: "#a9a0da",
+                    //borderWidth: 1,
+                  },
+                ]}
+              >
+                <SymbolView
+                  name={"trash"}
+                  size={18}
+                  tintColor={"white"}
+                  style={{ marginRight: 10 }}
+                />
+                <Text style={[styles.buttonText]}>Delete from Library</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
         ) : (
           listsBooks.map((item, index) => (
@@ -191,3 +229,30 @@ const ShelfLists = () => {
 };
 
 export default ShelfLists;
+
+const styles = StyleSheet.create({
+  buttonAdd: {
+    borderRadius: 100,
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    width: "70%",
+    alignSelf: "center",
+    marginTop: 18,
+    marginBottom: 18,
+    justifyContent: "center",
+    alignItems: "center",
+
+    shadowColor: "#000",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+
+  buttonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "white",
+    textAlign: "center",
+  },
+});

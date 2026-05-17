@@ -19,6 +19,8 @@ const _layout = () => {
           title: "Home",
           headerShown: false,
           //headerTransparent: true,
+          tabBarActiveTintColor: "#7663dc",
+          tabBarInactiveTintColor: "gray",
 
           tabBarIcon: ({ focused }) =>
             Platform.select({
@@ -35,6 +37,8 @@ const _layout = () => {
         options={{
           title: "Search",
           headerShown: false,
+          tabBarActiveTintColor: "#7663dc",
+          tabBarInactiveTintColor: "gray",
 
           tabBarIcon: ({ focused }) =>
             Platform.select({
@@ -51,6 +55,9 @@ const _layout = () => {
         options={{
           title: "Library",
           headerShown: false,
+          tabBarActiveTintColor: "#7663dc",
+          tabBarInactiveTintColor: "gray",
+
           tabBarIcon: ({ focused }) =>
             Platform.select({
               ios: {
@@ -66,6 +73,9 @@ const _layout = () => {
         options={{
           title: "Profile",
           headerShown: false,
+          tabBarActiveTintColor: "#7663dc",
+          tabBarInactiveTintColor: "gray",
+
           tabBarIcon: ({ focused }) =>
             Platform.select({
               ios: {
