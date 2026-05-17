@@ -15,3 +15,14 @@ export const getYear = (dateString?: string) => {
 
   return match ? match[0] : null;
 };
+
+export const findBookInShelve = (id, data) => {
+  return data.find((item) => item.books.some((book) => book.bookid === id))
+    ?.shelve;
+};
+
+export const findBookInLists = (id, data) => {
+  return data
+    .filter((item) => item.books.some((book) => book.bookid === id)) // 1. Filter all matches
+    .map((item) => item.listid);
+};

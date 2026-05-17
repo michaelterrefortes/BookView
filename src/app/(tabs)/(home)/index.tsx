@@ -74,6 +74,7 @@ export default function Index() {
         />
         <Text style={{ fontSize: 16, fontWeight: "500" }}>Browse by genre</Text>
       </View>
+
       <FlatList
         data={subjects}
         horizontal

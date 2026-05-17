@@ -1,5 +1,5 @@
 import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/unstable";
-import { withLayoutContext } from "expo-router";
+import { useRouter, withLayoutContext } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
 
@@ -7,6 +7,7 @@ const Tab = createNativeBottomTabNavigator();
 const Tabs = withLayoutContext(Tab.Navigator);
 
 const _layout = () => {
+  const router = useRouter();
   return (
     <Tabs
       screenOptions={{

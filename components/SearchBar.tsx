@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
@@ -17,6 +18,7 @@ const SearchBar = ({
   onChangeText,
   camera = true,
 }: Props) => {
+  const router = useRouter();
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <View style={styles.container}>
@@ -39,7 +41,10 @@ const SearchBar = ({
         )}
 
         {camera ? (
-          <TouchableOpacity style={[styles.container2]}>
+          <TouchableOpacity
+            style={[styles.container2]}
+            onPress={() => router.push("/(tabs)/(search)/camera")}
+          >
             <SymbolView
               name="barcode.viewfinder"
               size={21}

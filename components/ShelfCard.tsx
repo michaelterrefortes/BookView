@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -5,10 +6,28 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 const ShelfCard = ({ item, colors, symbol, title }) => {
   //console.log(item?.[1]);
 
-  const len = item.length;
+  //console.log(item);
+
+  //const len = item.length;
+
+  const router = useRouter();
 
   return (
-    <TouchableOpacity style={styles.cardShelf}>
+    <TouchableOpacity
+      style={styles.cardShelf}
+      onPress={() =>
+        router.push({
+          pathname: "/seeListShelf",
+          params: {
+            item: JSON.stringify(item),
+            title: title,
+            symbol: symbol,
+            color0: colors[0],
+            color1: colors[1],
+          },
+        })
+      }
+    >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View
           style={{

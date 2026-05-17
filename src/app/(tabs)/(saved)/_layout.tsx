@@ -110,11 +110,26 @@ export default function SavedLayout() {
           headerBackTitle: "",
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "Add to Shelf or Lists",
+          headerTitle: "Add to Library",
           //headerShadowVisible: false,
           headerBlurEffect: "none",
 
           presentation: "modal",
+        }}
+      />
+
+      <Stack.Screen
+        name="seeListShelf/index"
+        options={{
+          headerBackButtonDisplayMode: "minimal",
+          headerBackTitle: "",
+          //headerShown: true,
+          headerTransparent: true,
+          headerTitle: "",
+          //headerShadowVisible: false,
+          headerBlurEffect: "none",
+
+          //presentation: "modal",
         }}
       />
     </Stack>

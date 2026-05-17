@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -15,15 +15,19 @@ import {
 } from "react-native";
 import BookCard from "../../../../../components/BookCard";
 import { COVER_URL } from "../../../../../constants/urls";
+import { BookContext } from "../../../../../context/BookContext";
 import {
   fetchBookDetails,
   fetchBookEditions,
 } from "../../../../../services/api";
-import { getYear } from "../../../../../services/functions";
+import { findBookInShelve, getYear } from "../../../../../services/functions";
 
 const BookEditionDetails = () => {
   const { itemKey, coverId, urlPoster, title, authorName } =
     useLocalSearchParams();
+
+  const { shelfBooks } = useContext(BookContext);
+
   const cover = coverId;
   const id = itemKey.split("/")[2];
 
@@ -31,26 +35,36 @@ const BookEditionDetails = () => {
 
   const router = useRouter();
 
-  //console.log(
-  // "Edition details",
-  // itemKey,
-  // coverId,
-  // urlPoster,
-  // title,
-  // authorName,
-  //)//;
+  console.log(
+    "Edition details",
+    itemKey,
+    coverId,
+    urlPoster,
+    title,
+    authorName,
+  ); //;
 
   //console.log("looking at edition", cover, id);
 
-  const [colorText, setColorText] = useState("black");
-
   const [details, setDetails] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
-  const [added, setAdded] = useState(false);
+  const [added, setAdded] = useState(0);
   const [editions, setEditions] = useState([]);
   const [loadingEditions, setLoadingEditions] = useState(false);
 
   const [idWork, setIdWork] = useState("");
+
+  useEffect(() => {
+    const id = itemKey.split("/")[2];
+
+    const shelf = findBookInShelve(id, shelfBooks);
+
+    if (shelf) {
+      setAdded(shelf);
+    }
+
+    //console.log(added);
+  }, [shelfBooks]);
 
   useEffect(() => {
     const loadBooks = async () => {
@@ -158,40 +172,62 @@ const BookEditionDetails = () => {
               </View>
             </View>
 
-            <LinearGradient
-              colors={["#9d87ed", "#7663dc"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.buttonAdd}
+            <TouchableOpacity
+              onPress={() => {
+                router.push({
+                  pathname: "/shelfLists",
+                  params: { bookId: itemKey },
+                });
+              }}
+              activeOpacity={0.8}
             >
-              <TouchableOpacity
-                onPress={() => {
-                  router.push({
-                    pathname: "/shelfLists",
-                    params: { bookId: itemKey },
-                  });
-                }}
+              <LinearGradient
+                colors={
+                  added === 0 ? ["#9d87ed", "#7663dc"] : ["#a4a0b1", "#9591ad"]
+                }
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[
+                  styles.buttonAdd,
+                  {
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    position: "relative",
+                    borderColor: "#a9a0da",
+                    borderWidth: 1,
+                  },
+                ]}
               >
-                <Text style={styles.buttonText}>Want to Read</Text>
-
-                <TouchableOpacity
-                  style={styles.chevron}
-                  onPress={() => {
-                    router.push({
-                      pathname: "/shelfLists",
-                      params: { bookId: itemKey },
-                    });
-                  }}
-                >
+                {added !== 0 ? (
                   <SymbolView
-                    name={"chevron.down"}
+                    name={"checkmark.seal"}
+                    size={18}
                     tintColor={"white"}
-                    weight={"semibold"}
-                    size={16}
+                    style={{ marginRight: 10 }}
                   />
-                </TouchableOpacity>
-              </TouchableOpacity>
-            </LinearGradient>
+                ) : null}
+                <Text style={[styles.buttonText]}>
+                  {added === 0
+                    ? "Add to Library"
+                    : added === 1
+                      ? "Want to Read"
+                      : added === 2
+                        ? "Reading"
+                        : added === 3
+                          ? "Finished"
+                          : "Not Finished"}
+                </Text>
+
+                <SymbolView
+                  name="chevron.down"
+                  tintColor="white"
+                  weight="semibold"
+                  size={16}
+                  style={{ position: "absolute", right: 16 }}
+                />
+              </LinearGradient>
+            </TouchableOpacity>
 
             <View
               style={{
@@ -201,11 +237,10 @@ const BookEditionDetails = () => {
                 borderRadius: 10,
               }}
             >
-              <Text
-                numberOfLines={4}
-                style={[styles.keyText, { color: colorText }]}
-              >
-                {details?.description ?? "No Description"}
+              <Text numberOfLines={4} style={[styles.keyText]}>
+                {details?.description?.value ??
+                  details?.description ??
+                  "No Description"}
               </Text>
               <TouchableOpacity
                 style={{ alignSelf: "flex-end", paddingRight: 16 }}
@@ -213,7 +248,10 @@ const BookEditionDetails = () => {
                   router.push({
                     pathname: "/moreInfo/info",
                     params: {
-                      description: details?.description ?? "No Description",
+                      description:
+                        details?.description?.value ??
+                        details?.description ??
+                        "No Description",
                     },
                   })
                 }
@@ -257,7 +295,7 @@ const BookEditionDetails = () => {
                 marginTop: 16,
               }}
             >
-              <Text style={[styles.title, { color: colorText }]}>Editions</Text>
+              <Text style={[styles.title]}>Editions</Text>
               <Text
                 style={{ color: "#7663dc" }}
                 onPress={() =>

@@ -1,9 +1,16 @@
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { useIsFocused } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import ShelfCard from "../../../../components/ShelfCard";
 import { BookContext } from "../../../../context/BookContext";
+import { fetchAPILists, fetchAPIShelves } from "../../../../services/apiAPI";
 
 const TABS = ["Shelfs", "Lists"];
 
@@ -18,18 +25,11 @@ const colors = [
 ];
 
 const Saved = () => {
-  const {
-    reading,
-    finished,
-    notFinished,
-    wantToRead,
-    setWantToRead,
-    setListsBooks,
-    listsBooks,
-    setReading,
-  } = useContext(BookContext);
+  const { shelfBooks, setShelfBooks, listsBooks, setListsBooks } =
+    useContext(BookContext);
 
   const [loading, setLoading] = useState(false);
+  const [loadingList, setLoadingList] = useState(false);
   const [books, setBooks] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
@@ -39,48 +39,41 @@ const Saved = () => {
   //console.log(isFocused);
 
   useEffect(() => {
-    setReading([{ id: "OL24034W" }]);
-    setListsBooks([
-      {
-        name: "Favorites",
-        books: [
-          {
-            id: "OL15626917W",
-          },
-          {
-            id: "OL1000854M",
-          },
-        ],
-      },
-      { name: "Tired", books: [] },
-    ]);
-    setWantToRead([
-      {
-        id: "OL15626917W",
-      },
-      {
-        id: "OL1000854M",
-      },
-      {
-        id: "OL178496W",
-      },
-      {
-        id: "OL24200877M",
-      },
-      {
-        id: "OL12345M",
-      },
-      {
-        id: "OL23747519M",
-      },
-      {
-        id: "OL27448W",
-      },
-      {
-        id: "OL3189916W",
-      },
-    ]);
+    loadShelves();
+    loadLists();
   }, []);
+
+  const loadShelves = async () => {
+    setLoading(true);
+
+    const result = await fetchAPIShelves();
+
+    if (result.success) {
+      //console.log(result.data);
+      setShelfBooks(result.data);
+
+      //console.log(result.data);
+    } else {
+      Alert.alert("Error", result.error);
+    }
+
+    setLoading(false);
+  };
+
+  const loadLists = async () => {
+    setLoadingList(true);
+
+    const result = await fetchAPILists();
+
+    if (result.success) {
+      //console.log(result.data);
+      setListsBooks(result.data);
+    } else {
+      Alert.alert("Error", result.error);
+    }
+
+    setLoadingList(false);
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -103,27 +96,37 @@ const Saved = () => {
       ) : selected === 0 ? (
         <View style={{ paddingHorizontal: 16 }}>
           <ShelfCard
-            item={wantToRead}
+            item={
+              shelfBooks.find((item) => item.name === "want_to_read")?.books ||
+              []
+            } //shelfBooks.filter((item) => item.shelf === 1)?.[0]?.books}
             symbol={"books.vertical"}
             colors={["#f6e8ef", "#e05651"]}
             title={"Want to Read"}
           />
 
           <ShelfCard
-            item={reading}
+            item={
+              shelfBooks.find((item) => item.name === "reading")?.books || []
+            } //shelfBooks.filter((item) => item.shelf === 2)?.[0]?.books}
             symbol={"books.vertical"}
             colors={["#ebecf7", "#777d9f"]}
             title={"Reading"}
           />
 
           <ShelfCard
-            item={finished}
+            item={
+              shelfBooks.find((item) => item.name === "finished")?.books || []
+            } //shelfBooks.filter((item) => item.shelf === 3)?.[0]?.books}
             symbol={"books.vertical"}
             colors={["#faf2eb", "#fdb460"]}
             title={"Finished"}
           />
           <ShelfCard
-            item={notFinished}
+            item={
+              shelfBooks.find((item) => item.name === "not_finished")?.books ||
+              []
+            } //shelfBooks.filter((item) => item.shelf === 4)?.[0]?.books}
             symbol={"books.vertical"}
             colors={["#ebeafa", "#7671db"]}
             title={"Not Finished"}
@@ -133,11 +136,11 @@ const Saved = () => {
         <View style={{ paddingHorizontal: 16 }}>
           {listsBooks.map((item, index) => (
             <ShelfCard
-              key={index}
+              key={item.listid}
               item={item.books}
               symbol={"apple.books.pages"}
               colors={colors[index % 7]}
-              title={item.name}
+              title={item.name_list}
             />
           ))}
         </View>

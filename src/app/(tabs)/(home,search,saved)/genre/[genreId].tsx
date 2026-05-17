@@ -4,48 +4,39 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import BookCard from "../../../../../components/BookCard";
 import { COVER_URL } from "../../../../../constants/urls";
 import { fetchBooksSubject } from "../../../../../services/api";
 
 const Genre = () => {
   const router = useRouter();
-  const { name, data } = useLocalSearchParams();
-
-  const sections = data ? JSON.parse(data as string) : [];
+  const { name, endpoint } = useLocalSearchParams();
 
   const [loading, setLoading] = useState(false);
   const [bookData, setBookData] = useState({});
 
   useEffect(() => {
-    sections.map((item) =>
-      setBookData((prevData) => ({
-        ...prevData,
-        [item.name]: { loading: true }, // Dynamic key assignment
-      })),
-    );
-
-    sections.map(async (item) => {
+    setLoading(true);
+    const loadBooks = async () => {
       //console.log(item.url);
       const result = await fetchBooksSubject(
-        `/subjects/${item.url}.json?limit=10`,
+        `/subjects/${endpoint}.json?limit=20`,
       );
 
       if (result.success) {
-        setBookData((prevData) => ({
-          ...prevData,
-          [item.name]: { loading: false, data: result.data }, // Dynamic key assignment
-        }));
+        setBookData(result.data);
       } else {
         Alert.alert("Error", result.error);
       }
-    });
-  }, [sections]);
+      setLoading(false);
+    };
+
+    loadBooks();
+  }, []);
 
   return (
     <>
@@ -54,85 +45,41 @@ const Genre = () => {
           headerTitle: name,
         }}
       />
-      <ScrollView style={styles.scrollview}>
-        {sections.map((item) => (
-          <View key={item.name}>
-            {/*<TouchableOpacity
-              style={{
-                marginTop: 10,
-                marginBottom: 10,
-                //backgroundColor: "red",
-              }}
-            >
-              <Text style={styles.bigTitle}>
-                {item.name}
-                <SymbolView
-                  name={"chevron.right"}
-                  size={20}
-                  tintColor={"black"}
-                />
-              </Text>
-            </TouchableOpacity>*/}
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginRight: 16,
-                alignItems: "center",
-                marginTop: 30,
-                marginBottom: 10,
-              }}
-            >
-              <Text style={styles.bigTitle}>{item.name}</Text>
-              <Text
-                style={{ color: "#7663dc" }}
-                onPress={() =>
-                  router.push({
-                    pathname: `/moreBooks/${item.name}`,
-                    params: { endpoint: "subject", bookId: item.url },
-                  })
+      <SafeAreaView style={styles.scrollview}>
+        {loading ? (
+          <View style={styles.containerLoading}>
+            <ActivityIndicator size="large" />
+          </View>
+        ) : (
+          <FlatList
+            data={bookData}
+            showsHorizontalScrollIndicator={true}
+            ItemSeparatorComponent={() => (
+              <View style={{ backgroundColor: "lightgray", height: 1 }} />
+            )}
+            contentContainerStyle={{
+              marginHorizontal: 20,
+            }}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <BookCard
+                itemKey={item.key}
+                coverId={item.key.split("/")[2]}
+                urlPoster={`${COVER_URL}/w/olid/${item.key.split("/")[2]}-L.jpg`}
+                authorName={
+                  item.authors?.map((author) => author.name).filter(Boolean) ||
+                  []
                 }
-              >
-                See All
-              </Text>
-            </View>
-
-            {bookData[item.name]?.loading ? (
-              <View style={styles.containerLoading}>
-                <ActivityIndicator size="large" />
-              </View>
-            ) : (
-              <FlatList
-                data={bookData[item.name]?.data}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-                contentContainerStyle={{
-                  paddingHorizontal: 8,
-                  alignItems: "flex-end",
-                  gap: 16,
-                }}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => (
-                  <BookCard
-                    itemKey={item.key}
-                    coverId={item.key.split("/")[2]}
-                    urlPoster={`${COVER_URL}/w/olid/${item.key.split("/")[2]}-L.jpg`}
-                    authorName={
-                      item.authors
-                        ?.map((author) => author.name)
-                        .filter(Boolean) || []
-                    }
-                    title={item.title}
-                    routeUrl={"books"}
-                  />
-                )}
+                title={item.title}
+                routeUrl={"books"}
+                orientation={"v"}
+                year={item.first_publish_year}
               />
             )}
-          </View>
-        ))}
-      </ScrollView>
+            ListHeaderComponent={() => <View style={{ height: 70 }} />}
+          />
+        )}
+      </SafeAreaView>
     </>
   );
 };
@@ -148,7 +95,7 @@ const styles = StyleSheet.create({
   },
   scrollview: {
     flex: 1,
-    //paddingTop: 100,
+    //marginTop: 120,
   },
   bigTitle: {
     //paddingTop: 10,
