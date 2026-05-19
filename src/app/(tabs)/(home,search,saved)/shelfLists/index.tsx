@@ -151,7 +151,7 @@ const ShelfLists = () => {
       }
     } else {
       result = await addShelf(id, selectedShelf, title, authors, "PUT");
-      //console.log(result); //result2);
+      console.log(result); //result2);
 
       if (result.success) {
         //console.log("excelent edited");
@@ -162,17 +162,19 @@ const ShelfLists = () => {
                   ...item,
                   books: item.books.filter((book) => book.bookid !== id),
                 }
-              : item,
+              : item.shelve === selectedShelf
+                ? { ...item, books: [result.data[0], ...item.books] }
+                : item,
           ),
         );
 
-        setShelfBooks((prevData) =>
+        /*setShelfBooks((prevData) =>
           prevData.map((item) =>
             item.shelve === selectedShelf
               ? { ...item, books: [result.data[0], ...item.books] }
               : item,
           ),
-        );
+        );*/
         navigation.goBack();
       } else {
         Alert.alert("Error", result.error);

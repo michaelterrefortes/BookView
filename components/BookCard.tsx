@@ -122,7 +122,7 @@ const BookCard = ({
           <Text style={styles.title} numberOfLines={2}>
             {title}
           </Text>
-          {authorName[0].trim() !== "" ? (
+          {authorName?.[0].trim() !== "" ? (
             <Text style={[styles.author]} numberOfLines={1}>
               {authorName?.join(", ")}
             </Text>
