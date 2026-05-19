@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useIsFocused, useLocalSearchParams, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useState } from "react";
 import {
@@ -23,6 +23,7 @@ import {
 import { findBookInShelve, getYear } from "../../../../../services/functions";
 
 const BookEditionDetails = () => {
+  const isFocused = useIsFocused();
   const { itemKey, coverId, urlPoster, title, authorName } =
     useLocalSearchParams();
 
@@ -64,7 +65,7 @@ const BookEditionDetails = () => {
     }
 
     //console.log(added);
-  }, [shelfBooks]);
+  }, [shelfBooks, isFocused]);
 
   useEffect(() => {
     const loadBooks = async () => {
@@ -176,7 +177,13 @@ const BookEditionDetails = () => {
               onPress={() => {
                 router.push({
                   pathname: "/shelfLists",
-                  params: { bookId: itemKey },
+                  params: {
+                    bookId: itemKey,
+                    title: details.title,
+                    authors: details.authorDetails
+                      .map((item) => item.name)
+                      .join(", "),
+                  },
                 });
               }}
               activeOpacity={0.8}

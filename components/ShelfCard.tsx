@@ -1,14 +1,26 @@
-import { useRouter } from "expo-router";
+import { useIsFocused, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BookContext } from "../context/BookContext";
 
-const ShelfCard = ({ item, colors, symbol, title }) => {
+const ShelfCard = ({ item, colors, symbol, title, dataType }) => {
   //console.log(item?.[1]);
 
   //console.log(item);
 
   //const len = item.length;
+
+  const { shelfBooks, listsBooks } = useContext(BookContext);
+
+  const isFocused = useIsFocused();
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    if (dataType === "list") {
+      setData(listsBooks.find((el) => el.name_list === item)?.books || []);
+    } else setData(shelfBooks.find((el) => el.name === item)?.books || []);
+  }, [isFocused]);
 
   const router = useRouter();
 
@@ -19,11 +31,12 @@ const ShelfCard = ({ item, colors, symbol, title }) => {
         router.push({
           pathname: "/seeListShelf",
           params: {
-            item: JSON.stringify(item),
+            name: item,
             title: title,
             symbol: symbol,
             color0: colors[0],
             color1: colors[1],
+            dataType: dataType,
           },
         })
       }
@@ -100,7 +113,7 @@ const ShelfCard = ({ item, colors, symbol, title }) => {
         </View> */}
         <View style={{ marginLeft: 15 }}>
           <Text style={styles.shelfTitle}>{title}</Text>
-          <Text style={styles.shelfSubtitle}>{item.length} books</Text>
+          <Text style={styles.shelfSubtitle}>{data.length} books</Text>
         </View>
       </View>
     </TouchableOpacity>

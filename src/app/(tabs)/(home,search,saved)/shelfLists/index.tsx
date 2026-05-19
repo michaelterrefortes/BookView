@@ -4,6 +4,7 @@ import { useLocalSearchParams, useNavigation } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,7 +13,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ListCardAdd from "../../../../../components/ListCardAdd";
+import { API_URL } from "../../../../../constants/urls";
 import { BookContext } from "../../../../../context/BookContext";
+import { addShelf } from "../../../../../services/apiAPI";
 import {
   findBookInLists,
   findBookInShelve,
@@ -31,11 +34,11 @@ const colors = [
 ];
 
 const ShelfLists = () => {
-  const { bookId } = useLocalSearchParams();
+  const { bookId, title, authors } = useLocalSearchParams();
 
-  const { shelfBooks, listsBooks } = useContext(BookContext);
+  const { shelfBooks, listsBooks, setShelfBooks } = useContext(BookContext);
 
-  //console.log(description);
+  //-console.log(title, authors);
 
   const [selected, setSelected] = useState(0);
 
@@ -114,12 +117,121 @@ const ShelfLists = () => {
           },
           onPress: () => {
             // Do something
-            navigation.goBack();
+            //navigation.goBack();
+            handleConfirm();
           },
         },
       ],
     });
   }, [selectedShelf, selectedLists]);
+
+  const handleConfirm = async () => {
+    const id = bookId.split("/")[2];
+    //console.log("handleConfirm", id, selectedShelf, selectedLists);
+
+    let result = null;
+    if (prevSelectedShelf === -1) {
+      result = await addShelf(id, selectedShelf, title, authors);
+      //console.log(result); //result2);
+
+      if (result.success) {
+        //console.log("excelent added");
+
+        setShelfBooks((prevData) =>
+          prevData.map((item) =>
+            item.shelve === selectedShelf
+              ? { ...item, books: [result.data[0], ...item.books] }
+              : item,
+          ),
+        );
+
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", result.error);
+      }
+    } else {
+      result = await addShelf(id, selectedShelf, title, authors, "PUT");
+      //console.log(result); //result2);
+
+      if (result.success) {
+        //console.log("excelent edited");
+        setShelfBooks((prevData) =>
+          prevData.map((item) =>
+            item.shelve === prevSelectedShelf
+              ? {
+                  ...item,
+                  books: item.books.filter((book) => book.bookid !== id),
+                }
+              : item,
+          ),
+        );
+
+        setShelfBooks((prevData) =>
+          prevData.map((item) =>
+            item.shelve === selectedShelf
+              ? { ...item, books: [result.data[0], ...item.books] }
+              : item,
+          ),
+        );
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", result.error);
+      }
+    }
+
+    //const result2 = await addList(id, selectedLists, title, authors);
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Confirmation",
+      "Are you sure you want to delete this book from your library? This action will remove the book from shelf and lists.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => confirmDelete(),
+          style: "destructive",
+        },
+      ],
+      { cancelable: true }, // Allows tapping outside to dismiss on Android
+    );
+  };
+
+  const confirmDelete = async () => {
+    const id = bookId.split("/")[2];
+    const response = await fetch(`${API_URL}/shelf/${id}`, {
+      method: "DELETE", // Specify the method
+      headers: {
+        "Content-Type": "application/json", // Inform the server we're sending JSON
+      },
+    });
+
+    if (!response.ok) {
+      // @ts-ignore
+      //throw new Error("Failed to fetch books", response.statusText);
+      Alert.alert("Error", response.error);
+    } else {
+      console.log("deleted success");
+
+      setShelfBooks((prevData) =>
+        prevData.map((item) =>
+          item.shelve === prevSelectedShelf
+            ? {
+                ...item,
+                books: item.books.filter((book) => book.bookid !== id),
+              }
+            : item,
+        ),
+      );
+
+      navigation.goBack();
+    }
+  };
 
   return (
     <SafeAreaView
@@ -177,35 +289,37 @@ const ShelfLists = () => {
               value={4}
             />
 
-            <TouchableOpacity
-              onPress={() => console.log("Delete from library")}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={["#dd5656", "#d73939"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={[
-                  styles.buttonAdd,
-                  {
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    position: "relative",
-                    //borderColor: "#a9a0da",
-                    //borderWidth: 1,
-                  },
-                ]}
+            {prevSelectedShelf !== -1 ? (
+              <TouchableOpacity
+                onPress={() => handleDelete()}
+                activeOpacity={0.8}
               >
-                <SymbolView
-                  name={"trash"}
-                  size={18}
-                  tintColor={"white"}
-                  style={{ marginRight: 10 }}
-                />
-                <Text style={[styles.buttonText]}>Delete from Library</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                <LinearGradient
+                  colors={["#dd5656", "#d73939"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={[
+                    styles.buttonAdd,
+                    {
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: "relative",
+                      //borderColor: "#a9a0da",
+                      //borderWidth: 1,
+                    },
+                  ]}
+                >
+                  <SymbolView
+                    name={"trash"}
+                    size={18}
+                    tintColor={"white"}
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text style={[styles.buttonText]}>Delete from Library</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ) : null}
           </View>
         ) : (
           listsBooks.map((item, index) => (

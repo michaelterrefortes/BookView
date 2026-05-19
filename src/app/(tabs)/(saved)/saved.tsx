@@ -96,37 +96,31 @@ const Saved = () => {
       ) : selected === 0 ? (
         <View style={{ paddingHorizontal: 16 }}>
           <ShelfCard
-            item={
-              shelfBooks.find((item) => item.name === "want_to_read")?.books ||
-              []
-            } //shelfBooks.filter((item) => item.shelf === 1)?.[0]?.books}
+            item={"want_to_read"} //shelfBooks.filter((item) => item.shelf === 1)?.[0]?.books}
             symbol={"books.vertical"}
             colors={["#f6e8ef", "#e05651"]}
             title={"Want to Read"}
           />
 
           <ShelfCard
-            item={
-              shelfBooks.find((item) => item.name === "reading")?.books || []
-            } //shelfBooks.filter((item) => item.shelf === 2)?.[0]?.books}
+            item={"reading"} //shelfBooks.filter((item) => item.shelf === 2)?.[0]?.books}
             symbol={"books.vertical"}
             colors={["#ebecf7", "#777d9f"]}
             title={"Reading"}
           />
 
           <ShelfCard
-            item={
-              shelfBooks.find((item) => item.name === "finished")?.books || []
-            } //shelfBooks.filter((item) => item.shelf === 3)?.[0]?.books}
+            item={"finished"} //shelfBooks.filter((item) => item.shelf === 3)?.[0]?.books}
             symbol={"books.vertical"}
             colors={["#faf2eb", "#fdb460"]}
             title={"Finished"}
           />
           <ShelfCard
-            item={
+            /*item={
               shelfBooks.find((item) => item.name === "not_finished")?.books ||
               []
-            } //shelfBooks.filter((item) => item.shelf === 4)?.[0]?.books}
+            } //shelfBooks.filter((item) => item.shelf === 4)?.[0]?.books}*/
+            item={"not_finished"}
             symbol={"books.vertical"}
             colors={["#ebeafa", "#7671db"]}
             title={"Not Finished"}
@@ -137,10 +131,11 @@ const Saved = () => {
           {listsBooks.map((item, index) => (
             <ShelfCard
               key={item.listid}
-              item={item.books}
+              item={item.name_list}
               symbol={"apple.books.pages"}
               colors={colors[index % 7]}
               title={item.name_list}
+              dataType={"list"}
             />
           ))}
         </View>

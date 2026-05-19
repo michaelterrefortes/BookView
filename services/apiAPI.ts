@@ -37,3 +37,44 @@ export const fetchAPILists = async () => {
 
   return { success: true, data: data };
 };
+
+export const addShelf = async (
+  id,
+  selectedShelf,
+  title,
+  authors,
+  method = "POST",
+) => {
+  const endpoint = `${API_URL}/shelf`;
+
+  const dataBody = {
+    id: id,
+    selectedShelf: selectedShelf,
+    title: title,
+    authors: authors,
+  };
+
+  const response = await fetch(endpoint, {
+    method: method, // Specify the method
+    headers: {
+      "Content-Type": "application/json", // Inform the server we're sending JSON
+    },
+    body: JSON.stringify(dataBody),
+  });
+
+  if (!response.ok) {
+    // @ts-ignore
+    //throw new Error("Failed to fetch books", response.statusText);
+    return { success: false, error: response.error };
+  }
+
+  const result = await response.json();
+
+  return { success: true, data: result.data };
+};
+
+export const addList = async (id, selectedLists, title, authors) => {
+  const endpoint = `${API_URL}/lists_books`;
+
+  return { success: true, data: [] };
+};

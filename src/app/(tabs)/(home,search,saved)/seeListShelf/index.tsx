@@ -1,15 +1,28 @@
-import { useLocalSearchParams } from "expo-router";
+import { useIsFocused, useLocalSearchParams } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BookCard from "../../../../../components/BookCard";
 import { COVER_URL } from "../../../../../constants/urls";
+import { BookContext } from "../../../../../context/BookContext";
 
 const ListShelf = () => {
-  const { item, title, symbol, color0, color1 } = useLocalSearchParams();
+  const { name, title, symbol, color0, color1, dataType } =
+    useLocalSearchParams();
 
-  const data = item ? JSON.parse(item) : null;
+  const { shelfBooks, listsBooks } = useContext(BookContext);
+
+  const isFocused = useIsFocused();
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    if (dataType === "list") {
+      setData(listsBooks.find((el) => el.name_list === name)?.books || []);
+    } else setData(shelfBooks.find((el) => el.name === name)?.books || []);
+  }, [isFocused]);
+
+  //const data = item ? JSON.parse(item) : null;
 
   //console.log(data, title, symbol);
   return (
@@ -39,7 +52,7 @@ const ListShelf = () => {
 
         {data.map((item, index) => (
           <View
-            key={item.id}
+            key={`${item.id}-${index}`}
             style={{
               backgroundColor: "white",
               padding: 15,
@@ -53,7 +66,7 @@ const ListShelf = () => {
               coverId={item.bookid}
               title={item.title}
               authorName={[item.author]}
-              year={item.year_book.toString()}
+              year={item.year_book?.toString()}
               urlPoster={`${COVER_URL}/${item.bookid[item.bookid.length - 1] === "W" ? "w" : "b"}/olid/${item.bookid}-L.jpg`}
               routeUrl={
                 item.bookid[item.bookid.length - 1] === "W"
