@@ -168,6 +168,8 @@ const ShelfLists = () => {
           ),
         );
 
+        //console.log(shelfBooks);
+
         /*setShelfBooks((prevData) =>
           prevData.map((item) =>
             item.shelve === selectedShelf

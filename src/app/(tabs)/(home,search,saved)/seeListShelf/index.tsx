@@ -16,10 +16,14 @@ const ListShelf = () => {
   const isFocused = useIsFocused();
   const [data, setData] = useState([]);
 
+  //console.log(shelfBooks);
+
   useEffect(() => {
     if (dataType === "list") {
       setData(listsBooks.find((el) => el.name_list === name)?.books || []);
     } else setData(shelfBooks.find((el) => el.name === name)?.books || []);
+
+    //console.log(data);
   }, [isFocused]);
 
   //const data = item ? JSON.parse(item) : null;
