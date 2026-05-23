@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { BookContext } from "../context/BookContext";
 
-const ShelfCard = ({ item, colors, symbol, title, dataType }) => {
+const ShelfCard = ({ item, colors, symbol, title, dataType, id }) => {
   //console.log(item?.[1]);
 
   //console.log(item);
@@ -37,6 +37,7 @@ const ShelfCard = ({ item, colors, symbol, title, dataType }) => {
             color0: colors[0],
             color1: colors[1],
             dataType: dataType,
+            id: id,
           },
         })
       }

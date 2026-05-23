@@ -98,6 +98,7 @@ const Saved = () => {
           <ShelfCard
             item={"want_to_read"} //shelfBooks.filter((item) => item.shelf === 1)?.[0]?.books}
             symbol={"books.vertical"}
+            id={1}
             colors={["#f6e8ef", "#e05651"]}
             title={"Want to Read"}
           />
@@ -105,6 +106,7 @@ const Saved = () => {
           <ShelfCard
             item={"reading"} //shelfBooks.filter((item) => item.shelf === 2)?.[0]?.books}
             symbol={"books.vertical"}
+            id={2}
             colors={["#ebecf7", "#777d9f"]}
             title={"Reading"}
           />
@@ -112,6 +114,7 @@ const Saved = () => {
           <ShelfCard
             item={"finished"} //shelfBooks.filter((item) => item.shelf === 3)?.[0]?.books}
             symbol={"books.vertical"}
+            id={3}
             colors={["#faf2eb", "#fdb460"]}
             title={"Finished"}
           />
@@ -122,6 +125,7 @@ const Saved = () => {
             } //shelfBooks.filter((item) => item.shelf === 4)?.[0]?.books}*/
             item={"not_finished"}
             symbol={"books.vertical"}
+            id={4}
             colors={["#ebeafa", "#7671db"]}
             title={"Not Finished"}
           />
@@ -132,6 +136,7 @@ const Saved = () => {
             <ShelfCard
               key={item.listid}
               item={item.name_list}
+              id={item.listid}
               symbol={"apple.books.pages"}
               colors={colors[index % 7]}
               title={item.name_list}

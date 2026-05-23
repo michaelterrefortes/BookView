@@ -1,6 +1,6 @@
 import { Stack, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import { TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 
 export default function SavedLayout() {
   const router = useRouter();
@@ -19,10 +19,26 @@ export default function SavedLayout() {
 
           headerRight: () => (
             <TouchableOpacity
-              style={{ justifyContent: "center", alignItems: "center" }}
-              onPress={() => router.push("/(tabs)/(search)/search")}
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                paddingHorizontal: 10,
+              }}
+              onPress={() =>
+                router.push({
+                  pathname: "/(tabs)/(saved)/addList",
+                  params: { type: "add", method: "POST", value: "" },
+                })
+              }
             >
-              <SymbolView name="plus" size={25} tintColor={"black"} />
+              <SymbolView
+                name="plus"
+                size={18}
+                tintColor={"black"}
+                style={{ marginRight: 5 }}
+              />
+              <Text>Add List</Text>
             </TouchableOpacity>
           ),
         }}
@@ -39,6 +55,39 @@ export default function SavedLayout() {
           headerBlurEffect: "none",
           //presentation: "modal",
           //navigationBarHidden: false,
+        }}
+      />
+      <Stack.Screen
+        name="addList/index"
+        options={{
+          headerBackButtonDisplayMode: "minimal",
+          headerBackTitle: "",
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "Add List",
+          headerShadowVisible: false,
+          headerBlurEffect: "none",
+          presentation: "modal",
+
+          //sheetGrabberVisible: true,
+          //sheetAllowedDetents: "all",
+
+          //navigationBarHidden: false,
+          unstable_headerLeftItems: () => [
+            {
+              type: "button",
+              label: "Cancel",
+
+              icon: {
+                type: "sfSymbol",
+                name: "xmark",
+              },
+              onPress: () => {
+                // Do something
+                router.back();
+              },
+            },
+          ],
         }}
       />
       <Stack.Screen

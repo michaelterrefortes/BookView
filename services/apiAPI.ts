@@ -78,3 +78,38 @@ export const addList = async (id, selectedLists, title, authors) => {
 
   return { success: true, data: [] };
 };
+
+export const createList = async (name, method, id) => {
+  let response = null;
+  if (method === "POST") {
+    const endpoint = `${API_URL}/createList`;
+
+    response = await fetch(endpoint, {
+      method: method, // Specify the method
+      headers: {
+        "Content-Type": "application/json", // Inform the server we're sending JSON
+      },
+      body: JSON.stringify({ name: name }),
+    });
+  } else {
+    const endpoint = `${API_URL}/createList/${id}`;
+
+    response = await fetch(endpoint, {
+      method: method, // Specify the method
+      headers: {
+        "Content-Type": "application/json", // Inform the server we're sending JSON
+      },
+      body: JSON.stringify({ name: name }),
+    });
+  }
+
+  if (!response.ok) {
+    // @ts-ignore
+    //throw new Error("Failed to fetch books", response.statusText);
+    return { success: false, error: response.error };
+  }
+
+  const result = await response.json();
+
+  return { success: true, data: result.data };
+};
