@@ -1,6 +1,6 @@
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ListCardAdd from "../../../../../components/ListCardAdd";
 import { API_URL } from "../../../../../constants/urls";
 import { BookContext } from "../../../../../context/BookContext";
-import { addShelf } from "../../../../../services/apiAPI";
+import { addList, addShelf } from "../../../../../services/apiAPI";
 import {
   findBookInLists,
   findBookInShelve,
@@ -38,6 +38,8 @@ const ShelfLists = () => {
 
   const { shelfBooks, listsBooks, setShelfBooks } = useContext(BookContext);
 
+  const router = useRouter();
+
   //-console.log(title, authors);
 
   const [selected, setSelected] = useState(0);
@@ -47,6 +49,8 @@ const ShelfLists = () => {
 
   const [prevSelectedList, setPrevSelectedList] = useState([]);
   const [prevSelectedShelf, setPrevSelectedShelf] = useState(-1);
+
+  //console.log(selectedLists, prevSelectedList);
 
   useEffect(() => {
     const id = bookId.split("/")[2];
@@ -64,7 +68,7 @@ const ShelfLists = () => {
 
   useEffect(() => {
     const id = bookId.split("/")[2];
-    const lists = findBookInLists(id, listsBooks);
+    const lists = findBookInLists(id, listsBooks).sort();
 
     //console.log(lists, listsBooks);
 
@@ -129,8 +133,11 @@ const ShelfLists = () => {
     const id = bookId.split("/")[2];
     //console.log("handleConfirm", id, selectedShelf, selectedLists);
 
+    console.log("handle add");
+
     let result = null;
     if (prevSelectedShelf === -1) {
+      console.log("original shelf add");
       result = await addShelf(id, selectedShelf, title, authors);
       //console.log(result); //result2);
 
@@ -149,7 +156,11 @@ const ShelfLists = () => {
       } else {
         Alert.alert("Error", result.error);
       }
-    } else {
+    } else if (
+      prevSelectedShelf !== -1 &&
+      !(selectedShelf === prevSelectedShelf)
+    ) {
+      console.log("shelf edit");
       result = await addShelf(id, selectedShelf, title, authors, "PUT");
       console.log(result); //result2);
 
@@ -168,19 +179,24 @@ const ShelfLists = () => {
           ),
         );
 
-        //console.log(shelfBooks);
-
-        /*setShelfBooks((prevData) =>
-          prevData.map((item) =>
-            item.shelve === selectedShelf
-              ? { ...item, books: [result.data[0], ...item.books] }
-              : item,
-          ),
-        );*/
         navigation.goBack();
       } else {
         Alert.alert("Error", result.error);
       }
+    }
+
+    if (prevSelectedList.length === 0 && selectedLists.length !== 0) {
+      console.log("add list original");
+
+      result = await addList(id, selectedLists, prevSelectedList, "POST");
+    } else if (
+      (selectedLists.length !== 0 &&
+        prevSelectedList.length !== selectedLists.length) ||
+      !prevSelectedList.every((val, index) => val === selectedLists[index])
+    ) {
+      console.log("edit list selected");
+
+      result = await addList(id, selectedLists, prevSelectedList, "PUT");
     }
 
     //const result2 = await addList(id, selectedLists, title, authors);
@@ -326,20 +342,34 @@ const ShelfLists = () => {
             ) : null}
           </View>
         ) : (
-          listsBooks.map((item, index) => (
-            //<Text key={item.listid}>{item.name_list}</Text>
+          <View>
+            {listsBooks.map((item, index) => (
+              //<Text key={item.listid}>{item.name_list}</Text>
 
-            <ListCardAdd
-              key={item.listid}
-              symbol={"apple.books.pages"}
-              colors={colors[index % 7]}
-              title={item.name_list}
-              onChange={setSelectedLists}
-              selected={selectedLists}
-              value={item.listid}
-              type="lists"
-            />
-          ))
+              <ListCardAdd
+                key={item.listid}
+                symbol={"apple.books.pages"}
+                colors={colors[index % 7]}
+                title={item.name_list}
+                onChange={setSelectedLists}
+                selected={selectedLists}
+                value={item.listid}
+                type="lists"
+              />
+            ))}
+
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: "/addList",
+                  params: { type: "add", method: "POST", value: "" },
+                })
+              }
+              style={[styles.buttonAdd, { backgroundColor: "#4da0ff" }]}
+            >
+              <Text style={styles.buttonText}>Add List</Text>
+            </TouchableOpacity>
+          </View>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -360,11 +390,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
 
-    shadowColor: "#000",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
+    //shadowColor: "#000",
+    //shadowOpacity: 0.5,
+    //shadowRadius: 10,
+    //shadowOffset: { width: 0, height: 4 },
+    //elevation: 3,
   },
 
   buttonText: {

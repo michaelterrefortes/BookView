@@ -51,7 +51,7 @@ const ListCardAdd = ({
           if (selected.includes(value)) {
             onChange(selected.filter((num) => num !== value));
           } else {
-            onChange((item) => [...item, value]);
+            onChange((item) => [...item, value].sort());
           }
         }}
       >

@@ -73,8 +73,42 @@ export const addShelf = async (
   return { success: true, data: result.data };
 };
 
-export const addList = async (id, selectedLists, title, authors) => {
+export const addList = async (id, selectedLists, prevList, method) => {
   const endpoint = `${API_URL}/lists_books`;
+
+  console.log(id, selectedLists, prevList, method);
+
+  let response = null;
+
+  if (method === "POST") {
+    response = await fetch(endpoint, {
+      method: method, // Specify the method
+      headers: {
+        "Content-Type": "application/json", // Inform the server we're sending JSON
+      },
+      body: JSON.stringify({ selectedLists: selectedLists, id: id }),
+    });
+  } else {
+    response = await fetch(endpoint, {
+      method: method, // Specify the method
+      headers: {
+        "Content-Type": "application/json", // Inform the server we're sending JSON
+      },
+      body: JSON.stringify({
+        selectedLists: selectedLists,
+        id: id,
+        prevList: prevList,
+      }),
+    });
+  }
+
+  if (!response.ok) {
+    // @ts-ignore
+    //throw new Error("Failed to fetch books", response.statusText);
+    return { success: false, error: response.error };
+  }
+
+  const result = await response.json();
 
   return { success: true, data: [] };
 };
