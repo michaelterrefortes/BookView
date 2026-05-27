@@ -7,6 +7,19 @@ const Layout = () => {
     <BookProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen
+          name="(auth)"
+          options={{
+            headerBackTitle: "",
+
+            headerShown: false,
+            headerTitle: "",
+            //headerLargeTitle: true,
+            //headerLargeTitleEnabled: true,
+            //headerRight: () => <AccountButton />,
+          }}
+        />
+
+        <Stack.Screen
           name="(tabs)"
           options={{
             headerBackTitle: "",

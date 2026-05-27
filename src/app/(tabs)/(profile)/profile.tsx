@@ -1,23 +1,343 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
+import { API_URL } from "../../../../constants/urls";
+import { getAccessToken, supabase } from "../../../../services/auth";
 
 const Profile = () => {
+  const router = useRouter();
+  const [email, setEmail] = useState<string | null>(null);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
+  const [loadingSignout, setLoadingSignout] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setEmail(data.user?.email ?? null);
+    };
+
+    getUser();
+  }, []);
+
+  const handleSignOut = async () => {
+    setLoadingSignout(true);
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      Alert.alert("Error", "Problem signing out");
+    } finally {
+      setLoadingSignout(false);
+    }
+    router.replace("/(auth)");
+  };
+
+  const confirmDelete = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete this account? This action is irreversible and data is deleted",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: handleDelete,
+        },
+      ],
+    );
+  };
+
+  const handleDelete = async () => {
+    setLoadingDelete(true);
+    try {
+      const token = await getAccessToken();
+      const res = await fetch(`${API_URL}/profile`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await res.json();
+
+      setLoadingDelete(false);
+
+      if (!res.ok) Alert.alert("Error", result.error);
+      else handleSignOut();
+    } catch (err) {
+      Alert.alert("Error", "Could not delete account");
+      console.error(err);
+      setLoadingDelete(false);
+    }
+  };
+
+  const handleLink = useCallback(async () => {
+    // Check if the link is supported
+    const linkUrl = `https://monivue.onrender.com/privacy-policy`;
+    const supported = await Linking.canOpenURL(linkUrl);
+
+    if (supported) {
+      // Open the URL
+      await Linking.openURL(linkUrl);
+    } else {
+      Alert.alert(`Don't know how to open this URL: ${linkUrl}`);
+    }
+  }, []);
+
+  const handleEmail = async () => {
+    // Check if the link is supported
+    const email = "monivue.support@gmail.com";
+    const subject = "Contact Us";
+    const body = "Hello Support team,";
+
+    // Construct the mailto link
+    const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    try {
+      // Check if the device can handle the email URL
+      const supported = await Linking.canOpenURL(url);
+
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert(
+          "Error",
+          `No email app found to handle this request. The email for support is: ${email}`,
+        );
+      }
+    } catch (error) {
+      console.error("An error occurred", error);
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Profile</Text>
-    </View>
+    <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
+      <View
+        style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+      >
+        <View style={{ height: 30 }} />
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleEmail}
+        >
+          <Text
+            style={[
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
+            ]}
+          >
+            Contact Us
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleLink}
+        >
+          <Text
+            style={[
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
+            ]}
+          >
+            Privacy Policy
+          </Text>
+        </TouchableOpacity>
+
+        <View
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
+          <Text style={styles.label}>Email</Text>
+          <Text
+            style={[
+              styles.value,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            {email ?? "Loading..."}
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={() => router.push("/(tabs)/(profile)/change-email")}
+        >
+          <Text
+            style={[
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
+            ]}
+          >
+            Change Email
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={() => router.push("/(tabs)/(profile)/change-password")}
+        >
+          <Text
+            style={[
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
+            ]}
+          >
+            Change Password
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleSignOut}
+        >
+          <Text style={styles.buttonText}>Sign Out</Text>
+        </TouchableOpacity>
+
+        {loadingSignout ? (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              //marginTop: 10,
+              marginBottom: 10,
+              flexDirection: "row",
+            }}
+          >
+            <Text
+              style={[
+                { marginRight: 5 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Processing request ...
+            </Text>
+            <ActivityIndicator size={20} color="gray" />
+          </View>
+        ) : null}
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={confirmDelete}
+        >
+          <Text style={styles.buttonText}>Delete Account and Data</Text>
+        </TouchableOpacity>
+
+        {loadingDelete ? (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              //marginTop: 10,
+              marginBottom: 10,
+              flexDirection: "row",
+            }}
+          >
+            <Text
+              style={[
+                { marginRight: 5 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Processing addition ...
+            </Text>
+            <ActivityIndicator size={20} color="gray" />
+          </View>
+        ) : null}
+      </View>
+    </ScrollView>
   );
 };
 
 export default Profile;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgb(242, 242, 242)",
   },
-  scrollview: {
-    flex: 1,
+
+  button: {
+    backgroundColor: "#fff",
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    borderRadius: 50,
+    width: "70%",
+    alignSelf: "center",
+    marginBottom: 15, // ⬅️ spacing between items
+  },
+
+  label: {
+    fontSize: 12,
+    color: "gray",
+  },
+
+  value: {
+    fontSize: 14,
+    color: "#000",
+    marginTop: 4,
+  },
+
+  input: {
+    fontSize: 14,
+  },
+
+  buttonText: {
+    fontSize: 14,
+    color: "red",
+    textAlign: "left",
+  },
+
+  buttonTextRegular: {
+    fontSize: 14,
+    color: "blue",
+    textAlign: "left",
   },
 });
