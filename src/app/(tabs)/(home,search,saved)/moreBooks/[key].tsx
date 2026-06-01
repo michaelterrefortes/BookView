@@ -28,6 +28,8 @@ const MoreBooks = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [section, setSection] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [offset, setOffset] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,18 +38,23 @@ const MoreBooks = () => {
       let result = [];
 
       //console.log(key.split("_"));
+      setOffset(0);
 
       if (endpoint === "trending") {
-        result = await fetchBooksSubject("/trending/weekly.json?limit=20");
+        result = await fetchBooksSubject(
+          `/trending/weekly.json?limit=20&offset=${0}`,
+        );
         setSection(0);
       } else if (endpoint === "author") {
-        result = await fetchAuthorWorks(bookId);
+        result = await fetchAuthorWorks(bookId, 20, 0);
         setSection(1);
       } else if (endpoint === "subject") {
-        result = await fetchBooksSubject(`/subjects/${bookId}.json?limit=20`);
+        result = await fetchBooksSubject(
+          `/subjects/${bookId}.json?limit=20&offset=${0}`,
+        );
         setSection(3);
       } else {
-        result = await fetchBookEditions(bookId, 20);
+        result = await fetchBookEditions(bookId, 20, 0);
         setSection(2);
       }
 
@@ -64,6 +71,44 @@ const MoreBooks = () => {
 
     fetchData();
   }, []);
+
+  const fetchMoreData = async () => {
+    setLoadingMore(true);
+
+    const newOffset = offset + 10;
+    let point = "";
+    let result = [];
+
+    //console.log(key.split("_"));
+
+    if (endpoint === "trending") {
+      result = await fetchBooksSubject(
+        `/trending/weekly.json?limit=20&offset=${newOffset}`,
+      );
+      setSection(0);
+    } else if (endpoint === "author") {
+      result = await fetchAuthorWorks(bookId, 20, newOffset);
+      setSection(1);
+    } else if (endpoint === "subject") {
+      result = await fetchBooksSubject(
+        `/subjects/${bookId}.json?limit=20&offset=${newOffset}`,
+      );
+      setSection(3);
+    } else {
+      result = await fetchBookEditions(bookId, 20, newOffset);
+      setSection(2);
+    }
+
+    //console.log(result[0]);
+    setOffset(newOffset);
+    if (result.success) {
+      setBooks((prev) => [...prev, ...result.data]);
+    } else {
+      Alert.alert("Error", result.error);
+    }
+
+    setLoadingMore(false);
+  };
 
   return (
     <View style={styles.scrollview}>
@@ -96,8 +141,19 @@ const MoreBooks = () => {
               year={getYear(item.publish_date)}
             />
           )}
-          ListFooterComponent={<View style={styles.endContainer} />}
           ListHeaderComponent={<View style={styles.startContainer} />}
+          onEndReached={fetchMoreData}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <>
+                <ActivityIndicator />
+                <View style={styles.endContainer} />
+              </>
+            ) : (
+              <View style={styles.endContainer} />
+            )
+          }
         />
       ) : section === 2 ? (
         <>
@@ -126,11 +182,19 @@ const MoreBooks = () => {
                 year={getYear(item?.publish_date)}
               />
             )}
-            //onEndReached={loadBooksEditions}
-            //onEndReachedThreshold={0.5} // Trigger when 50% from bottom
-            //ListFooterComponent={renderFooter}
-            ListFooterComponent={<View style={styles.endContainer} />}
             ListHeaderComponent={<View style={styles.startContainer} />}
+            onEndReached={fetchMoreData}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              loadingMore ? (
+                <>
+                  <ActivityIndicator />
+                  <View style={styles.endContainer} />
+                </>
+              ) : (
+                <View style={styles.endContainer} />
+              )
+            }
           />
         </>
       ) : section === 1 ? (
@@ -154,8 +218,19 @@ const MoreBooks = () => {
               orientation={"v"}
             />
           )}
-          ListFooterComponent={<View style={styles.endContainer} />}
           ListHeaderComponent={<View style={styles.startContainer} />}
+          onEndReached={fetchMoreData}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <>
+                <ActivityIndicator />
+                <View style={styles.endContainer} />
+              </>
+            ) : (
+              <View style={styles.endContainer} />
+            )
+          }
         />
       ) : section === 3 ? (
         <FlatList
@@ -181,8 +256,19 @@ const MoreBooks = () => {
               orientation={"v"}
             />
           )}
-          ListFooterComponent={<View style={styles.endContainer} />}
           ListHeaderComponent={<View style={styles.startContainer} />}
+          onEndReached={fetchMoreData}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <>
+                <ActivityIndicator />
+                <View style={styles.endContainer} />
+              </>
+            ) : (
+              <View style={styles.endContainer} />
+            )
+          }
         />
       ) : null}
     </View>
@@ -206,9 +292,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   endContainer: {
-    height: 100,
-    width: "100%",
-    //backgroundColor: "red",
+    height: 110,
+    width: 20,
     flex: 1,
   },
   startContainer: {

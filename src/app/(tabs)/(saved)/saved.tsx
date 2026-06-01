@@ -12,7 +12,7 @@ import ShelfCard from "../../../../components/ShelfCard";
 import { BookContext } from "../../../../context/BookContext";
 import { fetchAPILists, fetchAPIShelves } from "../../../../services/apiAPI";
 
-const TABS = ["Shelfs", "Lists"];
+const TABS = ["Shelves", "Lists"];
 
 const colors = [
   ["#ffd6d6", "#ff6b6b"],

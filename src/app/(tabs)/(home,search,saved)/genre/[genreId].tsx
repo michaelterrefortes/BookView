@@ -17,24 +17,43 @@ const Genre = () => {
   const { name, endpoint } = useLocalSearchParams();
 
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [bookData, setBookData] = useState({});
+  const [offset, setOffset] = useState(0);
+
+  const loadBooks = async () => {
+    setLoading(true);
+    //console.log(item.url);
+    const result = await fetchBooksSubject(
+      `/subjects/${endpoint}.json?limit=20&offset=${offset}`,
+    );
+
+    if (result.success) {
+      setBookData(result.data);
+    } else {
+      Alert.alert("Error", result.error);
+    }
+    setLoading(false);
+  };
+
+  const loadMoreBooks = async () => {
+    setLoadingMore(true);
+    const newOffset = offset + 10;
+
+    const result = await fetchBooksSubject(
+      `/subjects/${endpoint}.json?limit=20&offset=${newOffset}`,
+    );
+
+    setOffset(newOffset);
+    if (result.success) {
+      setBookData((prev) => [...prev, ...result.data]);
+    } else {
+      Alert.alert("Error", result.error);
+    }
+    setLoadingMore(false);
+  };
 
   useEffect(() => {
-    setLoading(true);
-    const loadBooks = async () => {
-      //console.log(item.url);
-      const result = await fetchBooksSubject(
-        `/subjects/${endpoint}.json?limit=20`,
-      );
-
-      if (result.success) {
-        setBookData(result.data);
-      } else {
-        Alert.alert("Error", result.error);
-      }
-      setLoading(false);
-    };
-
     loadBooks();
   }, []);
 
@@ -45,7 +64,7 @@ const Genre = () => {
           headerTitle: name,
         }}
       />
-      <SafeAreaView style={styles.scrollview}>
+      <SafeAreaView style={styles.scrollview} edges={["left", "right"]}>
         {loading ? (
           <View style={styles.containerLoading}>
             <ActivityIndicator size="large" />
@@ -76,7 +95,19 @@ const Genre = () => {
                 year={item.first_publish_year}
               />
             )}
-            ListHeaderComponent={() => <View style={{ height: 70 }} />}
+            ListHeaderComponent={() => <View style={{ height: 120 }} />}
+            onEndReached={loadMoreBooks}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              loadingMore ? (
+                <>
+                  <ActivityIndicator />
+                  <View style={styles.endContainer} />
+                </>
+              ) : (
+                <View style={styles.endContainer} />
+              )
+            }
           />
         )}
       </SafeAreaView>
@@ -87,6 +118,11 @@ const Genre = () => {
 export default Genre;
 
 const styles = StyleSheet.create({
+  endContainer: {
+    height: 110,
+    width: 20,
+    flex: 1,
+  },
   container: {
     flex: 1,
     //alignItems: "center",

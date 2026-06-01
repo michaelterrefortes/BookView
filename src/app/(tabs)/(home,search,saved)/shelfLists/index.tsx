@@ -21,7 +21,7 @@ import {
   findBookInShelve,
 } from "../../../../../services/functions";
 
-const TABS = ["Shelfs", "Lists"];
+const TABS = ["Shelves", "Lists"];
 
 const colors = [
   ["#ffd6d6", "#ff6b6b"],

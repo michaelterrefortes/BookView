@@ -147,3 +147,46 @@ export const createList = async (name, method, id) => {
 
   return { success: true, data: result.data };
 };
+
+export const updateTrendingCount = async (book) => {
+  //console.log(book);
+
+  const endpoint = `${API_URL}/trending`;
+
+  const data = {
+    author: book?.author_name.join(", ") ?? [""],
+    title: book.title,
+    bookid: book.editions.docs[0].key.split("/")[2],
+  };
+
+  const response = await fetch(endpoint, {
+    method: "POST", // Specify the method
+    headers: {
+      "Content-Type": "application/json", // Inform the server we're sending JSON
+    },
+    body: JSON.stringify(data),
+  });
+
+  return;
+};
+
+export const fetchTrending = async () => {
+  const endpoint = `${API_URL}/trending`;
+
+  const response = await fetch(endpoint, {
+    method: "GET", // Specify the method
+    headers: {
+      "Content-Type": "application/json", // Inform the server we're sending JSON
+    },
+  });
+
+  if (!response.ok) {
+    // @ts-ignore
+    //throw new Error("Failed to fetch books", response.statusText);
+    return { success: false, error: response.error };
+  }
+
+  const result = await response.json();
+
+  return { success: true, data: result.data };
+};

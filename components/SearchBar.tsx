@@ -61,14 +61,15 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f3f4f6", // light gray (matches white UI)
+    //backgroundColor: "#f3f4f6", // light gray (matches white UI)
+    backgroundColor: "#fff",
     borderRadius: 9999,
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginVertical: 20,
 
-    borderWidth: 1,
-    borderColor: "#c4c4c4", // subtle border
+    //borderWidth: 1,
+    //borderColor: "#c4c4c4", // subtle border
 
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

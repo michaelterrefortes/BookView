@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 15,
     borderRadius: 50,
-    width: "70%",
+    width: "85%",
     alignSelf: "center",
     marginBottom: 15, // ⬅️ spacing between items
   },

@@ -1,4 +1,5 @@
 import { BASE_URL } from "../constants/urls";
+import { updateTrendingCount } from "./apiAPI";
 
 export const fetchBooks = async (path: String) => {
   // /trending/now.json?&sort=trending&limit=10
@@ -139,6 +140,10 @@ export const fetchSearch = async (query: string, offset: Number) => {
 
     const data = await response.json();
 
+    if (offset === 0 && data.docs.length !== 0) {
+      await updateTrendingCount(data.docs[0]);
+    }
+
     return { success: true, data: data.docs };
   } else {
     return { success: true, data: [] };
@@ -160,8 +165,12 @@ export const fetchAuthor = async (authorId: string) => {
   return { success: true, data: data };
 };
 
-export const fetchAuthorWorks = async (authorId: string, limit = 20) => {
-  const endpoint = `${BASE_URL}/authors/${authorId}/works.json?limit=${limit}&offset=0`;
+export const fetchAuthorWorks = async (
+  authorId: string,
+  limit = 20,
+  offset = 0,
+) => {
+  const endpoint = `${BASE_URL}/authors/${authorId}/works.json?limit=${limit}&offset=${offset}`;
 
   const response = await fetch(endpoint);
 

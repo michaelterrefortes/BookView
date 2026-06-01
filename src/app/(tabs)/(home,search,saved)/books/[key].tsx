@@ -39,6 +39,7 @@ const BookDetails = () => {
     authorName,
   );
   const [added, setAdded] = useState(0);
+  const [addedText, setAddedText] = useState("Want to Read");
 
   const [details, setDetails] = useState([]);
   const [editions, setEditions] = useState([]);
@@ -53,6 +54,12 @@ const BookDetails = () => {
 
     if (shelf) {
       setAdded(shelf);
+
+      if (shelf === 0) setAddedText("Add to Library");
+      else if (shelf === 1) setAddedText("Want to Read");
+      else if (shelf === 2) setAddedText("Reading");
+      else if (shelf === 3) setAddedText("Finished");
+      else setAddedText("Not Finished");
     }
   }, [shelfBooks, isFocused]);
 
@@ -194,17 +201,7 @@ const BookDetails = () => {
                     style={{ marginRight: 10 }}
                   />
                 ) : null}
-                <Text style={[styles.buttonText]}>
-                  {added === 0
-                    ? "Add to Library"
-                    : added === 1
-                      ? "Want to Read"
-                      : added === 2
-                        ? "Reading"
-                        : added === 3
-                          ? "Finished"
-                          : "Not Finished"}
-                </Text>
+                <Text style={[styles.buttonText]}>{addedText}</Text>
 
                 <SymbolView
                   name="chevron.down"
