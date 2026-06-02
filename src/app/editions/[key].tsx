@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import BookCard from "../../../components/BookCard";
@@ -33,6 +34,9 @@ const BookEditionDetails = () => {
   //console.log(itemKey);
 
   const router = useRouter();
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   console.log(
     "Edition details",
@@ -130,7 +134,10 @@ const BookEditionDetails = () => {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={[styles.scrollContent]}>
+    <ScrollView
+      style={isDarkMode ? styles.darkBg : styles.lightBg}
+      contentContainerStyle={[styles.scrollContent]}
+    >
       <View style={{ height: 120 }} />
       <View style={styles.container}>
         {loadingDetails ? (
@@ -161,7 +168,14 @@ const BookEditionDetails = () => {
               </View>
 
               <View style={styles.rightContent}>
-                <Text style={styles.titleName}>{details.title}</Text>
+                <Text
+                  style={[
+                    styles.titleName,
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
+                  {details.title}
+                </Text>
 
                 <View style={styles.authors}>
                   {details.authorDetails?.map((item, index) => {
@@ -179,8 +193,24 @@ const BookEditionDetails = () => {
                         }
                         style={{ flexDirection: "row" }}
                       >
-                        <Text style={styles.authorText}>{item.name}</Text>
-                        {!isLast && <Text style={styles.authorText}>, </Text>}
+                        <Text
+                          style={[
+                            styles.authorText,
+                            { color: isDarkMode ? "lightgray" : "gray" },
+                          ]}
+                        >
+                          {item.name}
+                        </Text>
+                        {!isLast && (
+                          <Text
+                            style={[
+                              styles.authorText,
+                              { color: isDarkMode ? "lightgray" : "gray" },
+                            ]}
+                          >
+                            ,{" "}
+                          </Text>
+                        )}
                       </TouchableOpacity>
                     );
                   })}
@@ -242,14 +272,23 @@ const BookEditionDetails = () => {
             </TouchableOpacity>
 
             <View
-              style={{
-                backgroundColor: "#fff",
-                marginHorizontal: 16,
-                paddingVertical: 15,
-                borderRadius: 10,
-              }}
+              style={[
+                {
+                  backgroundColor: "#fff",
+                  marginHorizontal: 16,
+                  paddingVertical: 15,
+                  borderRadius: 10,
+                },
+                isDarkMode ? styles.buttonDark : styles.buttonLight,
+              ]}
             >
-              <Text numberOfLines={4} style={[styles.keyText]}>
+              <Text
+                numberOfLines={4}
+                style={[
+                  styles.keyText,
+                  isDarkMode ? styles.lightText : styles.darkText,
+                ]}
+              >
                 {details?.description?.value ??
                   details?.description ??
                   "No Description"}
@@ -307,7 +346,14 @@ const BookEditionDetails = () => {
                 marginTop: 16,
               }}
             >
-              <Text style={[styles.title]}>Editions</Text>
+              <Text
+                style={[
+                  styles.title,
+                  isDarkMode ? styles.lightText : styles.darkText,
+                ]}
+              >
+                Editions
+              </Text>
               <Text
                 style={{ color: "#7663dc" }}
                 onPress={() =>
@@ -356,15 +402,26 @@ const BookEditionDetails = () => {
               marginTop: 5,
             }}
           >
-            <Text style={[styles.title2, { marginBottom: 20 }]}>About</Text>
+            <Text
+              style={[
+                styles.title2,
+                { marginBottom: 20 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              About
+            </Text>
 
             <View
-              style={{
-                backgroundColor: "white",
-                marginHorizontal: 16,
-                paddingHorizontal: 15,
-                borderRadius: 10,
-              }}
+              style={[
+                {
+                  backgroundColor: "white",
+                  marginHorizontal: 16,
+                  paddingHorizontal: 15,
+                  borderRadius: 10,
+                },
+                isDarkMode ? styles.buttonDark : styles.buttonLight,
+              ]}
             >
               {details?.isbn_13?.length > 0 && (
                 <View
@@ -376,8 +433,17 @@ const BookEditionDetails = () => {
                     borderBottomWidth: 0.2,
                   }}
                 >
-                  <Text style={{ width: "30%", fontWeight: "700" }}>ISBN</Text>
-                  <Text>{details.isbn_13.join(", ")}</Text>
+                  <Text
+                    style={[
+                      { width: "30%", fontWeight: "700" },
+                      isDarkMode ? styles.lightText : styles.darkText,
+                    ]}
+                  >
+                    ISBN
+                  </Text>
+                  <Text style={isDarkMode ? styles.lightText : styles.darkText}>
+                    {details.isbn_13.join(", ")}
+                  </Text>
                 </View>
               )}
 
@@ -391,8 +457,17 @@ const BookEditionDetails = () => {
                     borderBottomWidth: 0.2,
                   }}
                 >
-                  <Text style={{ width: "30%", fontWeight: "700" }}>Pages</Text>
-                  <Text>{details.number_of_pages}</Text>
+                  <Text
+                    style={[
+                      { width: "30%", fontWeight: "700" },
+                      isDarkMode ? styles.lightText : styles.darkText,
+                    ]}
+                  >
+                    Pages
+                  </Text>
+                  <Text style={isDarkMode ? styles.lightText : styles.darkText}>
+                    {details.number_of_pages}
+                  </Text>
                 </View>
               )}
 
@@ -406,10 +481,17 @@ const BookEditionDetails = () => {
                     borderBottomWidth: 0.2,
                   }}
                 >
-                  <Text style={{ width: "30%", fontWeight: "700" }}>
+                  <Text
+                    style={[
+                      { width: "30%", fontWeight: "700" },
+                      isDarkMode ? styles.lightText : styles.darkText,
+                    ]}
+                  >
                     Published Date
                   </Text>
-                  <Text>{details.publish_date}</Text>
+                  <Text style={isDarkMode ? styles.lightText : styles.darkText}>
+                    {details.publish_date}
+                  </Text>
                 </View>
               )}
 
@@ -423,10 +505,15 @@ const BookEditionDetails = () => {
                     borderBottomWidth: 0.2,
                   }}
                 >
-                  <Text>
-                    <Text style={{ width: "30%", fontWeight: "700" }}>
-                      Published Place
-                    </Text>
+                  <Text
+                    style={[
+                      { width: "30%", fontWeight: "700" },
+                      isDarkMode ? styles.lightText : styles.darkText,
+                    ]}
+                  >
+                    Published Place
+                  </Text>
+                  <Text style={isDarkMode ? styles.lightText : styles.darkText}>
                     {details.publish_places
                       .map((place) => place.name || place)
                       .join(", ")}
@@ -444,10 +531,15 @@ const BookEditionDetails = () => {
                     borderBottomWidth: 0.2,
                   }}
                 >
-                  <Text style={{ width: "30%", fontWeight: "700" }}>
+                  <Text
+                    style={[
+                      { width: "30%", fontWeight: "700" },
+                      isDarkMode ? styles.lightText : styles.darkText,
+                    ]}
+                  >
                     Publisher
                   </Text>
-                  <Text>
+                  <Text style={isDarkMode ? styles.lightText : styles.darkText}>
                     {details.publishers
                       .map((publisher) => publisher.name || publisher)
                       .join(", ")}
@@ -464,6 +556,13 @@ const BookEditionDetails = () => {
 };
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
   },

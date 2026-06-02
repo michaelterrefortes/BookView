@@ -19,7 +19,7 @@ import { supabase } from "../../../services/auth";
 const ChangePassword = () => {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const isDarkMode = colorScheme === "dark"; //colorScheme === "dark";
 
   const [password, setPassword] = useState("");
   const [passwordWarning, setPasswordWarning] = useState(false);

@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -281,9 +282,15 @@ const ListShelf = () => {
     );
   };
 
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   return (
     <GestureHandlerRootView>
-      <SafeAreaView style={styles.container} edges={["right", "left"]}>
+      <SafeAreaView
+        style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+        edges={["right", "left"]}
+      >
         <ScrollView>
           <View style={{ height: 120 }} />
           <View
@@ -298,23 +305,29 @@ const ListShelf = () => {
             <SymbolView name={symbol} size={45} tintColor={color1} />
           </View>
           <Text
-            style={{
-              paddingVertical: 15,
-              textAlign: "center",
-              fontSize: 24,
-              fontWeight: "600",
-            }}
+            style={[
+              {
+                paddingVertical: 15,
+                textAlign: "center",
+                fontSize: 24,
+                fontWeight: "600",
+              },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
           >
             {title}
           </Text>
 
           {data.length === 0 && (
             <Text
-              style={{
-                textAlign: "center",
-                fontWeight: "700",
-                marginTop: 50,
-              }}
+              style={[
+                {
+                  textAlign: "center",
+                  fontWeight: "700",
+                  marginTop: 50,
+                },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
             >
               No Books
             </Text>
@@ -331,13 +344,16 @@ const ListShelf = () => {
             >
               <View
                 key={`${item.id}-${index}`}
-                style={{
-                  backgroundColor: "white",
-                  padding: 15,
-                  marginHorizontal: 16,
-                  marginVertical: 10,
-                  borderRadius: 20,
-                }}
+                style={[
+                  {
+                    backgroundColor: "white",
+                    padding: 15,
+                    marginHorizontal: 16,
+                    marginVertical: 10,
+                    borderRadius: 20,
+                  },
+                  isDarkMode ? styles.buttonDark : styles.buttonLight,
+                ]}
               >
                 <BookCard
                   itemKey={`/${item.bookid[item.bookid.length - 1] === "W" ? "works" : "books"}/${item.bookid}`}
@@ -363,6 +379,13 @@ const ListShelf = () => {
 };
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
   },

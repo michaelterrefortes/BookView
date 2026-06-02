@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { validImage } from "../constants/functions";
@@ -34,6 +35,8 @@ const BookCard = ({
 }: Book) => {
   //console.log(itemKey, coverId, urlPoster);
   //console.log(authorName);
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark"; //colorScheme === "dark";
   const router = useRouter();
 
   //console.log(itemKey, coverId, urlPoster, title, authorName, routeUrl);
@@ -86,22 +89,46 @@ const BookCard = ({
           </View>
         )}
         <View style={{ height: 50, marginTop: 5 }}>
-          <Text style={[styles.title]} numberOfLines={2}>
+          <Text
+            style={[
+              styles.title,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+            numberOfLines={2}
+          >
             {title}
           </Text>
 
           {authorName[0].trim() !== "" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {authorName?.join(", ")}
             </Text>
           ) : null}
 
           {typeof year === "string" && year.trim() !== "" && year !== "null" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {year}
             </Text>
           ) : typeof year === "number" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {year}
             </Text>
           ) : null}
@@ -148,21 +175,45 @@ const BookCard = ({
           </View>
         )}
         <View style={styles.info}>
-          <Text style={styles.title} numberOfLines={2}>
+          <Text
+            style={[
+              styles.title,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+            numberOfLines={2}
+          >
             {title}
           </Text>
           {authorName?.[0].trim() !== "" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {authorName?.join(", ")}
             </Text>
           ) : null}
 
           {typeof year === "string" && year.trim() !== "" && year !== "null" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {year}
             </Text>
           ) : typeof year === "number" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {year}
             </Text>
           ) : null}
@@ -175,6 +226,13 @@ const BookCard = ({
 export default BookCard;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   card: {
     width: 120,
 

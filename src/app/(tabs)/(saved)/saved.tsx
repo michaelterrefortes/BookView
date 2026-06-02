@@ -7,6 +7,7 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
+  useColorScheme,
   View,
 } from "react-native";
 import ShelfCard from "../../../../components/ShelfCard";
@@ -36,6 +37,9 @@ const Saved = () => {
   const isFocused = useIsFocused();
 
   const [selected, setSelected] = useState(0);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   //console.log(isFocused);
 
@@ -87,7 +91,7 @@ const Saved = () => {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -167,6 +171,13 @@ const Saved = () => {
 export default Saved;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
 

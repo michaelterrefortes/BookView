@@ -1,18 +1,19 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    StyleSheet,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  StyleSheet,
+  useColorScheme,
+  View,
 } from "react-native";
 import BookCard from "../../../components/BookCard";
 import { COVER_URL } from "../../../constants/urls";
 import {
-    fetchAuthorWorks,
-    fetchBookEditions,
-    fetchBooksSubject,
+  fetchAuthorWorks,
+  fetchBookEditions,
+  fetchBooksSubject,
 } from "../../../services/api";
 import { getYear } from "../../../services/functions";
 
@@ -30,6 +31,9 @@ const MoreBooks = () => {
   const [section, setSection] = useState(0);
   const [loadingMore, setLoadingMore] = useState(false);
   const [offset, setOffset] = useState(0);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,7 +115,9 @@ const MoreBooks = () => {
   };
 
   return (
-    <View style={styles.scrollview}>
+    <View
+      style={[styles.scrollview, isDarkMode ? styles.darkBg : styles.lightBg]}
+    >
       {loading ? (
         <View style={styles.containerLoading}>
           <ActivityIndicator
@@ -126,7 +132,12 @@ const MoreBooks = () => {
           numColumns={3}
           showsHorizontalScrollIndicator={false}
           ItemSeparatorComponent={() => (
-            <View style={{ backgroundColor: "lightgray", height: 1 }} />
+            <View
+              style={{
+                backgroundColor: isDarkMode ? "gray" : "lightgray",
+                height: 1,
+              }}
+            />
           )}
           contentContainerStyle={{ paddingHorizontal: 10 }}
           keyExtractor={(item, index) => index.toString()}
@@ -278,6 +289,9 @@ const MoreBooks = () => {
 export default MoreBooks;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+
   scrollview: {
     flex: 1,
 

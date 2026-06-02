@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -49,6 +50,9 @@ const ShelfLists = () => {
   const [prevSelectedShelf, setPrevSelectedShelf] = useState(-1);
 
   //console.log(selectedLists, prevSelectedList);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   useEffect(() => {
     const id = bookId.split("/")[2];
@@ -288,7 +292,10 @@ const ShelfLists = () => {
 
   return (
     <SafeAreaView
-      style={{ flex: 1, paddingHorizontal: 20 }}
+      style={[
+        { flex: 1, paddingHorizontal: 20 },
+        isDarkMode ? styles.darkBg : styles.lightBg,
+      ]}
       edges={["left", "right"]}
     >
       <ScrollView>
@@ -413,6 +420,13 @@ const ShelfLists = () => {
 export default ShelfLists;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#1c1c1c" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   buttonAdd: {
     borderRadius: 100,
     paddingVertical: 15,

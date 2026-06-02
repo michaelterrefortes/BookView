@@ -13,7 +13,7 @@ export default function Index() {
   const router = useRouter();
 
   const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const isDarkMode = colorScheme === "dark"; //colorScheme === "dark";
 
   const [loading, setLoading] = useState(true);
 

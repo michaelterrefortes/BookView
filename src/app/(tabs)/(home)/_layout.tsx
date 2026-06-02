@@ -11,6 +11,7 @@ export default function HomeLayout() {
           headerShown: true,
           headerTitle: "Home",
           headerLargeTitleEnabled: true,
+          //headerTintColor: "black",
         }}
       />
     </Stack>

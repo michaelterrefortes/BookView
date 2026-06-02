@@ -1,9 +1,12 @@
 import { Stack, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, useColorScheme } from "react-native";
 
 export default function SavedLayout() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   return (
     <Stack>
       <Stack.Screen
@@ -16,6 +19,7 @@ export default function SavedLayout() {
           headerShadowVisible: false,
           headerBackTitle: "",
           headerLargeTitleEnabled: true,
+          //headerTintColor: "black",
 
           headerRight: () => (
             <TouchableOpacity
@@ -35,10 +39,12 @@ export default function SavedLayout() {
               <SymbolView
                 name="plus"
                 size={18}
-                tintColor={"black"}
+                tintColor={isDarkMode ? "white" : "black"}
                 style={{ marginRight: 5 }}
               />
-              <Text>Add List</Text>
+              <Text style={{ color: isDarkMode ? "white" : "black" }}>
+                Add List
+              </Text>
             </TouchableOpacity>
           ),
         }}

@@ -22,7 +22,7 @@ import { supabase } from "../../../services/auth";
 
 const LoginScreen = () => {
   const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const isDarkMode = colorScheme === "dark"; //colorScheme === "dark";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

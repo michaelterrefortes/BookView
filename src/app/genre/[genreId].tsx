@@ -1,11 +1,12 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    StyleSheet,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  StyleSheet,
+  useColorScheme,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BookCard from "../../../components/BookCard";
@@ -20,6 +21,9 @@ const Genre = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [bookData, setBookData] = useState({});
   const [offset, setOffset] = useState(0);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   const loadBooks = async () => {
     setLoading(true);
@@ -64,7 +68,10 @@ const Genre = () => {
           headerTitle: name,
         }}
       />
-      <SafeAreaView style={styles.scrollview} edges={["left", "right"]}>
+      <SafeAreaView
+        style={[styles.scrollview, isDarkMode ? styles.darkBg : styles.lightBg]}
+        edges={["left", "right"]}
+      >
         {loading ? (
           <View style={styles.containerLoading}>
             <ActivityIndicator size="large" />
@@ -74,7 +81,12 @@ const Genre = () => {
             data={bookData}
             showsHorizontalScrollIndicator={true}
             ItemSeparatorComponent={() => (
-              <View style={{ backgroundColor: "lightgray", height: 1 }} />
+              <View
+                style={{
+                  backgroundColor: isDarkMode ? "gray" : "lightgray",
+                  height: 1,
+                }}
+              />
             )}
             contentContainerStyle={{
               marginHorizontal: 20,
@@ -118,6 +130,9 @@ const Genre = () => {
 export default Genre;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+
   endContainer: {
     height: 110,
     width: 20,

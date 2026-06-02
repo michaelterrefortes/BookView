@@ -1,7 +1,14 @@
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useLayoutEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  useColorScheme,
+  View,
+} from "react-native";
 import { BookContext } from "../../../context/BookContext";
 import { createList } from "../../../services/apiAPI";
 
@@ -17,6 +24,9 @@ const AddList = () => {
   const [prevName, setPrevName] = useState(value);
 
   const navigation = useNavigation();
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   const processForm = async () => {
     const result = await createList(name, method, id);
@@ -72,7 +82,7 @@ const AddList = () => {
   }, [name]);
 
   return (
-    <ScrollView>
+    <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
       <View style={{ height: 100 }} />
       <View
         style={{
@@ -88,7 +98,11 @@ const AddList = () => {
         <SymbolView name={"apple.books.pages"} size={45} tintColor={"white"} />
       </View>
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          isDarkMode ? styles.buttonDark : styles.buttonLight,
+          isDarkMode ? styles.lightText : styles.darkText,
+        ]}
         value={name}
         onChangeText={setName}
         keyboardType="default"
@@ -101,6 +115,13 @@ const AddList = () => {
 export default AddList;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#1c1c1c" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   input: {
     backgroundColor: "#fff",
 

@@ -20,7 +20,7 @@ import { supabase } from "../../../services/auth";
 
 const forgotPassword = () => {
   const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const isDarkMode = colorScheme === "dark"; // colorScheme === "dark";
 
   const [email, setEmail] = useState("");
 

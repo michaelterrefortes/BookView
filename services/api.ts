@@ -183,3 +183,18 @@ export const fetchAuthorWorks = async (
 
   return { success: true, data: data.entries };
 };
+
+export const fetchISBN = async (isbn) => {
+  const endpoint = `${BASE_URL}/isbn/${isbn}.json`;
+
+  const response = await fetch(endpoint);
+
+  if (!response.ok) {
+    // @ts-ignore
+    return { success: false, error: "Error fetching ISBN data" };
+  }
+
+  const data = await response.json();
+
+  return { success: true, data: data };
+};

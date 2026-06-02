@@ -18,7 +18,7 @@ import { supabase } from "../../../services/auth";
 const ChangeEmail = () => {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const isDarkMode = colorScheme === "dark"; // colorScheme === "dark";
 
   const [email, setEmail] = useState("");
   const [emailWarning, setEmailWarning] = useState(false);

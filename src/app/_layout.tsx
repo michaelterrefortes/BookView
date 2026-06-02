@@ -141,6 +141,21 @@ const Layout = () => {
         />
 
         <Stack.Screen
+          name="camera/index"
+          options={{
+            headerBackButtonDisplayMode: "minimal",
+            headerBackTitle: "",
+            headerShown: true,
+            headerTransparent: true,
+            headerTitle: "",
+            //headerShadowVisible: false,
+            headerBlurEffect: "none",
+
+            //presentation: "modal",
+          }}
+        />
+
+        <Stack.Screen
           name="addList/index"
           options={{
             headerBackButtonDisplayMode: "minimal",

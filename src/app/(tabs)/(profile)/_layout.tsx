@@ -16,6 +16,7 @@ export default function ProfileLayout() {
           headerShadowVisible: false,
           headerBlurEffect: "none",
           headerLargeTitleEnabled: true,
+          //headerTintColor: "black",
 
           //presentation: "modal",
 

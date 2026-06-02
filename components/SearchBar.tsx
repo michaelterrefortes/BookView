@@ -1,7 +1,13 @@
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React from "react";
-import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
 
 interface Props {
   placeholder: string;
@@ -18,18 +24,28 @@ const SearchBar = ({
   onChangeText,
   camera = true,
 }: Props) => {
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark"; //colorScheme === "dark";
   const router = useRouter();
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          isDarkMode ? styles.buttonDark : styles.buttonLight,
+        ]}
+      >
         <SymbolView name="magnifyingglass" size={20} tintColor={"gray"} />
         <TextInput
           onPressIn={onPress}
           placeholder={placeholder}
           value={value}
           onChangeText={onChangeText}
-          placeholderTextColor="#6b7280"
-          style={styles.input}
+          placeholderTextColor="gray"
+          style={[
+            styles.input,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
         />
         {value?.trim() === "" ? null : (
           <TouchableOpacity
@@ -42,13 +58,13 @@ const SearchBar = ({
 
         {camera ? (
           <TouchableOpacity
-            style={[styles.container2]}
+            //style={[styles.container2]}
             onPress={() => router.push("/camera")}
           >
             <SymbolView
               name="barcode.viewfinder"
               size={21}
-              tintColor={"black"}
+              tintColor={isDarkMode ? "gray" : "black"}
             />
           </TouchableOpacity>
         ) : null}
@@ -58,6 +74,13 @@ const SearchBar = ({
 };
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flexDirection: "row",
     alignItems: "center",

@@ -1,7 +1,13 @@
 import { useIsFocused, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
 import { BookContext } from "../context/BookContext";
 
 const ShelfCard = ({ item, colors, symbol, title, dataType, id }) => {
@@ -24,9 +30,15 @@ const ShelfCard = ({ item, colors, symbol, title, dataType, id }) => {
 
   const router = useRouter();
 
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   return (
     <TouchableOpacity
-      style={styles.cardShelf}
+      style={[
+        styles.cardShelf,
+        isDarkMode ? styles.buttonDark : styles.buttonLight,
+      ]}
       onPress={() =>
         router.push({
           pathname: "/seeListShelf",
@@ -113,7 +125,14 @@ const ShelfCard = ({ item, colors, symbol, title, dataType, id }) => {
           </View>
         </View> */}
         <View style={{ marginLeft: 15 }}>
-          <Text style={styles.shelfTitle}>{title}</Text>
+          <Text
+            style={[
+              styles.shelfTitle,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            {title}
+          </Text>
           <Text style={styles.shelfSubtitle}>{data.length} books</Text>
         </View>
       </View>
@@ -124,6 +143,13 @@ const ShelfCard = ({ item, colors, symbol, title, dataType, id }) => {
 export default ShelfCard;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
     //sbackgroundColor: "#a94141",

@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -35,6 +36,9 @@ const Search = () => {
   const [entries, setEntries] = useState(0);
 
   const [history, setHistory] = useState([]);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark"; // colorScheme === "dark";
 
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
@@ -105,16 +109,11 @@ const Search = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeview} edges={["top", "left", "right"]}>
-      <View
-        style={
-          {
-            //marginVertical: 20,
-            //paddingLeft: 16,
-            //paddingRight: 16,
-          }
-        }
-      >
+    <SafeAreaView
+      style={[styles.safeview, isDarkMode ? styles.darkBg : styles.lightBg]}
+    >
+      <View style={{ height: 100 }} />
+      <View>
         <SearchBar
           placeholder="Search books"
           value={searchBook}
@@ -126,7 +125,12 @@ const Search = () => {
       {loading && <ActivityIndicator size="large" />}
 
       {!loading && searchBook.trim() && books?.length > 0 && (
-        <Text style={styles.text1}>
+        <Text
+          style={[
+            styles.text1,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
           Search Result for <Text style={styles.text2}>"{searchBook}"</Text>
         </Text>
       )}
@@ -135,7 +139,12 @@ const Search = () => {
         <FlatList
           data={books}
           ItemSeparatorComponent={() => (
-            <View style={{ backgroundColor: "lightgray", height: 1 }} />
+            <View
+              style={{
+                backgroundColor: isDarkMode ? "gray" : "lightgray",
+                height: 1,
+              }}
+            />
           )}
           renderItem={({ item }) => (
             <BookCard
@@ -155,7 +164,12 @@ const Search = () => {
           ListEmptyComponent={
             !loading ? (
               <View style={styles.containerText}>
-                <Text style={styles.text3}>
+                <Text
+                  style={[
+                    styles.text3,
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
                   {searchBook.trim() ? "No books found" : "Search for a book"}
                 </Text>
               </View>
@@ -186,7 +200,14 @@ const Search = () => {
               marginBottom: 10,
             }}
           >
-            <Text style={styles.bigTitle}>Recent Searches</Text>
+            <Text
+              style={[
+                styles.bigTitle,
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Recent Searches
+            </Text>
             <Text
               style={{ color: "#7663dc" }}
               onPress={async () => {
@@ -199,28 +220,41 @@ const Search = () => {
           </View>
 
           <View
-            style={{
-              backgroundColor: "#fff",
-              paddingVertical: 16,
-              marginHorizontal: 16,
-              borderRadius: 15,
-            }}
+            style={[
+              {
+                backgroundColor: "#fff",
+                paddingVertical: 16,
+                marginHorizontal: 16,
+                borderRadius: 15,
+              },
+              isDarkMode ? styles.buttonDark : styles.buttonLight,
+            ]}
           >
             {history.map((item, index) => {
               if (index > 4) return;
               return (
                 <TouchableOpacity
                   key={`${item}-${index}`}
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    paddingHorizontal: 20,
-                    paddingVertical: 8,
-                    alignItems: "center",
-                  }}
+                  style={[
+                    {
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      paddingHorizontal: 20,
+                      paddingVertical: 8,
+                      alignItems: "center",
+                    },
+                    isDarkMode ? styles.buttonDark : styles.buttonLight,
+                  ]}
                   onPress={() => setSearchBook(item)}
                 >
-                  <Text style={{ fontWeight: "300" }}>{item}</Text>
+                  <Text
+                    style={[
+                      { fontWeight: "300" },
+                      isDarkMode ? styles.lightText : styles.darkText,
+                    ]}
+                  >
+                    {item}
+                  </Text>
                   <TouchableOpacity
                     onPress={async () => {
                       await deleteSpecificSearch(index);
@@ -241,7 +275,12 @@ const Search = () => {
         </View>
       ) : !loading ? (
         <View style={styles.containerText}>
-          <Text style={styles.text3}>
+          <Text
+            style={[
+              styles.text3,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
             {searchBook.trim() ? "No books found" : "Search for a book"}
           </Text>
         </View>
@@ -253,6 +292,13 @@ const Search = () => {
 export default Search;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   bigTitle: {
     //paddingTop: 10,
     //paddingBottom: 5,
@@ -267,9 +313,9 @@ const styles = StyleSheet.create({
   },
   safeview: {
     flex: 1,
-    marginTop: 100,
-    marginLeft: 15,
-    marginRight: 15,
+    //marginTop: 100,
+    paddingLeft: 15,
+    paddingRight: 15,
   },
   text1: {
     fontWeight: "600",

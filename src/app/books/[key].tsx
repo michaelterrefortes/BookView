@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import BookCard from "../../../components/BookCard";
@@ -46,6 +47,9 @@ const BookDetails = () => {
   const [offset, setOffset] = useState(0);
 
   const [isValidImage, setIsValidImage] = useState<boolean | null>(null);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   useEffect(() => {
     validImage(urlPoster, setIsValidImage);
@@ -109,7 +113,10 @@ const BookDetails = () => {
   //console.log(details);
 
   return (
-    <ScrollView contentContainerStyle={[styles.scrollContent]}>
+    <ScrollView
+      style={isDarkMode ? styles.darkBg : styles.lightBg}
+      contentContainerStyle={[styles.scrollContent]}
+    >
       <View style={{ height: 120 }} />
       <View style={styles.container}>
         {loadingDetails ? (
@@ -140,7 +147,14 @@ const BookDetails = () => {
               </View>
 
               <View style={styles.rightContent}>
-                <Text style={styles.titleName}>{details.title}</Text>
+                <Text
+                  style={[
+                    styles.titleName,
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
+                  {details.title}
+                </Text>
 
                 <View style={styles.authors}>
                   {details.authorDetails?.map((item, index) => {
@@ -158,8 +172,24 @@ const BookDetails = () => {
                         }
                         style={{ flexDirection: "row" }}
                       >
-                        <Text style={styles.authorText}>{item.name}</Text>
-                        {!isLast && <Text style={styles.authorText}>, </Text>}
+                        <Text
+                          style={[
+                            styles.authorText,
+                            { color: isDarkMode ? "lightgray" : "gray" },
+                          ]}
+                        >
+                          {item.name}
+                        </Text>
+                        {!isLast && (
+                          <Text
+                            style={[
+                              styles.authorText,
+                              { color: isDarkMode ? "lightgray" : "gray" },
+                            ]}
+                          >
+                            ,{" "}
+                          </Text>
+                        )}
                       </TouchableOpacity>
                     );
                   })}
@@ -221,14 +251,23 @@ const BookDetails = () => {
             </TouchableOpacity>
 
             <View
-              style={{
-                backgroundColor: "#fff",
-                marginHorizontal: 16,
-                paddingVertical: 15,
-                borderRadius: 10,
-              }}
+              style={[
+                {
+                  //backgroundColor: "#fff",
+                  marginHorizontal: 16,
+                  paddingVertical: 15,
+                  borderRadius: 10,
+                },
+                isDarkMode ? styles.buttonDark : styles.buttonLight,
+              ]}
             >
-              <Text numberOfLines={4} style={[styles.keyText]}>
+              <Text
+                numberOfLines={4}
+                style={[
+                  styles.keyText,
+                  isDarkMode ? styles.lightText : styles.darkText,
+                ]}
+              >
                 {details?.description?.value ??
                   details?.description ??
                   "No Description"}
@@ -286,7 +325,14 @@ const BookDetails = () => {
                 marginTop: 16,
               }}
             >
-              <Text style={[styles.title]}>Editions</Text>
+              <Text
+                style={[
+                  styles.title,
+                  isDarkMode ? styles.lightText : styles.darkText,
+                ]}
+              >
+                Editions
+              </Text>
               <Text
                 style={{ color: "#7663dc" }}
                 onPress={() =>
@@ -333,6 +379,13 @@ const BookDetails = () => {
 };
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
   },

@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import BookCard from "../../../components/BookCard";
@@ -29,6 +30,9 @@ const AuthorDetails = () => {
   const [loadingBooks, setLoadingBooks] = useState(false);
 
   const [offset, setOffset] = useState(0);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   useEffect(() => {
     const loadAuthor = async () => {
@@ -74,7 +78,10 @@ const AuthorDetails = () => {
   //console.log(authorBooks[1]);
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={isDarkMode ? styles.darkBg : styles.lightBg}
+      contentContainerStyle={styles.scrollContent}
+    >
       <View style={{ height: 100 }} />
       <View style={styles.container}>
         <View style={{ flexDirection: "row", paddingHorizontal: 16 }}>
@@ -95,13 +102,26 @@ const AuthorDetails = () => {
           </View>
           {!loadingAuthor && authorInfo ? (
             <>
-              <Text style={styles.title}>{authorInfo.name}</Text>
+              <Text
+                style={[
+                  styles.title,
+                  isDarkMode ? styles.lightText : styles.darkText,
+                ]}
+              >
+                {authorInfo.name}
+              </Text>
             </>
           ) : null}
         </View>
         {!loadingAuthor && authorInfo ? (
           <>
-            <Text style={styles.keyText} numberOfLines={4}>
+            <Text
+              style={[
+                styles.keyText,
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+              numberOfLines={4}
+            >
               {typeof authorInfo.bio === "string"
                 ? authorInfo.bio
                 : authorInfo.bio?.value || "No biography available"}
@@ -135,7 +155,14 @@ const AuthorDetails = () => {
             marginTop: 5,
           }}
         >
-          <Text style={styles.title2}>Books</Text>
+          <Text
+            style={[
+              styles.title2,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Books
+          </Text>
           <Text
             onPress={() =>
               router.push({
@@ -190,21 +217,34 @@ const AuthorDetails = () => {
           </View>
         ) : (
           <View
-            style={{
-              //smarginRight: 16,
-              //alignItems: "center",
-              marginTop: 5,
-            }}
+            style={[
+              {
+                //smarginRight: 16,
+                //alignItems: "center",
+                marginTop: 5,
+              },
+            ]}
           >
-            <Text style={[styles.title2, { marginBottom: 20 }]}>About</Text>
+            <Text
+              style={[
+                styles.title2,
+                { marginBottom: 20 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              About
+            </Text>
 
             <View
-              style={{
-                backgroundColor: "white",
-                marginHorizontal: 16,
-                paddingHorizontal: 15,
-                borderRadius: 10,
-              }}
+              style={[
+                {
+                  backgroundColor: "white",
+                  marginHorizontal: 16,
+                  paddingHorizontal: 15,
+                  borderRadius: 10,
+                },
+                isDarkMode ? styles.buttonDark : styles.buttonLight,
+              ]}
             >
               <View
                 style={{
@@ -215,15 +255,31 @@ const AuthorDetails = () => {
                   borderBottomWidth: 0.2,
                 }}
               >
-                <Text style={{ width: "30%", fontWeight: "700" }}>Born</Text>
-                <Text>{authorInfo?.birth_date ?? "No Data"}</Text>
+                <Text
+                  style={[
+                    { width: "30%", fontWeight: "700" },
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
+                  Born
+                </Text>
+                <Text style={isDarkMode ? styles.lightText : styles.darkText}>
+                  {authorInfo?.birth_date ?? "No Data"}
+                </Text>
               </View>
 
               <View style={{ flexDirection: "row", paddingVertical: 20 }}>
-                <Text style={{ width: "30%", fontWeight: "700" }}>Website</Text>
+                <Text
+                  style={[
+                    { width: "30%", fontWeight: "700" },
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
+                  Website
+                </Text>
 
                 <Text
-                  style={{ color: "blue", flex: 1, flexWrap: "wrap" }}
+                  style={{ color: "#7663dc", flex: 1, flexWrap: "wrap" }}
                   onPress={() => {
                     const url = authorInfo?.links?.[0]?.url;
 
@@ -248,6 +304,13 @@ const AuthorDetails = () => {
 export default AuthorDetails;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
 

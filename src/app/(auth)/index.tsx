@@ -8,7 +8,7 @@ import {
   Text,
   TouchableOpacity,
   useColorScheme,
-  View
+  View,
 } from "react-native";
 
 const { width } = Dimensions.get("window");
@@ -36,7 +36,7 @@ const Index = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const isDarkMode = colorScheme === "dark"; // colorScheme === "dark";
 
   return (
     <ScrollView
@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+
     //backgroundColor: "#fff",
   },
 

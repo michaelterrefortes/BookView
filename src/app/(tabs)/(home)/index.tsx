@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import BookCard from "../../../../components/BookCard";
@@ -35,6 +36,9 @@ export default function Index() {
   const [refreshing, setRefreshing] = useState(false);
 
   const [authors, setAuthors] = useState([]);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark"; //colorScheme === "dark";
 
   useEffect(() => {
     loadBooks(setLoadingTrending, setDataTrending);
@@ -130,7 +134,7 @@ export default function Index() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
       //style={{ backgroundColor: "#8f5555" }}
-      style={styles.scrollview}
+      style={[styles.scrollview, isDarkMode ? styles.darkBg : styles.lightBg]}
     >
       <View style={{ paddingHorizontal: 16 }}>
         <SearchBar
@@ -152,7 +156,13 @@ export default function Index() {
           //marginTop: 16,
         }}
       >
-        <Text style={[styles.bigTitle, { marginBottom: 10 }]}>
+        <Text
+          style={[
+            styles.bigTitle,
+            { marginBottom: 10 },
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
           Your Library
         </Text>
 
@@ -173,22 +183,25 @@ export default function Index() {
         }}
       >
         <TouchableOpacity
-          style={{
-            padding: 10,
-            backgroundColor: "#fff",
-            borderRadius: 20,
-            flexDirection: "row",
-            alignItems: "center",
-            width: "48%",
+          style={[
+            {
+              padding: 10,
+              backgroundColor: "#fff",
+              borderRadius: 20,
+              flexDirection: "row",
+              alignItems: "center",
+              width: "48%",
 
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.08,
+              shadowRadius: 4,
             },
-            shadowOpacity: 0.08,
-            shadowRadius: 4,
-          }}
+            isDarkMode ? styles.buttonDark : styles.buttonLight,
+          ]}
           onPress={() => router.push("/saved")}
         >
           {/*["#ebecf7", "#777d9f"]*/}
@@ -208,28 +221,38 @@ export default function Index() {
             />
           </View>
           <View>
-            <Text style={{ fontWeight: "700", fontSize: 15 }}>Shelves</Text>
+            <Text
+              style={[
+                { fontWeight: "700", fontSize: 15 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Shelves
+            </Text>
             <Text style={styles.shelfSubtitle}>4 Total</Text>
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={{
-            padding: 10,
-            backgroundColor: "#fff",
-            borderRadius: 20,
-            flexDirection: "row",
-            alignItems: "center",
-            width: "48%",
+          style={[
+            {
+              padding: 10,
+              backgroundColor: "#fff",
+              borderRadius: 20,
+              flexDirection: "row",
+              alignItems: "center",
+              width: "48%",
 
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.08,
+              shadowRadius: 4,
             },
-            shadowOpacity: 0.08,
-            shadowRadius: 4,
-          }}
+            isDarkMode ? styles.buttonDark : styles.buttonLight,
+          ]}
           onPress={() => router.push("/saved")}
         >
           {/*["#ebecf7", "#777d9f"]*/}
@@ -249,13 +272,26 @@ export default function Index() {
             />
           </View>
           <View>
-            <Text style={{ fontWeight: "700", fontSize: 15 }}>Lists</Text>
+            <Text
+              style={[
+                { fontWeight: "700", fontSize: 15 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Lists
+            </Text>
             <Text style={styles.shelfSubtitle}>{listsBooks.length} Total</Text>
           </View>
         </TouchableOpacity>
       </View>
 
-      <Text style={[styles.bigTitle, { marginBottom: 10, marginTop: 15 }]}>
+      <Text
+        style={[
+          styles.bigTitle,
+          { marginBottom: 10, marginTop: 15 },
+          isDarkMode ? styles.lightText : styles.darkText,
+        ]}
+      >
         Trending
       </Text>
       {loadingTrending ? (
@@ -295,7 +331,13 @@ export default function Index() {
           }
         />
       )}
-      <Text style={[styles.bigTitle, { marginBottom: 10, marginTop: 15 }]}>
+      <Text
+        style={[
+          styles.bigTitle,
+          { marginBottom: 10, marginTop: 15 },
+          isDarkMode ? styles.lightText : styles.darkText,
+        ]}
+      >
         Browse by Genre
       </Text>
 
@@ -309,7 +351,10 @@ export default function Index() {
             {row.map((item, itemIndex) => (
               <TouchableOpacity
                 key={item.name || itemIndex}
-                style={styles.chip}
+                style={[
+                  styles.chip,
+                  isDarkMode ? styles.buttonDark : styles.buttonLight,
+                ]}
                 activeOpacity={0.8}
                 onPress={() =>
                   router.push({
@@ -321,7 +366,14 @@ export default function Index() {
                   })
                 }
               >
-                <Text style={styles.chipText}>{item.name}</Text>
+                <Text
+                  style={[
+                    styles.chipText,
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
+                  {item.name}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -333,6 +385,13 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   scrollContent: {
     paddingLeft: 16,
     paddingRight: 8,

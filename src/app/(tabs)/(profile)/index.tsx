@@ -19,7 +19,7 @@ const Profile = () => {
   const [email, setEmail] = useState<string | null>(null);
 
   const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const isDarkMode = colorScheme === "dark"; //colorScheme === "dark";
 
   const [loadingSignout, setLoadingSignout] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);

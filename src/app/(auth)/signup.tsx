@@ -24,7 +24,7 @@ const SignupScreen = () => {
   const [password, setPassword] = useState("");
 
   const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const isDarkMode = colorScheme === "dark"; //colorScheme === "dark";
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
