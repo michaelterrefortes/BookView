@@ -219,6 +219,7 @@ const SignupScreen = () => {
 
         <TouchableOpacity
           onPress={processButton} //router.replace("/(tabs)/(index)")}
+          disabled={loading}
         >
           <LinearGradient
             colors={["#00a440", "#007e53"]}

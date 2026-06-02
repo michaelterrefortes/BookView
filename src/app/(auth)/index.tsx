@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dimensions,
   ScrollView,
@@ -10,6 +10,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import { clearAllAppData } from "../../../services/localData";
 
 const { width } = Dimensions.get("window");
 
@@ -37,6 +38,14 @@ const Index = () => {
 
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark"; // colorScheme === "dark";
+
+  useEffect(() => {
+    const deleteLocalSearch = async () => {
+      await clearAllAppData();
+    };
+
+    deleteLocalSearch();
+  }, []);
 
   return (
     <ScrollView

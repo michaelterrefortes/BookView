@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { API_URL } from "../../../../constants/urls";
 import { getAccessToken, supabase } from "../../../../services/auth";
+import { clearAllAppData } from "../../../../services/localData";
 
 const Profile = () => {
   const router = useRouter();
@@ -37,6 +38,7 @@ const Profile = () => {
     setLoadingSignout(true);
     try {
       await supabase.auth.signOut();
+      await clearAllAppData();
     } catch (err) {
       Alert.alert("Error", "Problem signing out");
     } finally {
@@ -224,31 +226,17 @@ const Profile = () => {
             isDarkMode ? styles.darkField : styles.lightField,
           ]}
           onPress={handleSignOut}
+          disabled={loadingSignout}
         >
           <Text style={styles.buttonText}>Sign Out</Text>
-        </TouchableOpacity>
 
-        {loadingSignout ? (
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              //marginTop: 10,
-              marginBottom: 10,
-              flexDirection: "row",
-            }}
-          >
-            <Text
-              style={[
-                { marginRight: 5 },
-                isDarkMode ? styles.lightText : styles.darkText,
-              ]}
-            >
-              Processing request ...
-            </Text>
-            <ActivityIndicator size={20} color="gray" />
-          </View>
-        ) : null}
+          {loadingSignout ? (
+            <ActivityIndicator
+              size={"small"}
+              color={isDarkMode ? "white" : "gray"}
+            />
+          ) : null}
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={[
@@ -256,31 +244,17 @@ const Profile = () => {
             isDarkMode ? styles.darkField : styles.lightField,
           ]}
           onPress={confirmDelete}
+          disabled={loadingDelete}
         >
           <Text style={styles.buttonText}>Delete Account and Data</Text>
-        </TouchableOpacity>
 
-        {loadingDelete ? (
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              //marginTop: 10,
-              marginBottom: 10,
-              flexDirection: "row",
-            }}
-          >
-            <Text
-              style={[
-                { marginRight: 5 },
-                isDarkMode ? styles.lightText : styles.darkText,
-              ]}
-            >
-              Processing addition ...
-            </Text>
-            <ActivityIndicator size={20} color="gray" />
-          </View>
-        ) : null}
+          {loadingDelete ? (
+            <ActivityIndicator
+              size={"small"}
+              color={isDarkMode ? "white" : "gray"}
+            />
+          ) : null}
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );

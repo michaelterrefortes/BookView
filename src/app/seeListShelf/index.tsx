@@ -7,6 +7,7 @@ import {
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -21,6 +22,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import BookCard from "../../../components/BookCard";
 import { API_URL, COVER_URL } from "../../../constants/urls";
 import { BookContext } from "../../../context/BookContext";
+import { getAccessToken } from "../../../services/auth";
 
 const ListShelf = () => {
   const { name, title, symbol, color0, color1, dataType, id } =
@@ -38,6 +40,9 @@ const ListShelf = () => {
 
   const navigation = useNavigation();
   const [screenKey, setScreenKey] = useState(0);
+
+  const [loadingProcess, setLoadingProcess] = useState(false);
+  const [loadingProcessDelete, setLoadingProcessDelete] = useState(false);
 
   //console.log(shelfBooks);
 
@@ -74,24 +79,31 @@ const ListShelf = () => {
             },
           },
 
-          {
-            type: "button",
-            label: "Delete",
-            icon: {
-              type: "sfSymbol",
-              name: "trash",
-            },
-            tintColor: "red",
+          loadingProcessDelete
+            ? {
+                type: "custom",
+                variant: "done",
+                disabled: true,
+                element: <ActivityIndicator size="small" />,
+              }
+            : {
+                type: "button",
+                label: "Delete",
+                icon: {
+                  type: "sfSymbol",
+                  name: "trash",
+                },
+                tintColor: "red",
 
-            onPress: () => {
-              // Do something
-              pressDeleteConfirm();
-            },
-          },
+                onPress: () => {
+                  // Do something
+                  pressDeleteConfirm();
+                },
+              },
         ],
       });
     }
-  }, [dataType]);
+  }, [dataType, loadingProcessDelete]);
 
   const pressDeleteConfirm = async () => {
     Alert.alert("Delete List", "Are you sure you want to delete this list?", [
@@ -109,10 +121,13 @@ const ListShelf = () => {
 
   const handleDelete = async () => {
     try {
+      setLoadingProcessDelete(true);
+      const token = await getAccessToken();
       const res = await fetch(`${API_URL}/createList/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -123,19 +138,24 @@ const ListShelf = () => {
         setListsBooks((prevItems) =>
           prevItems.filter((item) => Number(item.listid) !== Number(id)),
         );
+        setLoadingProcessDelete(false);
         router.back();
       }
     } catch (err) {
       Alert.alert("Error", "Could not delete item");
+      setLoadingProcessDelete(false);
       console.error(err);
     }
   };
 
   const handleDeleteShelf = async (idBook) => {
+    setLoadingProcess(true);
+    const token = await getAccessToken();
     const response = await fetch(`${API_URL}/shelf/${idBook}`, {
       method: "DELETE", // Specify the method
       headers: {
         "Content-Type": "application/json", // Inform the server we're sending JSON
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -144,7 +164,7 @@ const ListShelf = () => {
       //throw new Error("Failed to fetch books", response.statusText);
       Alert.alert("Error", response.error);
     } else {
-      console.log("deleted success");
+      //console.log("deleted success");
 
       //console.log(id);
 
@@ -168,14 +188,18 @@ const ListShelf = () => {
     }
 
     //navigation.goBack();
+    setLoadingProcess(false);
     setScreenKey((prevKey) => prevKey + 1);
   };
 
   const handleDeleteList = async (list_item_id) => {
+    setLoadingProcess(true);
+    const token = await getAccessToken();
     const response = await fetch(`${API_URL}/lists_books/${list_item_id}`, {
       method: "DELETE", // Specify the method
       headers: {
         "Content-Type": "application/json", // Inform the server we're sending JSON
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -184,7 +208,7 @@ const ListShelf = () => {
       //throw new Error("Failed to fetch books", response.statusText);
       Alert.alert("Error", response.error);
     } else {
-      console.log("deleted success");
+      //console.log("deleted success");
 
       //console.log(id);
 
@@ -202,6 +226,7 @@ const ListShelf = () => {
       );
     }
 
+    setLoadingProcess(false);
     //navigation.goBack();
     setScreenKey((prevKey) => prevKey + 1);
   };
@@ -276,7 +301,11 @@ const ListShelf = () => {
               : confirmDeleteList(item.list_item_id)
           }
         >
-          <SymbolView name={"trash"} tintColor={"white"} />
+          {loadingProcess ? (
+            <ActivityIndicator size={"small"} color={"white"} />
+          ) : (
+            <SymbolView name={"trash"} tintColor={"white"} />
+          )}
         </TouchableOpacity>
       </View>
     );
@@ -360,7 +389,7 @@ const ListShelf = () => {
                   coverId={item.bookid}
                   title={item.title}
                   authorName={[item.author]}
-                  year={item.year_book?.toString()}
+                  year={""}
                   urlPoster={`${COVER_URL}/${item.bookid[item.bookid.length - 1] === "W" ? "w" : "b"}/olid/${item.bookid}-L.jpg`}
                   routeUrl={
                     item.bookid[item.bookid.length - 1] === "W"

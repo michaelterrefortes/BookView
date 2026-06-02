@@ -4,6 +4,7 @@ import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -17,6 +18,7 @@ import ListCardAdd from "../../../components/ListCardAdd";
 import { API_URL } from "../../../constants/urls";
 import { BookContext } from "../../../context/BookContext";
 import { addList, addShelf, fetchAPILists } from "../../../services/apiAPI";
+import { getAccessToken } from "../../../services/auth";
 import { findBookInLists, findBookInShelve } from "../../../services/functions";
 
 const TABS = ["Shelves", "Lists"];
@@ -50,6 +52,9 @@ const ShelfLists = () => {
   const [prevSelectedShelf, setPrevSelectedShelf] = useState(-1);
 
   //console.log(selectedLists, prevSelectedList);
+
+  const [loadingProcess, setLoadingProcess] = useState(false);
+  const [loadingProcessDelete, setLoadingProcessDelete] = useState(false);
 
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
@@ -112,34 +117,43 @@ const ShelfLists = () => {
 
     navigation.setOptions({
       unstable_headerRightItems: () => [
-        {
-          type: "button",
-          label: "Add",
-          variant: "done",
-          disabled: cond,
-          icon: {
-            type: "sfSymbol",
-            name: "checkmark",
-          },
-          onPress: () => {
-            // Do something
-            //navigation.goBack();
-            handleConfirm();
-          },
-        },
+        loadingProcess
+          ? {
+              type: "custom",
+              variant: "done",
+              disabled: true,
+              element: <ActivityIndicator size="small" />,
+            }
+          : {
+              type: "button",
+              label: "Add",
+              variant: "done",
+              disabled: cond,
+              icon: {
+                type: "sfSymbol",
+                name: "checkmark",
+              },
+              onPress: () => {
+                // Do something
+                //navigation.goBack();
+                handleConfirm();
+              },
+            },
       ],
     });
-  }, [selectedShelf, selectedLists]);
+  }, [selectedShelf, selectedLists, loadingProcess]);
 
   const handleConfirm = async () => {
+    setLoadingProcess(true);
+
     const id = bookId.split("/")[2];
     //console.log("handleConfirm", id, selectedShelf, selectedLists);
 
-    console.log("handle add");
+    //console.log("handle add");
 
     let result = null;
     if (prevSelectedShelf === -1) {
-      console.log("original shelf add");
+      //console.log("original shelf add");
       result = await addShelf(id, selectedShelf, title, authors);
       //console.log(result); //result2);
 
@@ -162,9 +176,9 @@ const ShelfLists = () => {
       prevSelectedShelf !== -1 &&
       !(selectedShelf === prevSelectedShelf)
     ) {
-      console.log("shelf edit");
+      //console.log("shelf edit");
       result = await addShelf(id, selectedShelf, title, authors, "PUT");
-      console.log(result); //result2);
+      //console.log(result); //result2);
 
       if (result.success) {
         //console.log("excelent edited");
@@ -188,7 +202,7 @@ const ShelfLists = () => {
     }
 
     if (prevSelectedList.length === 0 && selectedLists.length !== 0) {
-      console.log("add list original");
+      //console.log("add list original");
 
       result = await addList(id, selectedLists, prevSelectedList, "POST");
 
@@ -209,7 +223,7 @@ const ShelfLists = () => {
         prevSelectedList.length !== selectedLists.length) ||
       !prevSelectedList.every((val, index) => val === selectedLists[index])
     ) {
-      console.log("edit list selected");
+      //console.log("edit list selected");
 
       result = await addList(id, selectedLists, prevSelectedList, "PUT");
 
@@ -226,7 +240,7 @@ const ShelfLists = () => {
         Alert.alert("Error", result.error);
       }
     }
-
+    setLoadingProcess(false);
     navigation.goBack();
 
     //const result2 = await addList(id, selectedLists, title, authors);
@@ -253,20 +267,25 @@ const ShelfLists = () => {
   };
 
   const confirmDelete = async () => {
+    setLoadingProcessDelete(true);
     const id = bookId.split("/")[2];
+    const token = await getAccessToken();
     const response = await fetch(`${API_URL}/shelf/${id}`, {
       method: "DELETE", // Specify the method
       headers: {
         "Content-Type": "application/json", // Inform the server we're sending JSON
+        Authorization: `Bearer ${token}`,
       },
     });
+
+    setLoadingProcessDelete(false);
 
     if (!response.ok) {
       // @ts-ignore
       //throw new Error("Failed to fetch books", response.statusText);
       Alert.alert("Error", response.error);
     } else {
-      console.log("deleted success");
+      //console.log("deleted success");
 
       setShelfBooks((prevData) =>
         prevData.map((item) =>
@@ -350,10 +369,20 @@ const ShelfLists = () => {
               value={4}
             />
 
+            <ListCardAdd
+              symbol={"books.vertical"}
+              colors={["#f7faea", "#d8db71"]}
+              title={"None"}
+              onChange={setSelectedShelf}
+              selected={selectedShelf}
+              value={5}
+            />
+
             {prevSelectedShelf !== -1 ? (
               <TouchableOpacity
                 onPress={() => handleDelete()}
                 activeOpacity={0.8}
+                disabled={loadingProcessDelete}
               >
                 <LinearGradient
                   colors={["#dd5656", "#d73939"]}
@@ -371,13 +400,21 @@ const ShelfLists = () => {
                     },
                   ]}
                 >
-                  <SymbolView
-                    name={"trash"}
-                    size={18}
-                    tintColor={"white"}
-                    style={{ marginRight: 10 }}
-                  />
-                  <Text style={[styles.buttonText]}>Delete from Library</Text>
+                  {loadingProcessDelete ? (
+                    <ActivityIndicator size={"small"} color={"white"} />
+                  ) : (
+                    <View>
+                      <SymbolView
+                        name={"trash"}
+                        size={18}
+                        tintColor={"white"}
+                        style={{ marginRight: 10 }}
+                      />
+                      <Text style={[styles.buttonText]}>
+                        Delete from Library
+                      </Text>
+                    </View>
+                  )}
                 </LinearGradient>
               </TouchableOpacity>
             ) : null}

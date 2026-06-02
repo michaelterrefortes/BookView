@@ -204,6 +204,7 @@ const LoginScreen = () => {
 
         <TouchableOpacity
           onPress={processButton} //router.replace("/(tabs)/(index)")}
+          disabled={loading}
         >
           <LinearGradient
             colors={["#2b5bfc", "#921ffa"]}

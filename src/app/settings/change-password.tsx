@@ -123,38 +123,25 @@ const ChangePassword = () => {
             isDarkMode ? styles.darkField : styles.lightField,
           ]}
           onPress={handleUpdate}
+          disabled={loading}
         >
-          <Text
-            style={[
-              styles.buttonTextRegular,
-              { color: isDarkMode ? "lightblue" : "blue" },
-            ]}
-          >
-            Update Password
-          </Text>
-        </TouchableOpacity>
-
-        {loading ? (
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              //marginTop: 10,
-              marginBottom: 10,
-              flexDirection: "row",
-            }}
-          >
+          {loading ? (
+            <ActivityIndicator
+              size={"small"}
+              style={{ alignSelf: "center" }}
+              color={isDarkMode ? "white" : "gray"}
+            />
+          ) : (
             <Text
               style={[
-                { marginRight: 5 },
-                isDarkMode ? styles.lightText : styles.darkText,
+                styles.buttonTextRegular,
+                { color: isDarkMode ? "lightblue" : "blue" },
               ]}
             >
-              Processing request ...
+              Update Password
             </Text>
-            <ActivityIndicator size={20} color="gray" />
-          </View>
-        ) : null}
+          )}
+        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );

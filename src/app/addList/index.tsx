@@ -2,6 +2,7 @@ import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useLayoutEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -25,10 +26,13 @@ const AddList = () => {
 
   const navigation = useNavigation();
 
+  const [loadingProcess, setLoadingProcess] = useState(false);
+
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
 
   const processForm = async () => {
+    setLoadingProcess(true);
     const result = await createList(name, method, id);
 
     if (result.success) {
@@ -49,8 +53,11 @@ const AddList = () => {
       }
       //console.log("added");
 
+      setLoadingProcess(false);
+
       router.back();
     } else {
+      setLoadingProcess(false);
       Alert.alert("Error", result.error);
     }
   };
@@ -62,24 +69,32 @@ const AddList = () => {
     }
     navigation.setOptions({
       unstable_headerRightItems: () => [
-        {
-          type: "button",
-          label: "Add",
-          variant: "done",
-          disabled: cond,
-          icon: {
-            type: "sfSymbol",
-            name: "checkmark",
-          },
-          onPress: () => {
-            // Do something
-            //navigation.goBack();
-            processForm();
-          },
-        },
+        loadingProcess
+          ? {
+              type: "custom",
+              variant: "done",
+              disabled: true,
+              element: <ActivityIndicator size="small" />,
+            }
+          : {
+              type: "button",
+              label: "Add",
+              variant: "done",
+              disabled: cond,
+              icon: {
+                type: "sfSymbol",
+                name: "checkmark",
+              },
+              onPress: () => {
+                // Do something
+                //navigation.goBack();
+
+                processForm();
+              },
+            },
       ],
     });
-  }, [name]);
+  }, [name, loadingProcess]);
 
   return (
     <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
@@ -107,6 +122,7 @@ const AddList = () => {
         onChangeText={setName}
         keyboardType="default"
         placeholder="List Name"
+        placeholderTextColor="gray"
       />
     </ScrollView>
   );

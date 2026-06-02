@@ -1,12 +1,20 @@
 import { API_URL } from "../constants/urls";
+import { getAccessToken } from "./auth";
 
 export const fetchAPIShelves = async () => {
   // /trending/now.json?&sort=trending&limit=10
+  const token = await getAccessToken();
   const endpoint = `${API_URL}/shelf`;
 
   //console.log("aqui", endpoint);
 
-  const response = await fetch(endpoint);
+  const response = await fetch(endpoint, {
+    method: "GET", // Specify the method
+    headers: {
+      "Content-Type": "application/json", // Inform the server we're sending JSON
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     // @ts-ignore
@@ -21,11 +29,18 @@ export const fetchAPIShelves = async () => {
 
 export const fetchAPILists = async () => {
   // /trending/now.json?&sort=trending&limit=10
+  const token = await getAccessToken();
   const endpoint = `${API_URL}/lists_books`;
 
   //console.log("aqui", endpoint);
 
-  const response = await fetch(endpoint);
+  const response = await fetch(endpoint, {
+    method: "GET", // Specify the method
+    headers: {
+      "Content-Type": "application/json", // Inform the server we're sending JSON
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     // @ts-ignore
@@ -45,6 +60,7 @@ export const addShelf = async (
   authors,
   method = "POST",
 ) => {
+  const token = await getAccessToken();
   const endpoint = `${API_URL}/shelf`;
 
   const dataBody = {
@@ -58,6 +74,7 @@ export const addShelf = async (
     method: method, // Specify the method
     headers: {
       "Content-Type": "application/json", // Inform the server we're sending JSON
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(dataBody),
   });
@@ -76,7 +93,9 @@ export const addShelf = async (
 export const addList = async (id, selectedLists, prevList, method) => {
   const endpoint = `${API_URL}/lists_books`;
 
-  console.log(id, selectedLists, prevList, method);
+  const token = await getAccessToken();
+
+  //console.log(id, selectedLists, prevList, method);
 
   let response = null;
 
@@ -85,6 +104,7 @@ export const addList = async (id, selectedLists, prevList, method) => {
       method: method, // Specify the method
       headers: {
         "Content-Type": "application/json", // Inform the server we're sending JSON
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ selectedLists: selectedLists, id: id }),
     });
@@ -93,6 +113,7 @@ export const addList = async (id, selectedLists, prevList, method) => {
       method: method, // Specify the method
       headers: {
         "Content-Type": "application/json", // Inform the server we're sending JSON
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         selectedLists: selectedLists,
@@ -114,6 +135,8 @@ export const addList = async (id, selectedLists, prevList, method) => {
 };
 
 export const createList = async (name, method, id) => {
+  const token = await getAccessToken();
+
   let response = null;
   if (method === "POST") {
     const endpoint = `${API_URL}/createList`;
@@ -122,6 +145,7 @@ export const createList = async (name, method, id) => {
       method: method, // Specify the method
       headers: {
         "Content-Type": "application/json", // Inform the server we're sending JSON
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ name: name }),
     });
@@ -132,6 +156,7 @@ export const createList = async (name, method, id) => {
       method: method, // Specify the method
       headers: {
         "Content-Type": "application/json", // Inform the server we're sending JSON
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ name: name }),
     });
@@ -151,6 +176,8 @@ export const createList = async (name, method, id) => {
 export const updateTrendingCount = async (book) => {
   //console.log(book);
 
+  const token = await getAccessToken();
+
   const endpoint = `${API_URL}/trending`;
 
   const data = {
@@ -163,6 +190,7 @@ export const updateTrendingCount = async (book) => {
     method: "POST", // Specify the method
     headers: {
       "Content-Type": "application/json", // Inform the server we're sending JSON
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
@@ -173,10 +201,13 @@ export const updateTrendingCount = async (book) => {
 export const fetchTrending = async () => {
   const endpoint = `${API_URL}/trending`;
 
+  const token = await getAccessToken();
+
   const response = await fetch(endpoint, {
     method: "GET", // Specify the method
     headers: {
       "Content-Type": "application/json", // Inform the server we're sending JSON
+      Authorization: `Bearer ${token}`,
     },
   });
 

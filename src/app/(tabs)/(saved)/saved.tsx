@@ -1,12 +1,13 @@
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { useIsFocused } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   RefreshControl,
   ScrollView,
   StyleSheet,
+  Text,
   useColorScheme,
   View,
 } from "react-native";
@@ -43,10 +44,10 @@ const Saved = () => {
 
   //console.log(isFocused);
 
-  useEffect(() => {
+  /*useEffect(() => {
     loadShelves();
     loadLists();
-  }, []);
+  }, []);*/
 
   const loadShelves = async () => {
     setLoading(true);
@@ -148,9 +149,31 @@ const Saved = () => {
             colors={["#ebeafa", "#7671db"]}
             title={"Not Finished"}
           />
+
+          <ShelfCard
+            /*item={
+              shelfBooks.find((item) => item.name === "not_finished")?.books ||
+              []
+            } //shelfBooks.filter((item) => item.shelf === 4)?.[0]?.books}*/
+            item={"none"}
+            symbol={"books.vertical"}
+            id={5}
+            colors={["#f7faea", "#d8db71"]}
+            title={"None"}
+          />
         </View>
       ) : (
         <View style={{ paddingHorizontal: 16 }}>
+          {listsBooks.length === 0 ? (
+            <Text
+              style={[
+                { textAlign: "center", fontWeight: "600", paddingTop: 100 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              No Lists
+            </Text>
+          ) : null}
           {listsBooks.map((item, index) => (
             <ShelfCard
               key={item.listid}
