@@ -6,7 +6,16 @@ import {
 } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BookCard from "../../../components/BookCard";
 import { API_URL, COVER_URL } from "../../../constants/urls";
@@ -18,14 +27,20 @@ const ListShelf = () => {
 
   const router = useRouter();
 
-  const { shelfBooks, listsBooks, setListsBooks } = useContext(BookContext);
+  //console.log(id);
+
+  const { shelfBooks, listsBooks, setListsBooks, setShelfBooks } =
+    useContext(BookContext);
 
   const isFocused = useIsFocused();
   const [data, setData] = useState([]);
 
   const navigation = useNavigation();
+  const [screenKey, setScreenKey] = useState(0);
 
   //console.log(shelfBooks);
+
+  //console.log(listsBooks[0]);
 
   useEffect(() => {
     if (dataType === "list") {
@@ -33,7 +48,7 @@ const ListShelf = () => {
     } else setData(shelfBooks.find((el) => el.name === name)?.books || []);
 
     //console.log(data);
-  }, [isFocused]);
+  }, [isFocused, screenKey]);
 
   //const data = item ? JSON.parse(item) : null;
 
@@ -115,73 +130,235 @@ const ListShelf = () => {
     }
   };
 
-  return (
-    <SafeAreaView style={styles.container} edges={["right", "left"]}>
-      <ScrollView>
-        <View style={{ height: 120 }} />
-        <View
-          style={{
-            padding: 10,
-            backgroundColor: color0,
-            borderRadius: 10,
-            alignItems: "center",
-            alignSelf: "center",
-          }}
-        >
-          <SymbolView name={symbol} size={45} tintColor={color1} />
-        </View>
-        <Text
-          style={{
-            paddingVertical: 15,
-            textAlign: "center",
-            fontSize: 24,
-            fontWeight: "600",
-          }}
-        >
-          {title}
-        </Text>
+  const handleDeleteShelf = async (idBook) => {
+    const response = await fetch(`${API_URL}/shelf/${idBook}`, {
+      method: "DELETE", // Specify the method
+      headers: {
+        "Content-Type": "application/json", // Inform the server we're sending JSON
+      },
+    });
 
-        {data.length === 0 && (
+    if (!response.ok) {
+      // @ts-ignore
+      //throw new Error("Failed to fetch books", response.statusText);
+      Alert.alert("Error", response.error);
+    } else {
+      console.log("deleted success");
+
+      //console.log(id);
+
+      setShelfBooks((prevData) =>
+        prevData.map((item) =>
+          Number(item.shelve) === Number(id)
+            ? {
+                ...item,
+                books: item.books.filter((book) => book.bookid !== idBook),
+              }
+            : item,
+        ),
+      );
+
+      setListsBooks((prevData) =>
+        prevData.map((item) => ({
+          ...item,
+          books: item.books.filter((book) => book.bookid !== idBook),
+        })),
+      );
+    }
+
+    //navigation.goBack();
+    setScreenKey((prevKey) => prevKey + 1);
+  };
+
+  const handleDeleteList = async (list_item_id) => {
+    const response = await fetch(`${API_URL}/lists_books/${list_item_id}`, {
+      method: "DELETE", // Specify the method
+      headers: {
+        "Content-Type": "application/json", // Inform the server we're sending JSON
+      },
+    });
+
+    if (!response.ok) {
+      // @ts-ignore
+      //throw new Error("Failed to fetch books", response.statusText);
+      Alert.alert("Error", response.error);
+    } else {
+      console.log("deleted success");
+
+      //console.log(id);
+
+      setListsBooks((prevData) =>
+        prevData.map((item) =>
+          Number(item.listid) === Number(id)
+            ? {
+                ...item,
+                books: item.books.filter(
+                  (book) => book.list_item_id !== list_item_id,
+                ),
+              }
+            : item,
+        ),
+      );
+    }
+
+    //navigation.goBack();
+    setScreenKey((prevKey) => prevKey + 1);
+  };
+
+  const confirmDeleteShelf = (id) => {
+    //console.log(shelfBooks);
+    //console.log(id);
+    Alert.alert(
+      "Delete Confirmation",
+      "Are you sure you want to delete this book from your library? This action will remove the book from shelf and lists.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => handleDeleteShelf(id),
+          style: "destructive",
+        },
+      ],
+      { cancelable: true }, // Allows tapping outside to dismiss on Android
+    );
+  };
+
+  const confirmDeleteList = (list_item_id) => {
+    //console.log(list_item_id);
+    //console.log(id);
+    //console.log(list);
+    Alert.alert(
+      "Delete Confirmation",
+      "Are you sure you want to delete this book from this list?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => handleDeleteList(list_item_id),
+          style: "destructive",
+        },
+      ],
+      { cancelable: true }, // Allows tapping outside to dismiss on Android
+    );
+  };
+
+  // Render the delete button behind the row
+  const renderRightActions = (progress, dragX, item) => {
+    return (
+      <View
+        key={`delete-${item.bookid}`}
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          marginHorizontal: 18,
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            backgroundColor: "red",
+            padding: 8,
+            borderRadius: 30,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          onPress={() =>
+            dataType !== "list"
+              ? confirmDeleteShelf(item.bookid)
+              : confirmDeleteList(item.list_item_id)
+          }
+        >
+          <SymbolView name={"trash"} tintColor={"white"} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  return (
+    <GestureHandlerRootView>
+      <SafeAreaView style={styles.container} edges={["right", "left"]}>
+        <ScrollView>
+          <View style={{ height: 120 }} />
+          <View
+            style={{
+              padding: 10,
+              backgroundColor: color0,
+              borderRadius: 10,
+              alignItems: "center",
+              alignSelf: "center",
+            }}
+          >
+            <SymbolView name={symbol} size={45} tintColor={color1} />
+          </View>
           <Text
             style={{
+              paddingVertical: 15,
               textAlign: "center",
-              fontWeight: "700",
-              marginTop: 50,
+              fontSize: 24,
+              fontWeight: "600",
             }}
           >
-            No Books
+            {title}
           </Text>
-        )}
 
-        {data.map((item, index) => (
-          <View
-            key={`${item.id}-${index}`}
-            style={{
-              backgroundColor: "white",
-              padding: 15,
-              marginHorizontal: 16,
-              marginVertical: 10,
-              borderRadius: 20,
-            }}
-          >
-            <BookCard
-              itemKey={`/${item.bookid[item.bookid.length - 1] === "W" ? "works" : "books"}/${item.bookid}`}
-              coverId={item.bookid}
-              title={item.title}
-              authorName={[item.author]}
-              year={item.year_book?.toString()}
-              urlPoster={`${COVER_URL}/${item.bookid[item.bookid.length - 1] === "W" ? "w" : "b"}/olid/${item.bookid}-L.jpg`}
-              routeUrl={
-                item.bookid[item.bookid.length - 1] === "W"
-                  ? "books"
-                  : "editions"
+          {data.length === 0 && (
+            <Text
+              style={{
+                textAlign: "center",
+                fontWeight: "700",
+                marginTop: 50,
+              }}
+            >
+              No Books
+            </Text>
+          )}
+
+          {data.map((item, index) => (
+            <ReanimatedSwipeable
+              key={index}
+              friction={2}
+              rightThreshold={40}
+              renderRightActions={(progress, dragX) =>
+                renderRightActions(progress, dragX, item)
               }
-              orientation={"v"}
-            />
-          </View>
-        ))}
-      </ScrollView>
-    </SafeAreaView>
+            >
+              <View
+                key={`${item.id}-${index}`}
+                style={{
+                  backgroundColor: "white",
+                  padding: 15,
+                  marginHorizontal: 16,
+                  marginVertical: 10,
+                  borderRadius: 20,
+                }}
+              >
+                <BookCard
+                  itemKey={`/${item.bookid[item.bookid.length - 1] === "W" ? "works" : "books"}/${item.bookid}`}
+                  coverId={item.bookid}
+                  title={item.title}
+                  authorName={[item.author]}
+                  year={item.year_book?.toString()}
+                  urlPoster={`${COVER_URL}/${item.bookid[item.bookid.length - 1] === "W" ? "w" : "b"}/olid/${item.bookid}-L.jpg`}
+                  routeUrl={
+                    item.bookid[item.bookid.length - 1] === "W"
+                      ? "books"
+                      : "editions"
+                  }
+                  orientation={"v"}
+                />
+              </View>
+            </ReanimatedSwipeable>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 };
 
