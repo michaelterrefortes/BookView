@@ -11,6 +11,7 @@ const _layout = () => {
     <Tabs
       screenOptions={{
         headerShown: false,
+        //popToTopOnBlur: true,
       }}
     >
       <Tabs.Screen
@@ -71,7 +72,7 @@ const _layout = () => {
       <Tabs.Screen
         name="(profile)"
         options={{
-          title: "Profile",
+          title: "Account",
           headerShown: false,
           tabBarActiveTintColor: "#7663dc",
           tabBarInactiveTintColor: "gray",

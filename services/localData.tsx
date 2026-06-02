@@ -8,7 +8,7 @@ export const saveSearch = async (newSearchTerm) => {
     // Avoid duplicates and limit to 10 recent searches
     searches = searches.filter((item) => item !== newSearchTerm);
     searches.unshift(newSearchTerm); // Add to the front
-    if (searches.length > 10) searches.pop();
+    //if (searches.length > 10) searches.pop();
 
     await AsyncStorage.setItem("@recent_searches", JSON.stringify(searches));
   } catch (error) {

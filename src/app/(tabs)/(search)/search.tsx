@@ -75,6 +75,16 @@ const Search = () => {
     return () => clearTimeout(timeoutId);
   }, [searchBook]);
 
+  useEffect(() => {
+    const loadSearch = async () => {
+      const storedSearches = await AsyncStorage.getItem("@recent_searches");
+      if (storedSearches) {
+        setHistory(JSON.parse(storedSearches));
+      }
+    };
+    loadSearch();
+  }, []);
+
   const loadMoreBooks = async () => {
     if (loadingMore || loading) return;
     if (searchBook.trim() === "") return;

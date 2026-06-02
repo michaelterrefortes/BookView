@@ -3,6 +3,7 @@ import { SymbolView } from "expo-symbols";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   RefreshControl,
   ScrollView,
@@ -16,10 +17,15 @@ import SearchBar from "../../../../components/SearchBar";
 import { COVER_URL } from "../../../../constants/urls";
 import { subjects } from "../../../../constants/variables";
 import { BookContext } from "../../../../context/BookContext";
-import { fetchTrending } from "../../../../services/apiAPI";
+import {
+  fetchAPILists,
+  fetchAPIShelves,
+  fetchTrending,
+} from "../../../../services/apiAPI";
 
 export default function Index() {
-  const { listsBooks } = useContext(BookContext);
+  const { shelfBooks, setShelfBooks, listsBooks, setListsBooks } =
+    useContext(BookContext);
   const navigation = useNavigation();
   const router = useRouter();
   const [dataTrending, setDataTrending] = useState([]);
@@ -32,6 +38,7 @@ export default function Index() {
 
   useEffect(() => {
     loadBooks(setLoadingTrending, setDataTrending);
+    (loadLists(), loadShelves());
   }, []);
 
   const loadBooks = async (setLoading, setData) => {
@@ -59,6 +66,41 @@ export default function Index() {
     //setAuthors(authorsDict);
 
     setLoading(false);
+  };
+
+  const [loading, setLoading] = useState(false);
+  const [loadingList, setLoadingList] = useState(false);
+
+  const loadShelves = async () => {
+    setLoading(true);
+
+    const result = await fetchAPIShelves();
+
+    if (result.success) {
+      //console.log(result.data);
+      setShelfBooks(result.data);
+
+      //console.log(result.data);
+    } else {
+      Alert.alert("Error", result.error);
+    }
+
+    setLoading(false);
+  };
+
+  const loadLists = async () => {
+    setLoadingList(true);
+
+    const result = await fetchAPILists();
+
+    if (result.success) {
+      //console.log(result.data);
+      setListsBooks(result.data);
+    } else {
+      Alert.alert("Error", result.error);
+    }
+
+    setLoadingList(false);
   };
 
   // Handler for the pull-to-refresh gesture
@@ -116,7 +158,7 @@ export default function Index() {
 
         <Text
           style={{ color: "#7663dc" }}
-          onPress={() => router.push("/(tabs)/(saved)/saved")}
+          onPress={() => router.push("/saved")}
         >
           See All
         </Text>
@@ -147,7 +189,7 @@ export default function Index() {
             shadowOpacity: 0.08,
             shadowRadius: 4,
           }}
-          onPress={() => router.push("/(tabs)/(saved)/saved")}
+          onPress={() => router.push("/saved")}
         >
           {/*["#ebecf7", "#777d9f"]*/}
 
@@ -188,7 +230,7 @@ export default function Index() {
             shadowOpacity: 0.08,
             shadowRadius: 4,
           }}
-          onPress={() => router.push("/(tabs)/(saved)/saved")}
+          onPress={() => router.push("/saved")}
         >
           {/*["#ebecf7", "#777d9f"]*/}
 
@@ -229,8 +271,8 @@ export default function Index() {
           data={dataTrending}
           horizontal
           showsHorizontalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-          contentContainerStyle={{ paddingHorizontal: 8 }}
+          style={{ paddingLeft: 6 }}
+          ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <BookCard
@@ -248,10 +290,13 @@ export default function Index() {
               orientation={"h"}
             />
           )}
+          ListFooterComponent={
+            <View style={{ height: 20, paddingHorizontal: 10 }} />
+          }
         />
       )}
       <Text style={[styles.bigTitle, { marginBottom: 10, marginTop: 15 }]}>
-        Browse by genre
+        Browse by Genre
       </Text>
 
       <ScrollView
@@ -282,40 +327,6 @@ export default function Index() {
           </View>
         ))}
       </ScrollView>
-
-      {/*<FlatList
-        data={subjects}
-        horizontal
-        keyExtractor={(item, index) => index.toString()}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16 }}
-        ItemSeparatorComponent={<View style={{ paddingHorizontal: 5 }} />}
-        renderItem={({ item }) => <GenreCard item={item} />}
-      />
-      */}
-      {/*
-      <Text style={styles.bigTitle}>Popular Authors</Text>
-      {loadingTrending ? (
-        <View style={styles.containerLoading}>
-          <ActivityIndicator
-            size="large"
-            //color="#0000ff"
-            //className="mt-10 self-center" styling
-          />
-        </View>
-      ) : (
-        <FlatList
-          data={authors}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          //ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-          contentContainerStyle={{ paddingHorizontal: 8 }}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <AuthorCard key={item.key} authorId={item.key} name={item.name} />
-          )}
-        />
-      )} */}
     </ScrollView>
     //</SafeAreaView>
   );
@@ -355,6 +366,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: "#1F2937",
+    alignSelf: "center",
   },
 
   container: {

@@ -6,55 +6,13 @@ export default function ProfileLayout() {
       {/*<Stack.Screen name="profile" options={{ title: "Profile" }} />*/}
 
       <Stack.Screen
-        name="profile"
+        name="index"
         options={({ navigation }) => ({
           headerBackTitle: "",
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "Profile",
+          headerTitle: "Account",
           headerBackButtonDisplayMode: "minimal",
-          headerShadowVisible: false,
-          headerBlurEffect: "none",
-          headerLargeTitleEnabled: true,
-
-          //presentation: "modal",
-
-          //sheetGrabberVisible: true,
-          //sheetAllowedDetents: "all",
-
-          //navigationBarHidden: false,
-        })}
-      />
-
-      <Stack.Screen
-        name="change-email"
-        options={({ navigation }) => ({
-          headerBackTitle: "",
-          headerShown: true,
-          headerTransparent: true,
-          headerBackButtonDisplayMode: "minimal",
-          headerTitle: "Change Email",
-          headerShadowVisible: false,
-          headerBlurEffect: "none",
-          headerLargeTitleEnabled: true,
-
-          //presentation: "modal",
-
-          //sheetGrabberVisible: true,
-          //sheetAllowedDetents: "all",
-
-          //navigationBarHidden: false,
-        })}
-      />
-
-      <Stack.Screen
-        name="change-password"
-        options={({ navigation }) => ({
-          headerBackTitle: "",
-          headerShown: true,
-          headerTransparent: true,
-          headerBackButtonDisplayMode: "minimal",
-          headerTitle: "Change Password",
           headerShadowVisible: false,
           headerBlurEffect: "none",
           headerLargeTitleEnabled: true,

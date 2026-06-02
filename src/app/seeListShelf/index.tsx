@@ -8,9 +8,9 @@ import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BookCard from "../../../../../components/BookCard";
-import { API_URL, COVER_URL } from "../../../../../constants/urls";
-import { BookContext } from "../../../../../context/BookContext";
+import BookCard from "../../../components/BookCard";
+import { API_URL, COVER_URL } from "../../../constants/urls";
+import { BookContext } from "../../../context/BookContext";
 
 const ListShelf = () => {
   const { name, title, symbol, color0, color1, dataType, id } =
@@ -52,7 +52,7 @@ const ListShelf = () => {
             },
             onPress: () => {
               router.push({
-                pathname: "/(tabs)/(saved)/addList",
+                pathname: "/addList",
                 params: { type: "add", method: "PUT", value: title, id: id },
               });
             },
@@ -118,6 +118,7 @@ const ListShelf = () => {
   return (
     <SafeAreaView style={styles.container} edges={["right", "left"]}>
       <ScrollView>
+        <View style={{ height: 120 }} />
         <View
           style={{
             padding: 10,

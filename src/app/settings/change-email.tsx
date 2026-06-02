@@ -1,5 +1,4 @@
 import { useRouter } from "expo-router";
-import { SymbolView } from "expo-symbols";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -13,38 +12,34 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import { validatePassword } from "../../../../constants/functions";
-import { supabase } from "../../../../services/auth";
+import { validateEmail } from "../../../constants/functions";
+import { supabase } from "../../../services/auth";
 
-const ChangePassword = () => {
+const ChangeEmail = () => {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
 
-  const [password, setPassword] = useState("");
-  const [passwordWarning, setPasswordWarning] = useState(false);
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailWarning, setEmailWarning] = useState(false);
 
-  const [passwordIncorrectWarning, setPasswordIncorrectWarning] =
-    useState(false);
-
+  const [emailIncorrectWarning, setEmailIncorrectWarning] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleUpdate = async () => {
     let warning = false;
-    if (password.trim() === "") {
-      setPasswordWarning(true);
+    if (email.trim() === "") {
+      setEmailWarning(true);
       warning = true;
-    } else if (!validatePassword(password)) {
-      setPasswordIncorrectWarning(true);
+    } else if (!validateEmail(email)) {
+      setEmailIncorrectWarning(true);
       warning = true;
     }
-
     if (warning) return;
 
     setLoading(true);
 
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error } = await supabase.auth.updateUser({ email });
 
     setLoading(false);
 
@@ -53,7 +48,7 @@ const ChangePassword = () => {
       return;
     }
 
-    alert("Password updated");
+    alert("Check your email to confirm.");
     router.back();
   };
 
@@ -73,48 +68,29 @@ const ChangePassword = () => {
             isDarkMode ? styles.darkField : styles.lightField,
           ]}
         >
-          <View style={{ flexDirection: "row" }}>
-            <TextInput
-              //style={styles.input}
-              style={{ width: "90%" }}
-              placeholder="New Password"
-              value={password}
-              onChangeText={(val) => {
-                setPassword(val);
-                if (val.trim() !== "") {
-                  (setPasswordWarning(false),
-                    setPasswordIncorrectWarning(false));
-                }
-              }}
-              secureTextEntry={!isPasswordVisible} // Toggles visibility
-            />
-            <TouchableOpacity
-              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-            >
-              {isPasswordVisible ? (
-                <SymbolView
-                  name={{ ios: "eye.slash" }}
-                  tintColor={isDarkMode ? "white" : "#000"}
-                  size={20}
-                />
-              ) : (
-                <SymbolView
-                  name={{ ios: "eye" }}
-                  tintColor={isDarkMode ? "white" : "#000"}
-                  size={20}
-                />
-              )}
-            </TouchableOpacity>
-          </View>
+          <TextInput
+            placeholder="New email"
+            value={email}
+            onChangeText={(val) => {
+              setEmail(val);
+              if (val.trim() !== "") {
+                (setEmailWarning(false), setEmailIncorrectWarning(false));
+              }
+            }}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            style={[
+              styles.input,
+              isDarkMode ? styles.darkField : styles.lightField,
+            ]}
+          />
         </View>
 
-        {passwordWarning && (
+        {emailWarning && (
           <Text style={styles.warning}>* Field Missing Value</Text>
         )}
-        {passwordIncorrectWarning && (
-          <Text style={[styles.warning, { width: "90%" }]}>
-            * Min 8 chars, 1 upper, 1 lower, 1 number, 1 special char
-          </Text>
+        {emailIncorrectWarning && (
+          <Text style={styles.warning}>* Incorrect Email. Try again.</Text>
         )}
 
         <TouchableOpacity
@@ -130,7 +106,7 @@ const ChangePassword = () => {
               { color: isDarkMode ? "lightblue" : "blue" },
             ]}
           >
-            Update Password
+            Update Email
           </Text>
         </TouchableOpacity>
 
@@ -160,7 +136,7 @@ const ChangePassword = () => {
   );
 };
 
-export default ChangePassword;
+export default ChangeEmail;
 
 const styles = StyleSheet.create({
   darkField: { backgroundColor: "#2f2f2f", color: "white" },
@@ -175,7 +151,14 @@ const styles = StyleSheet.create({
     flex: 1,
     //justifyContent: "center",
     //alignItems: "center",
-    //backgroundColor: "rgb(242, 242, 242)",
+    backgroundColor: "rgb(242, 242, 242)",
+  },
+  warning: {
+    color: "red",
+    //paddingLeft: 70,
+    //paddingBottom: 10,
+    textAlign: "left",
+    marginBottom: 10,
   },
 
   button: {
@@ -213,14 +196,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "blue",
     textAlign: "left",
-  },
-  warning: {
-    color: "red",
-    //spaddingLeft: 70,
-    //paddingBottom: 10
-    textAlign: "left",
-
-    //marginTop: 5,
-    marginBottom: 10,
   },
 });

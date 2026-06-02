@@ -110,7 +110,7 @@ export const addList = async (id, selectedLists, prevList, method) => {
 
   const result = await response.json();
 
-  return { success: true, data: [] };
+  return { success: true };
 };
 
 export const createList = async (name, method, id) => {

@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   View,
@@ -75,8 +76,22 @@ const Saved = () => {
     setLoadingList(false);
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    loadShelves();
+    loadLists();
+
+    setRefreshing(false);
+  };
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <SegmentedControl
         values={TABS}
         style={{

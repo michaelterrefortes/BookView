@@ -12,14 +12,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ListCardAdd from "../../../../../components/ListCardAdd";
-import { API_URL } from "../../../../../constants/urls";
-import { BookContext } from "../../../../../context/BookContext";
-import { addList, addShelf } from "../../../../../services/apiAPI";
-import {
-  findBookInLists,
-  findBookInShelve,
-} from "../../../../../services/functions";
+import ListCardAdd from "../../../components/ListCardAdd";
+import { API_URL } from "../../../constants/urls";
+import { BookContext } from "../../../context/BookContext";
+import { addList, addShelf, fetchAPILists } from "../../../services/apiAPI";
+import { findBookInLists, findBookInShelve } from "../../../services/functions";
 
 const TABS = ["Shelves", "Lists"];
 
@@ -36,7 +33,8 @@ const colors = [
 const ShelfLists = () => {
   const { bookId, title, authors } = useLocalSearchParams();
 
-  const { shelfBooks, listsBooks, setShelfBooks } = useContext(BookContext);
+  const { shelfBooks, listsBooks, setShelfBooks, setListsBooks } =
+    useContext(BookContext);
 
   const router = useRouter();
 
@@ -152,7 +150,7 @@ const ShelfLists = () => {
           ),
         );
 
-        navigation.goBack();
+        //navigation.goBack();
       } else {
         Alert.alert("Error", result.error);
       }
@@ -179,7 +177,7 @@ const ShelfLists = () => {
           ),
         );
 
-        navigation.goBack();
+        //navigation.goBack();
       } else {
         Alert.alert("Error", result.error);
       }
@@ -189,6 +187,19 @@ const ShelfLists = () => {
       console.log("add list original");
 
       result = await addList(id, selectedLists, prevSelectedList, "POST");
+
+      if (result.success) {
+        const result2 = await fetchAPILists();
+
+        if (result2.success) {
+          setListsBooks(result2.data);
+        } else {
+          Alert.alert("Error", result2.error);
+        }
+        //navigation.goBack();
+      } else {
+        Alert.alert("Error", result.error);
+      }
     } else if (
       (selectedLists.length !== 0 &&
         prevSelectedList.length !== selectedLists.length) ||
@@ -197,7 +208,22 @@ const ShelfLists = () => {
       console.log("edit list selected");
 
       result = await addList(id, selectedLists, prevSelectedList, "PUT");
+
+      if (result.success) {
+        const result2 = await fetchAPILists();
+
+        if (result2.success) {
+          setListsBooks(result2.data);
+        } else {
+          Alert.alert("Error", result2.error);
+        }
+        //navigation.goBack();
+      } else {
+        Alert.alert("Error", result.error);
+      }
     }
+
+    navigation.goBack();
 
     //const result2 = await addList(id, selectedLists, title, authors);
   };
@@ -249,6 +275,13 @@ const ShelfLists = () => {
         ),
       );
 
+      setListsBooks((prevData) =>
+        prevData.map((item) => ({
+          ...item,
+          books: item.books.filter((book) => book.bookid !== id),
+        })),
+      );
+
       navigation.goBack();
     }
   };
@@ -259,6 +292,7 @@ const ShelfLists = () => {
       edges={["left", "right"]}
     >
       <ScrollView>
+        <View style={{ height: 100 }} />
         <SegmentedControl
           values={TABS}
           style={{

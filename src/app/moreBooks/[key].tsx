@@ -1,20 +1,20 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  StyleSheet,
-  View,
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    StyleSheet,
+    View,
 } from "react-native";
-import BookCard from "../../../../../components/BookCard";
-import { COVER_URL } from "../../../../../constants/urls";
+import BookCard from "../../../components/BookCard";
+import { COVER_URL } from "../../../constants/urls";
 import {
-  fetchAuthorWorks,
-  fetchBookEditions,
-  fetchBooksSubject,
-} from "../../../../../services/api";
-import { getYear } from "../../../../../services/functions";
+    fetchAuthorWorks,
+    fetchBookEditions,
+    fetchBooksSubject,
+} from "../../../services/api";
+import { getYear } from "../../../services/functions";
 
 const MoreBooks = () => {
   const { endpoint, bookId } = useLocalSearchParams();

@@ -2,8 +2,8 @@ import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useLayoutEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, TextInput, View } from "react-native";
-import { BookContext } from "../../../../../context/BookContext";
-import { createList } from "../../../../../services/apiAPI";
+import { BookContext } from "../../../context/BookContext";
+import { createList } from "../../../services/apiAPI";
 
 const AddList = () => {
   const router = useRouter();
@@ -73,6 +73,7 @@ const AddList = () => {
 
   return (
     <ScrollView>
+      <View style={{ height: 100 }} />
       <View
         style={{
           padding: 10,

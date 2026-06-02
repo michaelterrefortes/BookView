@@ -12,10 +12,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import BookCard from "../../../../../components/BookCard";
-import { COVER_URL } from "../../../../../constants/urls";
-import { fetchAuthor, fetchAuthorWorks } from "../../../../../services/api";
-import { getYear } from "../../../../../services/functions";
+import BookCard from "../../../components/BookCard";
+import { COVER_URL } from "../../../constants/urls";
+import { fetchAuthor, fetchAuthorWorks } from "../../../services/api";
+import { getYear } from "../../../services/functions";
 
 const AuthorDetails = () => {
   const router = useRouter();
@@ -75,6 +75,7 @@ const AuthorDetails = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
+      <View style={{ height: 100 }} />
       <View style={styles.container}>
         <View style={{ flexDirection: "row", paddingHorizontal: 16 }}>
           <View style={styles.imageContainer}>

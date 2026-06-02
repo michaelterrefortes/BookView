@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useLayoutEffect } from "react";
-import { ScrollView, Text } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const MoreInfo = () => {
@@ -36,6 +36,7 @@ const MoreInfo = () => {
       edges={["left", "right"]}
     >
       <ScrollView>
+        <View style={{ height: 100 }} />
         <Text>{description}</Text>
       </ScrollView>
     </SafeAreaView>

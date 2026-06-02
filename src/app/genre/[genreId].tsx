@@ -1,16 +1,16 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  StyleSheet,
-  View,
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    StyleSheet,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BookCard from "../../../../../components/BookCard";
-import { COVER_URL } from "../../../../../constants/urls";
-import { fetchBooksSubject } from "../../../../../services/api";
+import BookCard from "../../../components/BookCard";
+import { COVER_URL } from "../../../constants/urls";
+import { fetchBooksSubject } from "../../../services/api";
 
 const Genre = () => {
   const router = useRouter();

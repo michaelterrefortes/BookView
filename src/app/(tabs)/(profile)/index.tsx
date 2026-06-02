@@ -189,7 +189,7 @@ const Profile = () => {
             styles.button,
             isDarkMode ? styles.darkField : styles.lightField,
           ]}
-          onPress={() => router.push("/(tabs)/(profile)/change-email")}
+          onPress={() => router.push("/settings/change-email")}
         >
           <Text
             style={[
@@ -206,7 +206,7 @@ const Profile = () => {
             styles.button,
             isDarkMode ? styles.darkField : styles.lightField,
           ]}
-          onPress={() => router.push("/(tabs)/(profile)/change-password")}
+          onPress={() => router.push("/settings/change-password")}
         >
           <Text
             style={[

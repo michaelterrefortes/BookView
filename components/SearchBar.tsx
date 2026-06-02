@@ -43,7 +43,7 @@ const SearchBar = ({
         {camera ? (
           <TouchableOpacity
             style={[styles.container2]}
-            onPress={() => router.push("/(tabs)/(search)/camera")}
+            onPress={() => router.push("/camera")}
           >
             <SymbolView
               name="barcode.viewfinder"

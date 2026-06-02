@@ -1,6 +1,14 @@
 import { useRouter } from "expo-router";
-import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { validImage } from "../constants/functions";
 
 interface Book {
   itemKey: String;
@@ -32,6 +40,12 @@ const BookCard = ({
 
   //console.log(year);
 
+  const [isValidImage, setIsValidImage] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    validImage(urlPoster, setIsValidImage);
+  }, [urlPoster]);
+
   if (orientation === "h") {
     return (
       <TouchableOpacity
@@ -49,8 +63,14 @@ const BookCard = ({
           })
         }
       >
-        {coverId ? (
-          <View style={styles.coverContainer}>
+        {isValidImage === null ? (
+          <View style={[styles.coverContainer, styles.placeholder]}>
+            <ActivityIndicator size="small" color={"white"} />
+          </View>
+        ) : isValidImage ? (
+          <View
+            style={[styles.coverContainer, { backgroundColor: "transparent" }]}
+          >
             <Image
               resizeMode="contain"
               source={{
@@ -105,8 +125,17 @@ const BookCard = ({
           })
         }
       >
-        {coverId ? (
-          <View style={styles.coverContainerSmall}>
+        {isValidImage === null ? (
+          <View style={[styles.coverContainerSmall, styles.placeholder]}>
+            <ActivityIndicator size="small" color={"white"} />
+          </View>
+        ) : isValidImage ? (
+          <View
+            style={[
+              styles.coverContainerSmall,
+              { backgroundColor: "transparent" },
+            ]}
+          >
             <Image
               source={{ uri: urlPoster }}
               style={styles.cover}

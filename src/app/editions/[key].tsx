@@ -13,39 +13,53 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import BookCard from "../../../../../components/BookCard";
-import { COVER_URL } from "../../../../../constants/urls";
-import { BookContext } from "../../../../../context/BookContext";
-import {
-  fetchBookDetails,
-  fetchBookEditions,
-} from "../../../../../services/api";
-import { findBookInShelve, getYear } from "../../../../../services/functions";
+import BookCard from "../../../components/BookCard";
+import { validImage } from "../../../constants/functions";
+import { COVER_URL } from "../../../constants/urls";
+import { BookContext } from "../../../context/BookContext";
+import { fetchBookDetails, fetchBookEditions } from "../../../services/api";
+import { findBookInShelve, getYear } from "../../../services/functions";
 
-const BookDetails = () => {
-  const router = useRouter();
+const BookEditionDetails = () => {
   const isFocused = useIsFocused();
   const { itemKey, coverId, urlPoster, title, authorName } =
     useLocalSearchParams();
 
-  const { shelfBooks, listsBooks } = useContext(BookContext);
+  const { shelfBooks } = useContext(BookContext);
+
+  const cover = coverId;
+  const id = itemKey.split("/")[2];
+
+  //console.log(itemKey);
+
+  const router = useRouter();
 
   console.log(
-    "Details of work",
+    "Edition details",
     itemKey,
     coverId,
     urlPoster,
     title,
     authorName,
-  );
+  ); //;
+
+  //console.log("looking at edition", cover, id);
+
+  const [details, setDetails] = useState([]);
+  const [loadingDetails, setLoadingDetails] = useState(false);
   const [added, setAdded] = useState(0);
   const [addedText, setAddedText] = useState("Want to Read");
 
-  const [details, setDetails] = useState([]);
   const [editions, setEditions] = useState([]);
-  const [loadingDetails, setLoadingDetails] = useState(false);
   const [loadingEditions, setLoadingEditions] = useState(false);
-  const [offset, setOffset] = useState(0);
+
+  const [idWork, setIdWork] = useState("");
+
+  const [isValidImage, setIsValidImage] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    validImage(urlPoster, setIsValidImage);
+  }, [urlPoster]);
 
   useEffect(() => {
     const id = itemKey.split("/")[2];
@@ -61,51 +75,63 @@ const BookDetails = () => {
       else if (shelf === 3) setAddedText("Finished");
       else setAddedText("Not Finished");
     }
+
+    //console.log(added);
   }, [shelfBooks, isFocused]);
 
   useEffect(() => {
-    loadBooksDetails();
+    const loadBooks = async () => {
+      //console.log("editions/", id, key);
+      setLoadingDetails(true);
+      setLoadingEditions(true);
+      const result = await fetchBookDetails(id, "books");
+
+      //console.log(result);
+
+      const workId = result.data.works[0].key.split("/")[2];
+
+      setIdWork(workId);
+
+      //console.log("\n\n\nno hay", workId);
+
+      const result2 = await fetchBookDetails(workId, "works");
+      //console.log(result2);
+      if (!result.data?.description) {
+        result.data["description"] = result2.data.description;
+        //console.log("aqui");
+      }
+
+      if (!result.data?.authorDetails) {
+        result.data["authorDetails"] = result2.data.authorDetails;
+      }
+
+      const resultEditions = await fetchBookEditions(workId, 3, 0);
+
+      if (result.success) {
+        //console.log(result);
+        setDetails(result.data);
+      }
+      //console.log(result);
+      else {
+        Alert.alert("Error", result.error);
+      }
+
+      if (resultEditions?.success) {
+        setEditions(resultEditions.data);
+      } else {
+        Alert.alert("Error", resultEditions.error);
+      }
+
+      setLoadingDetails(false);
+      setLoadingEditions(false);
+    };
+
+    loadBooks();
   }, []);
-
-  useEffect(() => {
-    loadBooksEditions();
-  }, []);
-
-  const loadBooksDetails = async () => {
-    //console.log("books/", id);
-    setLoadingDetails(true);
-    const result = await fetchBookDetails(itemKey.split("/")[2], "works");
-
-    if (result?.success) {
-      //console.log(result.data);
-      setDetails(result.data);
-    } else {
-      Alert.alert("Error", result.error);
-    }
-
-    //console.log(details, "aqui");
-    setLoadingDetails(false);
-  };
-
-  const loadBooksEditions = async () => {
-    if (loadingEditions) return;
-    setLoadingEditions(true);
-    const result = await fetchBookEditions(itemKey.split("/")[2], 3, 0);
-
-    if (result?.success) {
-      setEditions(result.data);
-      setOffset(10 + offset);
-    } else {
-      Alert.alert("Error", result.error);
-    }
-
-    setLoadingEditions(false);
-  };
-
-  //console.log(details);
 
   return (
     <ScrollView contentContainerStyle={[styles.scrollContent]}>
+      <View style={{ height: 120 }} />
       <View style={styles.container}>
         {loadingDetails ? (
           <View>
@@ -119,7 +145,9 @@ const BookDetails = () => {
           <>
             <View style={styles.row}>
               <View style={styles.imageContainer}>
-                {coverId ? (
+                {isValidImage === null ? (
+                  <ActivityIndicator size="small" color={"white"} />
+                ) : isValidImage ? (
                   <Image
                     source={{ uri: urlPoster }}
                     style={styles.coverImage}
@@ -284,10 +312,10 @@ const BookDetails = () => {
                 style={{ color: "#7663dc" }}
                 onPress={() =>
                   router.push({
-                    pathname: `/moreBooks/${itemKey.split("/")[2]}`,
+                    pathname: `/moreBooks/${idWork}`,
                     params: {
                       endpoint: "editions",
-                      bookId: itemKey.split("/")[2],
+                      bookId: idWork,
                     },
                   })
                 }
@@ -319,6 +347,116 @@ const BookDetails = () => {
             />
           </>
         )}
+
+        {loadingDetails ? null : (
+          <View
+            style={{
+              //smarginRight: 16,
+              //alignItems: "center",
+              marginTop: 5,
+            }}
+          >
+            <Text style={[styles.title2, { marginBottom: 20 }]}>About</Text>
+
+            <View
+              style={{
+                backgroundColor: "white",
+                marginHorizontal: 16,
+                paddingHorizontal: 15,
+                borderRadius: 10,
+              }}
+            >
+              {details?.isbn_13?.length > 0 && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    paddingVertical: 20,
+                    borderBottomColor: "lightgray",
+                    //borderBottomWidth: "50%",
+                    borderBottomWidth: 0.2,
+                  }}
+                >
+                  <Text style={{ width: "30%", fontWeight: "700" }}>ISBN</Text>
+                  <Text>{details.isbn_13.join(", ")}</Text>
+                </View>
+              )}
+
+              {details?.number_of_pages && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    paddingVertical: 20,
+                    borderBottomColor: "lightgray",
+                    //borderBottomWidth: "50%",
+                    borderBottomWidth: 0.2,
+                  }}
+                >
+                  <Text style={{ width: "30%", fontWeight: "700" }}>Pages</Text>
+                  <Text>{details.number_of_pages}</Text>
+                </View>
+              )}
+
+              {details?.publish_date && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    paddingVertical: 20,
+                    borderBottomColor: "lightgray",
+                    //borderBottomWidth: "50%",
+                    borderBottomWidth: 0.2,
+                  }}
+                >
+                  <Text style={{ width: "30%", fontWeight: "700" }}>
+                    Published Date
+                  </Text>
+                  <Text>{details.publish_date}</Text>
+                </View>
+              )}
+
+              {details?.publish_places?.length > 0 && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    paddingVertical: 20,
+                    borderBottomColor: "lightgray",
+                    //borderBottomWidth: "50%",
+                    borderBottomWidth: 0.2,
+                  }}
+                >
+                  <Text>
+                    <Text style={{ width: "30%", fontWeight: "700" }}>
+                      Published Place
+                    </Text>
+                    {details.publish_places
+                      .map((place) => place.name || place)
+                      .join(", ")}
+                  </Text>
+                </View>
+              )}
+
+              {details?.publishers?.length > 0 && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    paddingVertical: 20,
+                    borderBottomColor: "lightgray",
+                    //borderBottomWidth: "50%",
+                    borderBottomWidth: 0.2,
+                  }}
+                >
+                  <Text style={{ width: "30%", fontWeight: "700" }}>
+                    Publisher
+                  </Text>
+                  <Text>
+                    {details.publishers
+                      .map((publisher) => publisher.name || publisher)
+                      .join(", ")}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
         <View style={{ height: 20 }} />
       </View>
     </ScrollView>
@@ -334,6 +472,15 @@ const styles = StyleSheet.create({
     // paddingBottom: 80,
   },
 
+  title2: {
+    fontSize: 20,
+    fontWeight: "600",
+    //color: "#fff",
+    marginBottom: 8,
+    marginTop: 8,
+    paddingLeft: 16,
+  },
+
   // 🔥 MAIN ROW (image + content)
   row: {
     flexDirection: "row",
@@ -345,8 +492,8 @@ const styles = StyleSheet.create({
 
   // 📸 IMAGE
   imageContainer: {
-    width: 100,
-    height: 150,
+    width: 120,
+    height: 180,
     //borderRadius: 8,
     overflow: "hidden",
   },
@@ -449,4 +596,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BookDetails;
+export default BookEditionDetails;
