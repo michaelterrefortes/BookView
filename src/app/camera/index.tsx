@@ -4,10 +4,11 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   StyleSheet,
   Text,
   useColorScheme,
-  View
+  View,
 } from "react-native";
 import { COVER_URL } from "../../../constants/urls";
 import { fetchISBN } from "../../../services/api";
@@ -52,6 +53,21 @@ export default function Camera() {
     loadBook();
   }, [isbn]);
 
+  const handlePermission = async () => {
+    const result = await requestPermission();
+
+    if (!result.granted) {
+      Alert.alert(
+        "Camera Permission Required",
+        "Enable camera access in settings to scan ISBN barcodes.",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Settings", onPress: () => Linking.openSettings() },
+        ],
+      );
+    }
+  };
+
   if (!permission) {
     return (
       <View style={styles.container}>
@@ -70,7 +86,7 @@ export default function Camera() {
         >
           We need your permission to show the camera
         </Text>
-        <Text style={{ color: "#7663dc" }} onPress={requestPermission}>
+        <Text style={{ color: "#7663dc" }} onPress={handlePermission}>
           Grant Permission
         </Text>
       </View>
