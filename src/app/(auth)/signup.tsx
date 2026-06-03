@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -96,16 +97,21 @@ const SignupScreen = () => {
       <ScrollView
         style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
       >
-        <View style={{ height: "20%" }} />
+        <View style={{ height: 150 }} />
 
-        {/*<Image
-          source={require("../../../assets/images/icon-monivue.png")}
+        <Image
+          source={require("../../../assets/images/bookview-icon.png")}
           style={{ width: 100, height: 100, alignSelf: "center" }}
-        />*/}
+        />
 
         <Text
           style={[
-            { fontWeight: "700", fontSize: 32, textAlign: "center" },
+            {
+              fontWeight: "700",
+              fontSize: 32,
+              textAlign: "center",
+              marginTop: 15,
+            },
             isDarkMode ? styles.lightText : styles.darkText,
           ]}
         >
@@ -117,7 +123,7 @@ const SignupScreen = () => {
             isDarkMode ? styles.lightText : styles.darkText,
           ]}
         >
-          Start managing your bookslists today
+          Start managing your shelves and lists today
         </Text>
 
         {/* Email Input */}

@@ -11,7 +11,9 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import { useComposedEventHandler } from "react-native-reanimated";
 import { API_URL } from "../../../../constants/urls";
+import { BookContext } from "../../../../context/BookContext";
 import { getAccessToken, supabase } from "../../../../services/auth";
 import { clearAllAppData } from "../../../../services/localData";
 
@@ -24,6 +26,8 @@ const Profile = () => {
 
   const [loadingSignout, setLoadingSignout] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
+
+  const { setShelfBooks, setListsBooks } = useComposedEventHandler(BookContext);
 
   useEffect(() => {
     const getUser = async () => {
@@ -39,6 +43,8 @@ const Profile = () => {
     try {
       await supabase.auth.signOut();
       await clearAllAppData();
+      setShelfBooks([]);
+      setListsBooks([]);
     } catch (err) {
       Alert.alert("Error", "Problem signing out");
     } finally {
@@ -105,7 +111,7 @@ const Profile = () => {
 
   const handleEmail = async () => {
     // Check if the link is supported
-    const email = "monivue.support@gmail.com";
+    const email = "mt.apps.support@gmail.com";
     const subject = "Contact Us";
     const body = "Hello Support team,";
 

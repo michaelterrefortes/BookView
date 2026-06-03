@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Dimensions,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,19 +17,19 @@ const { width } = Dimensions.get("window");
 
 const slides = [
   {
-    title: "Track Expenses",
+    title: "Your Personal Bookshelf",
     description:
-      "Monitor your daily spending, categorize expenses, and stay on top of your monthly budget with ease.",
+      "Create beautiful shelves, organize your collection, and keep every book right at your fingertips.",
   },
   {
-    title: "Credit Card Analysis",
+    title: "Find Stories You'll Love",
     description:
-      "Analyze your credit card usage, and gain insights into balances and interest payments.",
+      "Browse by genre, author, or title and discover books tailored to your reading interests.",
   },
   {
-    title: "Bills",
+    title: "Read With Purpose",
     description:
-      "Keep track of upcoming bills, payment due dates, and recurring expenses so you never miss a payment.",
+      "Track your reading journey, manage lists, and celebrate every book you finish.",
   },
 ];
 
@@ -55,10 +56,10 @@ const Index = () => {
       <View style={{ height: 150 }} />
 
       {/* Logo */}
-      {/*<Image
-        source={require("../../../assets/images/icon-monivue.png")}
+      <Image
+        source={require("../../../assets/images/bookview-icon.png")}
         style={styles.logo}
-      />*/}
+      />
 
       {/* App Title */}
       <Text
@@ -70,7 +71,7 @@ const Index = () => {
         BookView
       </Text>
 
-      <Text style={styles.subtitle}>A Book Tracking App</Text>
+      <Text style={styles.subtitle}>Your Personal Library</Text>
 
       {/* Carousel / Slideshow */}
       <ScrollView
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
 
   card: {
     width: width - 40,
-    backgroundColor: "#d7dfff",
+    backgroundColor: "#e0d7ff",
     borderRadius: 25,
     padding: 25,
     marginRight: 10,
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#2b5bfc",
+    color: "#5c2bfc",
     marginBottom: 12,
   },
 

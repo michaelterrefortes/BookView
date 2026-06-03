@@ -1,5 +1,6 @@
 import { Stack, useRouter } from "expo-router";
 import React from "react";
+import { Alert } from "react-native";
 import { BookProvider } from "../../context/BookContext";
 
 const Layout = () => {
@@ -150,6 +151,25 @@ const Layout = () => {
             headerTitle: "",
             //headerShadowVisible: false,
             headerBlurEffect: "none",
+
+            unstable_headerRightItems: () => [
+              {
+                type: "button",
+                label: "Scan",
+
+                icon: {
+                  type: "sfSymbol",
+                  name: "info",
+                },
+                onPress: () => {
+                  // Do something
+                  Alert.alert(
+                    "Scan Book Barcode",
+                    "Point camera to book barcode to scan ISBN and search book.",
+                  );
+                },
+              },
+            ],
 
             //presentation: "modal",
           }}

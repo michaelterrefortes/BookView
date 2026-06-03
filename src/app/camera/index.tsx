@@ -4,11 +4,10 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Button,
   StyleSheet,
   Text,
   useColorScheme,
-  View,
+  View
 } from "react-native";
 import { COVER_URL } from "../../../constants/urls";
 import { fetchISBN } from "../../../services/api";
@@ -71,7 +70,9 @@ export default function Camera() {
         >
           We need your permission to show the camera
         </Text>
-        <Button onPress={requestPermission} title="Grant Permission" />
+        <Text style={{ color: "#7663dc" }} onPress={requestPermission}>
+          Grant Permission
+        </Text>
       </View>
     );
   }

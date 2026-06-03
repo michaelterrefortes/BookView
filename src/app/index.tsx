@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   StyleSheet,
   Text,
   useColorScheme,
@@ -47,10 +48,10 @@ export default function Index() {
           { backgroundColor: isDarkMode ? "#000" : "#f2f2f2" },
         ]}
       >
-        {/*<Image
-          source={require("../../assets/images/icon-monivue.png")}
+        <Image
+          source={require("../../assets/images/bookview-icon.png")}
           style={styles.logo}
-        />*/}
+        />
 
         <Text style={[styles.title, { color: isDarkMode ? "#fff" : "#000" }]}>
           BookView
@@ -59,7 +60,7 @@ export default function Index() {
         <Text
           style={[styles.subtitle, { color: isDarkMode ? "#fff" : "#000" }]}
         >
-          Book Tracking App
+          Your Personal Library
         </Text>
 
         <ActivityIndicator
