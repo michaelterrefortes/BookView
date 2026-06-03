@@ -270,42 +270,48 @@ const ShelfLists = () => {
     setLoadingProcessDelete(true);
     const id = bookId.split("/")[2];
     const token = await getAccessToken();
-    const response = await fetch(`${API_URL}/shelf/${id}`, {
-      method: "DELETE", // Specify the method
-      headers: {
-        "Content-Type": "application/json", // Inform the server we're sending JSON
-        Authorization: `Bearer ${token}`,
-      },
-    });
 
-    setLoadingProcessDelete(false);
+    try {
+      const response = await fetch(`${API_URL}/shelf/${id}`, {
+        method: "DELETE", // Specify the method
+        headers: {
+          "Content-Type": "application/json", // Inform the server we're sending JSON
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    if (!response.ok) {
-      // @ts-ignore
-      //throw new Error("Failed to fetch books", response.statusText);
-      Alert.alert("Error", response.error);
-    } else {
-      //console.log("deleted success");
+      setLoadingProcessDelete(false);
 
-      setShelfBooks((prevData) =>
-        prevData.map((item) =>
-          item.shelve === prevSelectedShelf
-            ? {
-                ...item,
-                books: item.books.filter((book) => book.bookid !== id),
-              }
-            : item,
-        ),
-      );
+      if (!response.ok) {
+        // @ts-ignore
+        //throw new Error("Failed to fetch books", response.statusText);
+        Alert.alert("Error", response.error);
+      } else {
+        //console.log("deleted success");
 
-      setListsBooks((prevData) =>
-        prevData.map((item) => ({
-          ...item,
-          books: item.books.filter((book) => book.bookid !== id),
-        })),
-      );
+        setShelfBooks((prevData) =>
+          prevData.map((item) =>
+            item.shelve === prevSelectedShelf
+              ? {
+                  ...item,
+                  books: item.books.filter((book) => book.bookid !== id),
+                }
+              : item,
+          ),
+        );
 
-      navigation.goBack();
+        setListsBooks((prevData) =>
+          prevData.map((item) => ({
+            ...item,
+            books: item.books.filter((book) => book.bookid !== id),
+          })),
+        );
+
+        navigation.goBack();
+      }
+    } catch (err) {
+      setLoadingProcessDelete(false);
+      Alert.alert("Error", "Problem deleting.");
     }
   };
 

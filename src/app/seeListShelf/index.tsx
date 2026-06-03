@@ -151,84 +151,94 @@ const ListShelf = () => {
   const handleDeleteShelf = async (idBook) => {
     setLoadingProcess(true);
     const token = await getAccessToken();
-    const response = await fetch(`${API_URL}/shelf/${idBook}`, {
-      method: "DELETE", // Specify the method
-      headers: {
-        "Content-Type": "application/json", // Inform the server we're sending JSON
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const response = await fetch(`${API_URL}/shelf/${idBook}`, {
+        method: "DELETE", // Specify the method
+        headers: {
+          "Content-Type": "application/json", // Inform the server we're sending JSON
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    if (!response.ok) {
-      // @ts-ignore
-      //throw new Error("Failed to fetch books", response.statusText);
-      Alert.alert("Error", response.error);
-    } else {
-      //console.log("deleted success");
+      if (!response.ok) {
+        // @ts-ignore
+        //throw new Error("Failed to fetch books", response.statusText);
+        Alert.alert("Error", response.error);
+      } else {
+        //console.log("deleted success");
 
-      //console.log(id);
+        //console.log(id);
 
-      setShelfBooks((prevData) =>
-        prevData.map((item) =>
-          Number(item.shelve) === Number(id)
-            ? {
-                ...item,
-                books: item.books.filter((book) => book.bookid !== idBook),
-              }
-            : item,
-        ),
-      );
+        setShelfBooks((prevData) =>
+          prevData.map((item) =>
+            Number(item.shelve) === Number(id)
+              ? {
+                  ...item,
+                  books: item.books.filter((book) => book.bookid !== idBook),
+                }
+              : item,
+          ),
+        );
 
-      setListsBooks((prevData) =>
-        prevData.map((item) => ({
-          ...item,
-          books: item.books.filter((book) => book.bookid !== idBook),
-        })),
-      );
+        setListsBooks((prevData) =>
+          prevData.map((item) => ({
+            ...item,
+            books: item.books.filter((book) => book.bookid !== idBook),
+          })),
+        );
+      }
+
+      //navigation.goBack();
+      setLoadingProcess(false);
+      setScreenKey((prevKey) => prevKey + 1);
+    } catch (err) {
+      setLoadingProcess(false);
+      Alert.alert("Error", "Problem deleting book.");
     }
-
-    //navigation.goBack();
-    setLoadingProcess(false);
-    setScreenKey((prevKey) => prevKey + 1);
   };
 
   const handleDeleteList = async (list_item_id) => {
     setLoadingProcess(true);
     const token = await getAccessToken();
-    const response = await fetch(`${API_URL}/lists_books/${list_item_id}`, {
-      method: "DELETE", // Specify the method
-      headers: {
-        "Content-Type": "application/json", // Inform the server we're sending JSON
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const response = await fetch(`${API_URL}/lists_books/${list_item_id}`, {
+        method: "DELETE", // Specify the method
+        headers: {
+          "Content-Type": "application/json", // Inform the server we're sending JSON
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    if (!response.ok) {
-      // @ts-ignore
-      //throw new Error("Failed to fetch books", response.statusText);
-      Alert.alert("Error", response.error);
-    } else {
-      //console.log("deleted success");
+      if (!response.ok) {
+        // @ts-ignore
+        //throw new Error("Failed to fetch books", response.statusText);
+        Alert.alert("Error", response.error);
+      } else {
+        //console.log("deleted success");
 
-      //console.log(id);
+        //console.log(id);
 
-      setListsBooks((prevData) =>
-        prevData.map((item) =>
-          Number(item.listid) === Number(id)
-            ? {
-                ...item,
-                books: item.books.filter(
-                  (book) => book.list_item_id !== list_item_id,
-                ),
-              }
-            : item,
-        ),
-      );
+        setListsBooks((prevData) =>
+          prevData.map((item) =>
+            Number(item.listid) === Number(id)
+              ? {
+                  ...item,
+                  books: item.books.filter(
+                    (book) => book.list_item_id !== list_item_id,
+                  ),
+                }
+              : item,
+          ),
+        );
+      }
+
+      setLoadingProcess(false);
+      //navigation.goBack();
+      setScreenKey((prevKey) => prevKey + 1);
+    } catch (err) {
+      setLoadingProcess(false);
+      Alert.alert("Error", "Problem deleting list.");
     }
-
-    setLoadingProcess(false);
-    //navigation.goBack();
-    setScreenKey((prevKey) => prevKey + 1);
   };
 
   const confirmDeleteShelf = (id) => {

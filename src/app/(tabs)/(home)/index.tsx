@@ -302,7 +302,7 @@ export default function Index() {
             //className="mt-10 self-center"
           />
         </View>
-      ) : (
+      ) : dataTrending.length !== 0 ? (
         <FlatList
           data={dataTrending}
           horizontal
@@ -330,6 +330,10 @@ export default function Index() {
             <View style={{ height: 20, paddingHorizontal: 10 }} />
           }
         />
+      ) : (
+        <Text style={{ textAlign: "center", fontWeight: "600" }}>
+          No Trending
+        </Text>
       )}
       <Text
         style={[

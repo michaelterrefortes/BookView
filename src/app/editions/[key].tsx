@@ -19,14 +19,27 @@ import { validImage } from "../../../constants/functions";
 import { COVER_URL } from "../../../constants/urls";
 import { BookContext } from "../../../context/BookContext";
 import { fetchBookDetails, fetchBookEditions } from "../../../services/api";
+import { updateTrendingCount } from "../../../services/apiAPI";
 import { findBookInShelve, getYear } from "../../../services/functions";
 
 const BookEditionDetails = () => {
   const isFocused = useIsFocused();
-  const { itemKey, coverId, urlPoster, title, authorName } =
+  const { itemKey, coverId, urlPoster, title, authorName, searchPress } =
     useLocalSearchParams();
 
   const { shelfBooks } = useContext(BookContext);
+
+  useEffect(() => {
+    const trendUpdate = async () => {
+      await updateTrendingCount({
+        title: title,
+        author_name: authorName,
+        bookid: itemKey,
+      });
+    };
+
+    if (Boolean(searchPress)) trendUpdate();
+  }, []);
 
   const cover = coverId;
   const id = itemKey.split("/")[2];

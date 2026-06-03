@@ -19,15 +19,28 @@ import { validImage } from "../../../constants/functions";
 import { COVER_URL } from "../../../constants/urls";
 import { BookContext } from "../../../context/BookContext";
 import { fetchBookDetails, fetchBookEditions } from "../../../services/api";
+import { updateTrendingCount } from "../../../services/apiAPI";
 import { findBookInShelve, getYear } from "../../../services/functions";
 
 const BookDetails = () => {
   const router = useRouter();
   const isFocused = useIsFocused();
-  const { itemKey, coverId, urlPoster, title, authorName } =
+  const { itemKey, coverId, urlPoster, title, authorName, searchPress } =
     useLocalSearchParams();
 
   const { shelfBooks, listsBooks } = useContext(BookContext);
+
+  useEffect(() => {
+    const trendUpdate = async () => {
+      await updateTrendingCount({
+        title: title,
+        author_name: authorName,
+        bookid: itemKey,
+      });
+    };
+
+    if (Boolean(searchPress)) trendUpdate();
+  }, []);
 
   console.log(
     "Details of work",

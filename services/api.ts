@@ -1,21 +1,24 @@
 import { BASE_URL } from "../constants/urls";
-import { updateTrendingCount } from "./apiAPI";
 
 export const fetchBooks = async (path: String) => {
   // /trending/now.json?&sort=trending&limit=10
   const endpoint = `${BASE_URL}${path}`;
 
-  const response = await fetch(endpoint);
+  try {
+    const response = await fetch(endpoint);
 
-  if (!response.ok) {
-    // @ts-ignore
-    //throw new Error("Failed to fetch books", response.statusText);
+    if (!response.ok) {
+      // @ts-ignore
+      //throw new Error("Failed to fetch books", response.statusText);
+      return { success: false, error: "Error fetching book data" };
+    }
+
+    const data = await response.json();
+
+    return { success: true, data: data.works };
+  } catch (err) {
     return { success: false, error: "Error fetching book data" };
   }
-
-  const data = await response.json();
-
-  return { success: true, data: data.works };
 };
 
 export const fetchBooksSubject = async (path: String) => {
@@ -24,16 +27,20 @@ export const fetchBooksSubject = async (path: String) => {
 
   //console.log(endpoint);
 
-  const response = await fetch(endpoint);
+  try {
+    const response = await fetch(endpoint);
 
-  if (!response.ok) {
-    // @ts-ignore
+    if (!response.ok) {
+      // @ts-ignore
+      return { success: false, error: "Error fetching subject data" };
+    }
+
+    const data = await response.json();
+
+    return { success: true, data: data.works };
+  } catch (err) {
     return { success: false, error: "Error fetching subject data" };
   }
-
-  const data = await response.json();
-
-  return { success: true, data: data.works };
 };
 
 export const fetchBookDetails = async (workId: String, type: String) => {
@@ -42,68 +49,72 @@ export const fetchBookDetails = async (workId: String, type: String) => {
 
   //console.log(endpoint);
 
-  const response = await fetch(endpoint);
+  try {
+    const response = await fetch(endpoint);
 
-  if (!response.ok) {
-    // @ts-ignore
-    return { success: false, error: "Error fetching book details data" };
-  }
+    if (!response.ok) {
+      // @ts-ignore
+      return { success: false, error: "Error fetching book details data" };
+    }
 
-  const dataDetails = await response.json();
+    const dataDetails = await response.json();
 
-  //console.log(dataDetails);
+    //console.log(dataDetails);
 
-  if (type === "works") {
-    const authors = [];
-    const authorImages = [];
-    const authorData = await Promise.all(
-      dataDetails.authors.map(async (item) => {
-        const authorKey = item.author.key; // e.g., "/authors/OL23919A"
-        const endpointAuthor = `${BASE_URL}${authorKey}.json`;
+    if (type === "works") {
+      const authors = [];
+      const authorImages = [];
+      const authorData = await Promise.all(
+        dataDetails.authors.map(async (item) => {
+          const authorKey = item.author.key; // e.g., "/authors/OL23919A"
+          const endpointAuthor = `${BASE_URL}${authorKey}.json`;
 
-        const response = await fetch(endpointAuthor);
-        const data = await response.json();
-        return {
-          name: data.name,
-          //image: data.photos?.[0],
-          key: authorKey,
-        }; // returns each author's JSON
-      }),
-    );
+          const response = await fetch(endpointAuthor);
+          const data = await response.json();
+          return {
+            name: data.name,
+            //image: data.photos?.[0],
+            key: authorKey,
+          }; // returns each author's JSON
+        }),
+      );
 
-    //console.log(authorData);
+      //console.log(authorData);
 
-    dataDetails["authorDetails"] = authorData;
-  }
-
-  if (type === "books") {
-    const authors = [];
-    const authorImages = [];
-    const authorData = await Promise.all(
-      dataDetails?.authors?.map(async (item) => {
-        const authorKey = item.key; // e.g., "/authors/OL23919A"
-        const endpointAuthor = `${BASE_URL}${authorKey}.json`;
-
-        const response = await fetch(endpointAuthor);
-        const data = await response.json();
-        return {
-          name: data.name,
-          //image: data.photos?.[0],
-          key: authorKey,
-        }; // returns each author's JSON
-      }) || [],
-    );
-
-    //console.log(authorData);
-
-    if (authorData.length !== 0) {
       dataDetails["authorDetails"] = authorData;
     }
+
+    if (type === "books") {
+      const authors = [];
+      const authorImages = [];
+      const authorData = await Promise.all(
+        dataDetails?.authors?.map(async (item) => {
+          const authorKey = item.key; // e.g., "/authors/OL23919A"
+          const endpointAuthor = `${BASE_URL}${authorKey}.json`;
+
+          const response = await fetch(endpointAuthor);
+          const data = await response.json();
+          return {
+            name: data.name,
+            //image: data.photos?.[0],
+            key: authorKey,
+          }; // returns each author's JSON
+        }) || [],
+      );
+
+      //console.log(authorData);
+
+      if (authorData.length !== 0) {
+        dataDetails["authorDetails"] = authorData;
+      }
+    }
+
+    //console.log(dataDetails);
+
+    return { success: true, data: dataDetails };
+  } catch (err) {
+    return { success: false, error: "Error fetching book details data" };
   }
-
-  //console.log(dataDetails);
-
-  return { success: true, data: dataDetails };
 };
 
 export const fetchBookEditions = async (
@@ -111,18 +122,22 @@ export const fetchBookEditions = async (
   limit = 10,
   offset = 0,
 ) => {
-  const endpoint = `${BASE_URL}/works/${workId}/editions.json?limit=${limit}&offset=${offset}`; //https://openlibrary.org/works/OL82563W.json
+  try {
+    const endpoint = `${BASE_URL}/works/${workId}/editions.json?limit=${limit}&offset=${offset}`; //https://openlibrary.org/works/OL82563W.json
 
-  const response = await fetch(endpoint);
+    const response = await fetch(endpoint);
 
-  if (!response.ok) {
-    // @ts-ignore
+    if (!response.ok) {
+      // @ts-ignore
+      return { success: false, error: "Error fetching book editions data" };
+    }
+
+    const dataEditions = await response.json();
+
+    return { success: true, data: dataEditions.entries };
+  } catch (err) {
     return { success: false, error: "Error fetching book editions data" };
   }
-
-  const dataEditions = await response.json();
-
-  return { success: true, data: dataEditions.entries };
 };
 
 export const fetchSearch = async (query: string, offset: Number) => {
@@ -131,20 +146,24 @@ export const fetchSearch = async (query: string, offset: Number) => {
 
     //console.log(endpoint);
 
-    const response = await fetch(endpoint);
+    try {
+      const response = await fetch(endpoint);
 
-    if (!response.ok) {
-      // @ts-ignore
+      if (!response.ok) {
+        // @ts-ignore
+        return { success: false, error: "Error with search" };
+      }
+
+      const data = await response.json();
+
+      //if (offset === 0 && data.docs.length !== 0) {
+      //  await updateTrendingCount(data.docs[0]);
+      //}
+
+      return { success: true, data: data.docs };
+    } catch (err) {
       return { success: false, error: "Error with search" };
     }
-
-    const data = await response.json();
-
-    if (offset === 0 && data.docs.length !== 0) {
-      await updateTrendingCount(data.docs[0]);
-    }
-
-    return { success: true, data: data.docs };
   } else {
     return { success: true, data: [] };
   }
@@ -153,16 +172,20 @@ export const fetchSearch = async (query: string, offset: Number) => {
 export const fetchAuthor = async (authorId: string) => {
   const endpoint = `${BASE_URL}/authors/${authorId}.json`;
 
-  const response = await fetch(endpoint);
+  try {
+    const response = await fetch(endpoint);
 
-  if (!response.ok) {
-    // @ts-ignore
+    if (!response.ok) {
+      // @ts-ignore
+      return { success: false, error: "Error fetching author data" };
+    }
+
+    const data = await response.json();
+
+    return { success: true, data: data };
+  } catch (err) {
     return { success: false, error: "Error fetching author data" };
   }
-
-  const data = await response.json();
-
-  return { success: true, data: data };
 };
 
 export const fetchAuthorWorks = async (
@@ -172,29 +195,37 @@ export const fetchAuthorWorks = async (
 ) => {
   const endpoint = `${BASE_URL}/authors/${authorId}/works.json?limit=${limit}&offset=${offset}`;
 
-  const response = await fetch(endpoint);
+  try {
+    const response = await fetch(endpoint);
 
-  if (!response.ok) {
-    // @ts-ignore
+    if (!response.ok) {
+      // @ts-ignore
+      return { success: false, error: "Error fetching author works data" };
+    }
+
+    const data = await response.json();
+
+    return { success: true, data: data.entries };
+  } catch (err) {
     return { success: false, error: "Error fetching author works data" };
   }
-
-  const data = await response.json();
-
-  return { success: true, data: data.entries };
 };
 
 export const fetchISBN = async (isbn) => {
   const endpoint = `${BASE_URL}/isbn/${isbn}.json`;
 
-  const response = await fetch(endpoint);
+  try {
+    const response = await fetch(endpoint);
 
-  if (!response.ok) {
-    // @ts-ignore
+    if (!response.ok) {
+      // @ts-ignore
+      return { success: false, error: "Error fetching ISBN data" };
+    }
+
+    const data = await response.json();
+
+    return { success: true, data: data };
+  } catch (err) {
     return { success: false, error: "Error fetching ISBN data" };
   }
-
-  const data = await response.json();
-
-  return { success: true, data: data };
 };

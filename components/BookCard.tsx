@@ -20,6 +20,7 @@ interface Book {
   routeUrl: String;
   year: String;
   orientation: String;
+  searchPress: Boolean;
 }
 
 const BookCard = ({
@@ -32,6 +33,7 @@ const BookCard = ({
   year = "",
 
   orientation = "h",
+  searchPress = false,
 }: Book) => {
   //console.log(itemKey, coverId, urlPoster);
   //console.log(authorName);
@@ -148,6 +150,7 @@ const BookCard = ({
               urlPoster: urlPoster,
               title: title,
               authorName: authorName,
+              searchPress: searchPress,
             },
           })
         }

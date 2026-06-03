@@ -158,6 +158,7 @@ const Search = () => {
               year={getYear(
                 item?.editions?.docs?.[0]?.publish_year?.[0].toString(),
               )}
+              searchPress={true}
             />
           )}
           keyExtractor={(item) => item.key.toString()}

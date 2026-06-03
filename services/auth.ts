@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from "@supabase/supabase-js";
+import { Alert } from "react-native";
 //import "dotenv/config";
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
@@ -15,20 +16,28 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 export async function getAccessToken() {
-  const { data, error } = await supabase.auth.getSession();
-  if (data?.session) {
-    return data.session.access_token; // This is the JWT token
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    if (data?.session) {
+      return data.session.access_token; // This is the JWT token
+    }
+    return null;
+  } catch (err) {
+    Alert.alert("Error", "Problem getting token");
   }
-  return null;
 }
 
 export async function getUUID() {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (user?.id) {
-    return user?.id;
+    if (user?.id) {
+      return user?.id;
+    }
+    return null;
+  } catch (err) {
+    Alert.alert("Error", "Problem getting uuid");
   }
-  return null;
 }
