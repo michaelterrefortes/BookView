@@ -108,12 +108,7 @@ const ChangeEmail = () => {
               color={isDarkMode ? "white" : "gray"}
             />
           ) : (
-            <Text
-              style={[
-                styles.buttonTextRegular,
-                { color: isDarkMode ? "lightblue" : "blue" },
-              ]}
-            >
+            <Text style={[styles.buttonTextRegular, { color: "#7663dc" }]}>
               Update Email
             </Text>
           )}

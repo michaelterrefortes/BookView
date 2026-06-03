@@ -50,7 +50,7 @@ const forgotPassword = () => {
     setLoading(true);
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       // This URL must be added to your Redirect URLs in the Supabase Dashboard
-      redirectTo: "https://monivue.onrender.com/restore-password",
+      redirectTo: "https://bookview.onrender.com/restore-password",
     });
     setLoading(false);
     if (error) Alert.alert(error.message);

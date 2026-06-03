@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -11,7 +11,6 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import { useComposedEventHandler } from "react-native-reanimated";
 import { API_URL } from "../../../../constants/urls";
 import { BookContext } from "../../../../context/BookContext";
 import { getAccessToken, supabase } from "../../../../services/auth";
@@ -27,7 +26,7 @@ const Profile = () => {
   const [loadingSignout, setLoadingSignout] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
 
-  const { setShelfBooks, setListsBooks } = useComposedEventHandler(BookContext);
+  const { setShelfBooks, setListsBooks } = useContext(BookContext);
 
   useEffect(() => {
     const getUser = async () => {
@@ -98,7 +97,7 @@ const Profile = () => {
 
   const handleLink = useCallback(async () => {
     // Check if the link is supported
-    const linkUrl = `https://monivue.onrender.com/privacy-policy`;
+    const linkUrl = `https://bookview.onrender.com/privacy-policy`;
     const supported = await Linking.canOpenURL(linkUrl);
 
     if (supported) {
@@ -148,12 +147,7 @@ const Profile = () => {
           ]}
           onPress={handleEmail}
         >
-          <Text
-            style={[
-              styles.buttonTextRegular,
-              { color: isDarkMode ? "lightblue" : "blue" },
-            ]}
-          >
+          <Text style={[styles.buttonTextRegular, { color: "#7663dc" }]}>
             Contact Us
           </Text>
         </TouchableOpacity>
@@ -165,12 +159,7 @@ const Profile = () => {
           ]}
           onPress={handleLink}
         >
-          <Text
-            style={[
-              styles.buttonTextRegular,
-              { color: isDarkMode ? "lightblue" : "blue" },
-            ]}
-          >
+          <Text style={[styles.buttonTextRegular, { color: "#7663dc" }]}>
             Privacy Policy
           </Text>
         </TouchableOpacity>
@@ -199,12 +188,7 @@ const Profile = () => {
           ]}
           onPress={() => router.push("/settings/change-email")}
         >
-          <Text
-            style={[
-              styles.buttonTextRegular,
-              { color: isDarkMode ? "lightblue" : "blue" },
-            ]}
-          >
+          <Text style={[styles.buttonTextRegular, { color: "#7663dc" }]}>
             Change Email
           </Text>
         </TouchableOpacity>
@@ -216,12 +200,7 @@ const Profile = () => {
           ]}
           onPress={() => router.push("/settings/change-password")}
         >
-          <Text
-            style={[
-              styles.buttonTextRegular,
-              { color: isDarkMode ? "lightblue" : "blue" },
-            ]}
-          >
+          <Text style={[styles.buttonTextRegular, { color: "#7663dc" }]}>
             Change Password
           </Text>
         </TouchableOpacity>
