@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useIsFocused, useRouter } from "expo-router";
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -28,6 +28,8 @@ const Profile = () => {
 
   const { setShelfBooks, setListsBooks } = useContext(BookContext);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser();
@@ -35,7 +37,7 @@ const Profile = () => {
     };
 
     getUser();
-  }, []);
+  }, [isFocused]);
 
   const handleSignOut = async () => {
     setLoadingSignout(true);

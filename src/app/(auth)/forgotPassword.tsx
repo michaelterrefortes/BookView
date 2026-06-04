@@ -105,6 +105,7 @@ const forgotPassword = () => {
           }}
           keyboardType="email-address"
           autoCapitalize="none"
+          autoCorrect={false}
         />
         {emailWarning && (
           <Text style={styles.warning}>* Field Missing Value</Text>

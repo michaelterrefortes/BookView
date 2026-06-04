@@ -87,6 +87,8 @@ const ChangePassword = () => {
                 }
               }}
               secureTextEntry={!isPasswordVisible} // Toggles visibility
+              autoCapitalize="none"
+              autoCorrect={false}
             />
             <TouchableOpacity
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}

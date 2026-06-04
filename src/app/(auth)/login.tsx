@@ -142,6 +142,7 @@ const LoginScreen = () => {
           }}
           keyboardType="email-address"
           autoCapitalize="none"
+          autoCorrect={false}
         />
         {emailWarning && (
           <Text style={styles.warning}>* Field Missing Value</Text>
@@ -184,6 +185,8 @@ const LoginScreen = () => {
                 }
               }}
               secureTextEntry={!isPasswordVisible} // Toggles visibility
+              autoCapitalize="none"
+              autoCorrect={false}
             />
             <TouchableOpacity
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}

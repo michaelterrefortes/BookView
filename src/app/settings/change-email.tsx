@@ -79,6 +79,7 @@ const ChangeEmail = () => {
             }}
             keyboardType="email-address"
             autoCapitalize="none"
+            autoCorrect={false}
             style={[
               styles.input,
               isDarkMode ? styles.darkField : styles.lightField,
