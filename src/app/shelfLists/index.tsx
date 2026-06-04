@@ -409,7 +409,7 @@ const ShelfLists = () => {
                   {loadingProcessDelete ? (
                     <ActivityIndicator size={"small"} color={"white"} />
                   ) : (
-                    <View>
+                    <View style={{ flexDirection: "row" }}>
                       <SymbolView
                         name={"trash"}
                         size={18}
