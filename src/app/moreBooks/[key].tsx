@@ -5,6 +5,7 @@ import {
   Alert,
   FlatList,
   StyleSheet,
+  Text,
   useColorScheme,
   View,
 } from "react-native";
@@ -34,6 +35,8 @@ const MoreBooks = () => {
 
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
+
+  const [entries, setEntries] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,6 +69,7 @@ const MoreBooks = () => {
 
       if (result.success) {
         setBooks(result.data);
+        setEntries(result.numFound);
       } else {
         Alert.alert("Error", result.error);
       }
@@ -77,6 +81,7 @@ const MoreBooks = () => {
   }, []);
 
   const fetchMoreData = async () => {
+    if (books.length >= entries) return;
     setLoadingMore(true);
 
     const newOffset = offset + 10;
@@ -129,6 +134,11 @@ const MoreBooks = () => {
       ) : section === 0 ? (
         <FlatList
           data={books}
+          ListEmptyComponent={
+            <Text style={{ textAlign: "center", fontWeight: "600" }}>
+              No Books
+            </Text>
+          }
           numColumns={3}
           showsHorizontalScrollIndicator={false}
           ItemSeparatorComponent={() => (
@@ -172,7 +182,11 @@ const MoreBooks = () => {
           <FlatList
             data={books}
             //numColumns={3}
-
+            ListEmptyComponent={
+              <Text style={{ textAlign: "center", fontWeight: "600" }}>
+                No Books
+              </Text>
+            }
             showsHorizontalScrollIndicator={true}
             ItemSeparatorComponent={() => (
               <View style={{ backgroundColor: "lightgray", height: 1 }} />
@@ -211,6 +225,11 @@ const MoreBooks = () => {
       ) : section === 1 ? (
         <FlatList
           data={books}
+          ListEmptyComponent={
+            <Text style={{ textAlign: "center", fontWeight: "600" }}>
+              No Books
+            </Text>
+          }
           showsHorizontalScrollIndicator={false}
           ItemSeparatorComponent={() => (
             <View style={{ backgroundColor: "lightgray", height: 1 }} />
@@ -248,6 +267,11 @@ const MoreBooks = () => {
           data={books}
           //numColumns={3}
           //showsHorizontalScrollIndicator={false}
+          ListEmptyComponent={
+            <Text style={{ textAlign: "center", fontWeight: "600" }}>
+              No Books
+            </Text>
+          }
           ItemSeparatorComponent={() => (
             <View style={{ backgroundColor: "lightgray", height: 1 }} />
           )}

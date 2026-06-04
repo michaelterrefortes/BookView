@@ -325,7 +325,7 @@ const BookDetails = () => {
           </>
         )}
 
-        {loadingEditions ? null : (
+        {loadingEditions ? null : editions.length !== 0 ? (
           <>
             <View
               style={{
@@ -384,7 +384,7 @@ const BookDetails = () => {
               ListFooterComponent={<View style={{ height: 20 }} />}
             />
           </>
-        )}
+        ) : null}
         <View style={{ height: 20 }} />
       </View>
     </ScrollView>

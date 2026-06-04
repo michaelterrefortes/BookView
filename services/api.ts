@@ -37,7 +37,7 @@ export const fetchBooksSubject = async (path: String) => {
 
     const data = await response.json();
 
-    return { success: true, data: data.works };
+    return { success: true, data: data.works, work_count: data.work_count };
   } catch (err) {
     return { success: false, error: "Error fetching subject data" };
   }
@@ -134,7 +134,11 @@ export const fetchBookEditions = async (
 
     const dataEditions = await response.json();
 
-    return { success: true, data: dataEditions.entries };
+    return {
+      success: true,
+      data: dataEditions.entries,
+      numFound: dataEditions.size,
+    };
   } catch (err) {
     return { success: false, error: "Error fetching book editions data" };
   }
@@ -160,7 +164,7 @@ export const fetchSearch = async (query: string, offset: Number) => {
       //  await updateTrendingCount(data.docs[0]);
       //}
 
-      return { success: true, data: data.docs };
+      return { success: true, data: data.docs, numFound: data.numFound };
     } catch (err) {
       return { success: false, error: "Error with search" };
     }
@@ -205,7 +209,7 @@ export const fetchAuthorWorks = async (
 
     const data = await response.json();
 
-    return { success: true, data: data.entries };
+    return { success: true, data: data.entries, numFound: data.size };
   } catch (err) {
     return { success: false, error: "Error fetching author works data" };
   }

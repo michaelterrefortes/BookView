@@ -346,7 +346,7 @@ const BookEditionDetails = () => {
           </>
         )}
 
-        {loadingEditions ? null : (
+        {loadingEditions ? null : editions.length !== 0 ? (
           <>
             <View
               style={{
@@ -405,7 +405,7 @@ const BookEditionDetails = () => {
               ListFooterComponent={<View style={{ height: 20 }} />}
             />
           </>
-        )}
+        ) : null}
 
         {loadingDetails ? null : (
           <View

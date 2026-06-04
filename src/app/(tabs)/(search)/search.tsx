@@ -58,7 +58,7 @@ const Search = () => {
 
         if (result.success) {
           setBooks(result.data);
-          setEntries(result.data.numFound);
+          setEntries(result.numFound);
         } else {
           Alert.alert("Error", result.error);
         }
@@ -92,6 +92,9 @@ const Search = () => {
   const loadMoreBooks = async () => {
     if (loadingMore || loading) return;
     if (searchBook.trim() === "") return;
+
+    if (books.length >= entries) return;
+
     setLoadingMore(true);
 
     const newOffset = offset + 10;
@@ -146,21 +149,25 @@ const Search = () => {
               }}
             />
           )}
-          renderItem={({ item }) => (
-            <BookCard
-              itemKey={item.editions.docs[0].key}
-              coverId={item.editions.docs[0].key.split("/")[2]}
-              urlPoster={`${COVER_URL}/b/olid/${item.editions.docs[0].key.split("/")[2]}-L.jpg`}
-              authorName={item?.author_name ?? [""]}
-              title={item.title}
-              routeUrl={"editions"}
-              orientation={"v"}
-              year={getYear(
-                item?.editions?.docs?.[0]?.publish_year?.[0].toString(),
-              )}
-              searchPress={true}
-            />
-          )}
+          renderItem={({ item }) => {
+            const id = item.editions?.docs?.[0]?.key || item.key;
+
+            return (
+              <BookCard
+                itemKey={id}
+                coverId={id.split("/")[2]}
+                urlPoster={`${COVER_URL}/${id[id.length - 1] === "W" ? "w" : "b"}/olid/${id.split("/")[2]}-L.jpg`}
+                authorName={item?.author_name ?? [""]}
+                title={item.title}
+                routeUrl={id[id.length - 1] === "W" ? "books" : "editions"}
+                orientation={"v"}
+                year={getYear(
+                  item?.editions?.docs?.[0]?.publish_year?.[0].toString(),
+                )}
+                searchPress={true}
+              />
+            );
+          }}
           keyExtractor={(item) => item.key.toString()}
           ListEmptyComponent={
             !loading ? (

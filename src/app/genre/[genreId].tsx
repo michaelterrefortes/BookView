@@ -5,6 +5,7 @@ import {
   Alert,
   FlatList,
   StyleSheet,
+  Text,
   useColorScheme,
   View,
 } from "react-native";
@@ -19,11 +20,15 @@ const Genre = () => {
 
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [bookData, setBookData] = useState({});
+  const [bookData, setBookData] = useState([]);
   const [offset, setOffset] = useState(0);
 
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
+
+  const [entries, setEntries] = useState(0);
+
+  console.log("Genre", name, endpoint);
 
   const loadBooks = async () => {
     setLoading(true);
@@ -34,6 +39,7 @@ const Genre = () => {
 
     if (result.success) {
       setBookData(result.data);
+      setEntries(result.work_count);
     } else {
       Alert.alert("Error", result.error);
     }
@@ -41,6 +47,7 @@ const Genre = () => {
   };
 
   const loadMoreBooks = async () => {
+    if (bookData.length >= entries) return;
     setLoadingMore(true);
     const newOffset = offset + 10;
 
@@ -78,6 +85,11 @@ const Genre = () => {
           </View>
         ) : (
           <FlatList
+            ListEmptyComponent={
+              <Text style={{ textAlign: "center", fontWeight: "600" }}>
+                No Books
+              </Text>
+            }
             data={bookData}
             showsHorizontalScrollIndicator={true}
             ItemSeparatorComponent={() => (
