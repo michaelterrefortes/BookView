@@ -65,7 +65,7 @@ export const fetchBookDetails = async (workId: String, type: String) => {
       const authors = [];
       const authorImages = [];
       const authorData = await Promise.all(
-        dataDetails.authors.map(async (item) => {
+        dataDetails?.authors?.map(async (item) => {
           const authorKey = item.author.key; // e.g., "/authors/OL23919A"
           const endpointAuthor = `${BASE_URL}${authorKey}.json`;
 
@@ -76,13 +76,15 @@ export const fetchBookDetails = async (workId: String, type: String) => {
             //image: data.photos?.[0],
             key: authorKey,
           }; // returns each author's JSON
-        }),
+        }) || [],
       );
 
       //console.log(authorData);
 
       dataDetails["authorDetails"] = authorData;
     }
+
+    //console.log("aqui");
 
     if (type === "books") {
       const authors = [];
@@ -110,6 +112,8 @@ export const fetchBookDetails = async (workId: String, type: String) => {
     }
 
     //console.log(dataDetails);
+
+    //console.log("return");
 
     return { success: true, data: dataDetails };
   } catch (err) {
