@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   Alert,
   Linking,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -30,14 +31,16 @@ const Profile = () => {
 
   const isFocused = useIsFocused();
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setEmail(data.user?.email ?? null);
-    };
+  const [refreshing, setRefreshing] = useState(false);
 
+  const getUser = async () => {
+    const { data } = await supabase.auth.getUser();
+    setEmail(data.user?.email ?? null);
+  };
+
+  useEffect(() => {
     getUser();
-  }, [isFocused]);
+  }, []);
 
   const handleSignOut = async () => {
     setLoadingSignout(true);
@@ -136,8 +139,21 @@ const Profile = () => {
     }
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    getUser();
+
+    setRefreshing(false);
+  };
+
   return (
-    <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
+    <ScrollView
+      style={isDarkMode ? styles.darkBg : styles.lightBg}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View
         style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
       >

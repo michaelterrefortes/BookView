@@ -172,6 +172,14 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: 15,
     marginBottom: 15,
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
   },
   shelfTitle: {
     fontWeight: "700",

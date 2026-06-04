@@ -229,7 +229,7 @@ export default function Index() {
             >
               Shelves
             </Text>
-            <Text style={styles.shelfSubtitle}>{shelfBooks.length} Total</Text>
+            <Text style={styles.shelfSubtitle}>5 Total</Text>
           </View>
         </TouchableOpacity>
 
