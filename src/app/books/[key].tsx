@@ -80,7 +80,8 @@ const BookDetails = () => {
       else if (shelf === 1) setAddedText("Want to Read");
       else if (shelf === 2) setAddedText("Reading");
       else if (shelf === 3) setAddedText("Finished");
-      else setAddedText("Not Finished");
+      else if (shelf === 4) setAddedText("Not Finished");
+      else setAddedText("None");
     }
   }, [shelfBooks, isFocused]);
 

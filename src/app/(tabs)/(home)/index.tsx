@@ -49,24 +49,13 @@ export default function Index() {
     setLoading(true);
 
     const result = await fetchTrending();
-    //console.log(result.data);
-    //let authorNames = [];
-    let authorsId = [];
-
-    let authorsDict = [];
-
-    /*result.data.forEach((element) => {
-      element.author_key.forEach((key, index) => {
-        if (!authorsId.includes(key)) {
-          authorsId.push(key);
-          //authorNames.push(element.author_name[index]);
-          authorsDict.push({ key: key, name: element.author_name[index] });
-        }
-      });
-    });*/
 
     //console.log(authorNames);
-    setData(result.data);
+    if (result.success) {
+      setData(result.data);
+    } else {
+      Alert.alert("Error", "Problem fetching trending");
+    }
     //setAuthors(authorsDict);
 
     setLoading(false);
