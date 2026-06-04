@@ -287,7 +287,7 @@ const Profile = () => {
             isDarkMode ? styles.lightText : styles.darkText,
           ]}
         >
-          Book, author, edition, and genre data provided by{" "}
+          Book, author, edition, search and genre data provided by{" "}
           <Text style={{ color: "#7663dc" }} onPress={handleLinkOpenLibrary}>
             (https://openlibrary.org)
           </Text>
