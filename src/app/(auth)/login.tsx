@@ -39,7 +39,7 @@ const LoginScreen = () => {
 
   const handleLink = useCallback(async () => {
     // Check if the link is supported
-    const linkUrl = `https://bookview.onrender.com/privacy-policy`;
+    const linkUrl = `https://bookview-library.onrender.com/privacy-policy`;
     const supported = await Linking.canOpenURL(linkUrl);
 
     if (supported) {
