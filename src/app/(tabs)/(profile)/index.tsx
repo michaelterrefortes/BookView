@@ -33,6 +33,19 @@ const Profile = () => {
 
   const [refreshing, setRefreshing] = useState(false);
 
+  const handleLinkOpenLibrary = useCallback(async () => {
+    // Check if the link is supported
+    const linkUrl = `https://openlibrary.org`;
+    const supported = await Linking.canOpenURL(linkUrl);
+
+    if (supported) {
+      // Open the URL
+      await Linking.openURL(linkUrl);
+    } else {
+      Alert.alert(`Don't know how to open this URL: ${linkUrl}`);
+    }
+  }, []);
+
   const getUser = async () => {
     const { data } = await supabase.auth.getUser();
     setEmail(data.user?.email ?? null);
@@ -258,6 +271,28 @@ const Profile = () => {
             />
           ) : null}
         </TouchableOpacity>
+
+        <Text
+          style={[
+            isDarkMode ? styles.lightText : styles.darkText,
+            { paddingBottom: 5 },
+          ]}
+        >
+          About / Credits
+        </Text>
+
+        <Text
+          style={[
+            { textAlign: "center", paddingHorizontal: 20 },
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Book, author, edition, and genre data provided by{" "}
+          <Text style={{ color: "#7663dc" }} onPress={handleLinkOpenLibrary}>
+            (https://openlibrary.org)
+          </Text>
+          , part of the Internet Archive.
+        </Text>
       </View>
     </ScrollView>
   );
