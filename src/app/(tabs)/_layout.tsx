@@ -1,5 +1,5 @@
 import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/unstable";
-import { useRouter, withLayoutContext } from "expo-router";
+import { withLayoutContext } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
 
@@ -7,11 +7,11 @@ const Tab = createNativeBottomTabNavigator();
 const Tabs = withLayoutContext(Tab.Navigator);
 
 const _layout = () => {
-  const router = useRouter();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        //popToTopOnBlur: true,
       }}
     >
       <Tabs.Screen
@@ -38,7 +38,6 @@ const _layout = () => {
         options={{
           title: "Search",
           headerShown: false,
-
           tabBarActiveTintColor: "#7663dc",
           tabBarInactiveTintColor: "gray",
 
@@ -59,6 +58,7 @@ const _layout = () => {
           headerShown: false,
           tabBarActiveTintColor: "#7663dc",
           tabBarInactiveTintColor: "gray",
+
           tabBarIcon: ({ focused }) =>
             Platform.select({
               ios: {
@@ -72,10 +72,11 @@ const _layout = () => {
       <Tabs.Screen
         name="(profile)"
         options={{
-          title: "Profile",
+          title: "Account",
           headerShown: false,
           tabBarActiveTintColor: "#7663dc",
           tabBarInactiveTintColor: "gray",
+
           tabBarIcon: ({ focused }) =>
             Platform.select({
               ios: {

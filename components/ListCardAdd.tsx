@@ -1,6 +1,12 @@
 import { SymbolView } from "expo-symbols";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
 
 const ListCardAdd = ({
   colors,
@@ -15,11 +21,17 @@ const ListCardAdd = ({
 
   //console.log(item);
 
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   //const len = item.length;
   if (type === "shelf") {
     return (
       <TouchableOpacity
-        style={styles.cardShelf}
+        style={[
+          styles.cardShelf,
+          isDarkMode ? styles.buttonDark : styles.buttonLight,
+        ]}
         onPress={() => onChange(value)}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -34,7 +46,14 @@ const ListCardAdd = ({
           </View>
 
           <View style={{ marginLeft: 15 }}>
-            <Text style={styles.shelfTitle}>{title}</Text>
+            <Text
+              style={[
+                styles.shelfTitle,
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              {title}
+            </Text>
           </View>
         </View>
 
@@ -46,12 +65,15 @@ const ListCardAdd = ({
   } else {
     return (
       <TouchableOpacity
-        style={styles.cardShelf}
+        style={[
+          styles.cardShelf,
+          isDarkMode ? styles.buttonDark : styles.buttonLight,
+        ]}
         onPress={() => {
           if (selected.includes(value)) {
             onChange(selected.filter((num) => num !== value));
           } else {
-            onChange((item) => [...item, value]);
+            onChange((item) => [...item, value].sort());
           }
         }}
       >
@@ -67,7 +89,14 @@ const ListCardAdd = ({
           </View>
 
           <View style={{ marginLeft: 15 }}>
-            <Text style={styles.shelfTitle}>{title}</Text>
+            <Text
+              style={[
+                styles.shelfTitle,
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              {title}
+            </Text>
           </View>
         </View>
 
@@ -82,6 +111,11 @@ const ListCardAdd = ({
 export default ListCardAdd;
 
 const styles = StyleSheet.create({
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
     //sbackgroundColor: "#a94141",
@@ -107,6 +141,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
   },
   shelfTitle: {
     fontWeight: "700",

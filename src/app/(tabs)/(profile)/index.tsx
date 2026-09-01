@@ -1,0 +1,355 @@
+import { useIsFocused, useRouter } from "expo-router";
+import { useCallback, useContext, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Linking,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
+import { API_URL } from "../../../../constants/urls";
+import { BookContext } from "../../../../context/BookContext";
+import { getAccessToken, supabase } from "../../../../services/auth";
+import { clearAllAppData } from "../../../../services/localData";
+
+const Profile = () => {
+  const router = useRouter();
+  const [email, setEmail] = useState<string | null>(null);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark"; //colorScheme === "dark";
+
+  const [loadingSignout, setLoadingSignout] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+
+  const { setShelfBooks, setListsBooks } = useContext(BookContext);
+
+  const isFocused = useIsFocused();
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleLinkOpenLibrary = useCallback(async () => {
+    // Check if the link is supported
+    const linkUrl = `https://openlibrary.org`;
+    const supported = await Linking.canOpenURL(linkUrl);
+
+    if (supported) {
+      // Open the URL
+      await Linking.openURL(linkUrl);
+    } else {
+      Alert.alert(`Don't know how to open this URL: ${linkUrl}`);
+    }
+  }, []);
+
+  const getUser = async () => {
+    const { data } = await supabase.auth.getUser();
+    setEmail(data.user?.email ?? null);
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const handleSignOut = async () => {
+    setLoadingSignout(true);
+    try {
+      await supabase.auth.signOut();
+      await clearAllAppData();
+      setShelfBooks([]);
+      setListsBooks([]);
+    } catch (err) {
+      Alert.alert("Error", "Problem signing out");
+    } finally {
+      setLoadingSignout(false);
+    }
+    router.replace("/(auth)");
+  };
+
+  const confirmDelete = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete this account? This action is irreversible and data is deleted",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: handleDelete,
+        },
+      ],
+    );
+  };
+
+  const handleDelete = async () => {
+    setLoadingDelete(true);
+    try {
+      const token = await getAccessToken();
+      const res = await fetch(`${API_URL}/profile`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await res.json();
+
+      setLoadingDelete(false);
+
+      if (!res.ok) Alert.alert("Error", result.error);
+      else handleSignOut();
+    } catch (err) {
+      Alert.alert("Error", "Could not delete account");
+      console.error(err);
+      setLoadingDelete(false);
+    }
+  };
+
+  const handleLink = useCallback(async () => {
+    // Check if the link is supported
+    const linkUrl = `https://bookview-library.onrender.com/privacy-policy`;
+    const supported = await Linking.canOpenURL(linkUrl);
+
+    if (supported) {
+      // Open the URL
+      await Linking.openURL(linkUrl);
+    } else {
+      Alert.alert(`Don't know how to open this URL: ${linkUrl}`);
+    }
+  }, []);
+
+  const handleEmail = async () => {
+    // Check if the link is supported
+    const email = "mt.apps.support@gmail.com";
+    const subject = "Contact Us";
+    const body = "Hello Support team,";
+
+    // Construct the mailto link
+    const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    try {
+      // Check if the device can handle the email URL
+      const supported = await Linking.canOpenURL(url);
+
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert(
+          "Error",
+          `No email app found to handle this request. The email for support is: ${email}`,
+        );
+      }
+    } catch (error) {
+      console.error("An error occurred", error);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    getUser();
+
+    setRefreshing(false);
+  };
+
+  return (
+    <ScrollView
+      style={isDarkMode ? styles.darkBg : styles.lightBg}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <View
+        style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+      >
+        <View style={{ height: 30 }} />
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleEmail}
+        >
+          <Text style={[styles.buttonTextRegular, { color: "#7663dc" }]}>
+            Contact Us
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleLink}
+        >
+          <Text style={[styles.buttonTextRegular, { color: "#7663dc" }]}>
+            Privacy Policy
+          </Text>
+        </TouchableOpacity>
+
+        <View
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
+          <Text style={styles.label}>Email</Text>
+          <Text
+            style={[
+              styles.value,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            {email ?? "Loading..."}
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={() => router.push("/settings/change-email")}
+        >
+          <Text style={[styles.buttonTextRegular, { color: "#7663dc" }]}>
+            Change Email
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={() => router.push("/settings/change-password")}
+        >
+          <Text style={[styles.buttonTextRegular, { color: "#7663dc" }]}>
+            Change Password
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleSignOut}
+          disabled={loadingSignout}
+        >
+          <Text style={styles.buttonText}>Sign Out</Text>
+
+          {loadingSignout ? (
+            <ActivityIndicator
+              size={"small"}
+              color={isDarkMode ? "white" : "gray"}
+            />
+          ) : null}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={confirmDelete}
+          disabled={loadingDelete}
+        >
+          <Text style={styles.buttonText}>Delete Account and Data</Text>
+
+          {loadingDelete ? (
+            <ActivityIndicator
+              size={"small"}
+              color={isDarkMode ? "white" : "gray"}
+            />
+          ) : null}
+        </TouchableOpacity>
+
+        <Text
+          style={[
+            isDarkMode ? styles.lightText : styles.darkText,
+            { paddingBottom: 5 },
+          ]}
+        >
+          About / Credits
+        </Text>
+
+        <Text
+          style={[
+            { textAlign: "center", paddingHorizontal: 20 },
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Book, author, edition, search and genre data provided by{" "}
+          <Text style={{ color: "#7663dc" }} onPress={handleLinkOpenLibrary}>
+            (https://openlibrary.org)
+          </Text>
+          , part of the Internet Archive.
+        </Text>
+      </View>
+    </ScrollView>
+  );
+};
+
+export default Profile;
+
+const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgb(242, 242, 242)",
+  },
+
+  button: {
+    backgroundColor: "#fff",
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    borderRadius: 50,
+    width: "85%",
+    alignSelf: "center",
+    marginBottom: 15, // ⬅️ spacing between items
+  },
+
+  label: {
+    fontSize: 12,
+    color: "gray",
+  },
+
+  value: {
+    fontSize: 14,
+    color: "#000",
+    marginTop: 4,
+  },
+
+  input: {
+    fontSize: 14,
+  },
+
+  buttonText: {
+    fontSize: 14,
+    color: "red",
+    textAlign: "left",
+  },
+
+  buttonTextRegular: {
+    fontSize: 14,
+    color: "blue",
+    textAlign: "left",
+  },
+});

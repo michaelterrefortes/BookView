@@ -1,9 +1,12 @@
 import { Stack, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import { TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, useColorScheme } from "react-native";
 
 export default function SavedLayout() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   return (
     <Stack>
       <Stack.Screen
@@ -16,120 +19,34 @@ export default function SavedLayout() {
           headerShadowVisible: false,
           headerBackTitle: "",
           headerLargeTitleEnabled: true,
+          //headerTintColor: "black",
 
           headerRight: () => (
             <TouchableOpacity
-              style={{ justifyContent: "center", alignItems: "center" }}
-              onPress={() => router.push("/(tabs)/(search)/search")}
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                paddingHorizontal: 10,
+              }}
+              onPress={() =>
+                router.push({
+                  pathname: "/addList",
+                  params: { type: "add", method: "POST", value: "" },
+                })
+              }
             >
-              <SymbolView name="plus" size={25} tintColor={"black"} />
+              <SymbolView
+                name="plus"
+                size={18}
+                tintColor={isDarkMode ? "white" : "black"}
+                style={{ marginRight: 5 }}
+              />
+              <Text style={{ color: isDarkMode ? "white" : "black" }}>
+                Add List
+              </Text>
             </TouchableOpacity>
           ),
-        }}
-      />
-      <Stack.Screen
-        name="books/[key]"
-        options={{
-          headerBackButtonDisplayMode: "minimal",
-          headerBackTitle: "",
-          headerShown: true,
-          headerTransparent: true,
-          headerTitle: "",
-          headerShadowVisible: false,
-          headerBlurEffect: "none",
-          //presentation: "modal",
-          //navigationBarHidden: false,
-        }}
-      />
-      <Stack.Screen
-        name="editions/[key]"
-        options={{
-          headerBackButtonDisplayMode: "minimal",
-          headerBackTitle: "",
-          headerShown: true,
-          headerTransparent: true,
-          headerTitle: "",
-          headerShadowVisible: false,
-        }}
-      />
-
-      <Stack.Screen
-        name="authors/[key]"
-        options={{
-          headerBackButtonDisplayMode: "minimal",
-          headerBackTitle: "",
-          headerShown: true,
-          headerTransparent: true,
-          headerTitle: "",
-          headerShadowVisible: false,
-        }}
-      />
-
-      <Stack.Screen
-        name="genre/[genreId]"
-        options={{
-          headerBackButtonDisplayMode: "minimal",
-          headerShown: true,
-          headerTransparent: true,
-          headerTitle: "",
-          headerShadowVisible: false,
-        }}
-      />
-
-      <Stack.Screen
-        name="moreBooks/[key]"
-        options={{
-          headerBackButtonDisplayMode: "minimal",
-          headerShown: true,
-          headerTransparent: true,
-          headerTitle: "More Books",
-          headerShadowVisible: false,
-          headerBackTitle: "",
-        }}
-      />
-
-      <Stack.Screen
-        name="moreInfo/info"
-        options={{
-          headerBackButtonDisplayMode: "minimal",
-          headerBackTitle: "",
-          headerShown: true,
-          headerTransparent: true,
-          headerTitle: "More",
-          //headerShadowVisible: false,
-          headerBlurEffect: "none",
-
-          presentation: "modal",
-        }}
-      />
-
-      <Stack.Screen
-        name="shelfLists/index"
-        options={{
-          headerBackButtonDisplayMode: "minimal",
-          headerBackTitle: "",
-          headerShown: true,
-          headerTransparent: true,
-          headerTitle: "Add to Library",
-          //headerShadowVisible: false,
-          headerBlurEffect: "none",
-
-          presentation: "modal",
-        }}
-      />
-
-      <Stack.Screen
-        name="seeListShelf/index"
-        options={{
-          headerBackButtonDisplayMode: "minimal",
-          headerBackTitle: "",
-          //headerShown: true,
-          headerTransparent: true,
-          headerTitle: "",
-          //headerShadowVisible: false,
-          headerBlurEffect: "none",
-
-          //presentation: "modal",
         }}
       />
     </Stack>

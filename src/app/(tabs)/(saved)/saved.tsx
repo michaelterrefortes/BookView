@@ -1,18 +1,21 @@
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { useIsFocused } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  RefreshControl,
   ScrollView,
   StyleSheet,
+  Text,
+  useColorScheme,
   View,
 } from "react-native";
 import ShelfCard from "../../../../components/ShelfCard";
 import { BookContext } from "../../../../context/BookContext";
 import { fetchAPILists, fetchAPIShelves } from "../../../../services/apiAPI";
 
-const TABS = ["Shelfs", "Lists"];
+const TABS = ["Shelves", "Lists"];
 
 const colors = [
   ["#ffd6d6", "#ff6b6b"],
@@ -36,12 +39,15 @@ const Saved = () => {
 
   const [selected, setSelected] = useState(0);
 
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   //console.log(isFocused);
 
-  useEffect(() => {
+  /*useEffect(() => {
     loadShelves();
     loadLists();
-  }, []);
+  }, []);*/
 
   const loadShelves = async () => {
     setLoading(true);
@@ -75,8 +81,22 @@ const Saved = () => {
     setLoadingList(false);
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    loadShelves();
+    loadLists();
+
+    setRefreshing(false);
+  };
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <SegmentedControl
         values={TABS}
         style={{
@@ -96,51 +116,73 @@ const Saved = () => {
       ) : selected === 0 ? (
         <View style={{ paddingHorizontal: 16 }}>
           <ShelfCard
-            item={
-              shelfBooks.find((item) => item.name === "want_to_read")?.books ||
-              []
-            } //shelfBooks.filter((item) => item.shelf === 1)?.[0]?.books}
+            item={"want_to_read"} //shelfBooks.filter((item) => item.shelf === 1)?.[0]?.books}
             symbol={"books.vertical"}
+            id={1}
             colors={["#f6e8ef", "#e05651"]}
             title={"Want to Read"}
           />
 
           <ShelfCard
-            item={
-              shelfBooks.find((item) => item.name === "reading")?.books || []
-            } //shelfBooks.filter((item) => item.shelf === 2)?.[0]?.books}
+            item={"reading"} //shelfBooks.filter((item) => item.shelf === 2)?.[0]?.books}
             symbol={"books.vertical"}
+            id={2}
             colors={["#ebecf7", "#777d9f"]}
             title={"Reading"}
           />
 
           <ShelfCard
-            item={
-              shelfBooks.find((item) => item.name === "finished")?.books || []
-            } //shelfBooks.filter((item) => item.shelf === 3)?.[0]?.books}
+            item={"finished"} //shelfBooks.filter((item) => item.shelf === 3)?.[0]?.books}
             symbol={"books.vertical"}
+            id={3}
             colors={["#faf2eb", "#fdb460"]}
             title={"Finished"}
           />
           <ShelfCard
-            item={
+            /*item={
               shelfBooks.find((item) => item.name === "not_finished")?.books ||
               []
-            } //shelfBooks.filter((item) => item.shelf === 4)?.[0]?.books}
+            } //shelfBooks.filter((item) => item.shelf === 4)?.[0]?.books}*/
+            item={"not_finished"}
             symbol={"books.vertical"}
+            id={4}
             colors={["#ebeafa", "#7671db"]}
             title={"Not Finished"}
+          />
+
+          <ShelfCard
+            /*item={
+              shelfBooks.find((item) => item.name === "not_finished")?.books ||
+              []
+            } //shelfBooks.filter((item) => item.shelf === 4)?.[0]?.books}*/
+            item={"none"}
+            symbol={"books.vertical"}
+            id={5}
+            colors={["#f7faea", "#d8db71"]}
+            title={"None"}
           />
         </View>
       ) : (
         <View style={{ paddingHorizontal: 16 }}>
+          {listsBooks.length === 0 ? (
+            <Text
+              style={[
+                { textAlign: "center", fontWeight: "600", paddingTop: 100 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              No Lists
+            </Text>
+          ) : null}
           {listsBooks.map((item, index) => (
             <ShelfCard
               key={item.listid}
-              item={item.books}
+              item={item.name_list}
+              id={item.listid}
               symbol={"apple.books.pages"}
               colors={colors[index % 7]}
               title={item.name_list}
+              dataType={"list"}
             />
           ))}
         </View>
@@ -152,6 +194,13 @@ const Saved = () => {
 export default Saved;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
 

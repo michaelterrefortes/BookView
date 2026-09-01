@@ -1,6 +1,15 @@
 import { useRouter } from "expo-router";
-import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
+import { validImage } from "../constants/functions";
 
 interface Book {
   itemKey: String;
@@ -11,6 +20,7 @@ interface Book {
   routeUrl: String;
   year: String;
   orientation: String;
+  searchPress: Boolean;
 }
 
 const BookCard = ({
@@ -23,14 +33,23 @@ const BookCard = ({
   year = "",
 
   orientation = "h",
+  searchPress = false,
 }: Book) => {
   //console.log(itemKey, coverId, urlPoster);
   //console.log(authorName);
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark"; //colorScheme === "dark";
   const router = useRouter();
 
   //console.log(itemKey, coverId, urlPoster, title, authorName, routeUrl);
 
   //console.log(year);
+
+  const [isValidImage, setIsValidImage] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    validImage(urlPoster, setIsValidImage);
+  }, [urlPoster]);
 
   if (orientation === "h") {
     return (
@@ -49,8 +68,14 @@ const BookCard = ({
           })
         }
       >
-        {coverId ? (
-          <View style={styles.coverContainer}>
+        {isValidImage === null ? (
+          <View style={[styles.coverContainer, styles.placeholder]}>
+            <ActivityIndicator size="small" color={"white"} />
+          </View>
+        ) : isValidImage ? (
+          <View
+            style={[styles.coverContainer, { backgroundColor: "transparent" }]}
+          >
             <Image
               resizeMode="contain"
               source={{
@@ -66,22 +91,46 @@ const BookCard = ({
           </View>
         )}
         <View style={{ height: 50, marginTop: 5 }}>
-          <Text style={[styles.title]} numberOfLines={2}>
+          <Text
+            style={[
+              styles.title,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+            numberOfLines={2}
+          >
             {title}
           </Text>
 
           {authorName[0].trim() !== "" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {authorName?.join(", ")}
             </Text>
           ) : null}
 
           {typeof year === "string" && year.trim() !== "" && year !== "null" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {year}
             </Text>
           ) : typeof year === "number" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {year}
             </Text>
           ) : null}
@@ -101,12 +150,22 @@ const BookCard = ({
               urlPoster: urlPoster,
               title: title,
               authorName: authorName,
+              searchPress: searchPress,
             },
           })
         }
       >
-        {coverId ? (
-          <View style={styles.coverContainerSmall}>
+        {isValidImage === null ? (
+          <View style={[styles.coverContainerSmall, styles.placeholder]}>
+            <ActivityIndicator size="small" color={"white"} />
+          </View>
+        ) : isValidImage ? (
+          <View
+            style={[
+              styles.coverContainerSmall,
+              { backgroundColor: "transparent" },
+            ]}
+          >
             <Image
               source={{ uri: urlPoster }}
               style={styles.cover}
@@ -119,21 +178,45 @@ const BookCard = ({
           </View>
         )}
         <View style={styles.info}>
-          <Text style={styles.title} numberOfLines={2}>
+          <Text
+            style={[
+              styles.title,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+            numberOfLines={2}
+          >
             {title}
           </Text>
-          {authorName[0].trim() !== "" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+          {authorName?.[0].trim() !== "" ? (
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {authorName?.join(", ")}
             </Text>
           ) : null}
 
           {typeof year === "string" && year.trim() !== "" && year !== "null" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {year}
             </Text>
           ) : typeof year === "number" ? (
-            <Text style={[styles.author]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.author,
+                { color: isDarkMode ? "lightgray" : "gray" },
+              ]}
+              numberOfLines={1}
+            >
               {year}
             </Text>
           ) : null}
@@ -146,6 +229,13 @@ const BookCard = ({
 export default BookCard;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   card: {
     width: 120,
 

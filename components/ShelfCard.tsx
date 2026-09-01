@@ -1,29 +1,55 @@
-import { useRouter } from "expo-router";
+import { useIsFocused, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
+import { BookContext } from "../context/BookContext";
 
-const ShelfCard = ({ item, colors, symbol, title }) => {
+const ShelfCard = ({ item, colors, symbol, title, dataType, id }) => {
   //console.log(item?.[1]);
 
   //console.log(item);
 
   //const len = item.length;
 
+  const { shelfBooks, listsBooks } = useContext(BookContext);
+
+  const isFocused = useIsFocused();
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    if (dataType === "list") {
+      setData(listsBooks.find((el) => el.name_list === item)?.books || []);
+    } else setData(shelfBooks.find((el) => el.name === item)?.books || []);
+  }, [isFocused]);
+
   const router = useRouter();
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   return (
     <TouchableOpacity
-      style={styles.cardShelf}
+      style={[
+        styles.cardShelf,
+        isDarkMode ? styles.buttonDark : styles.buttonLight,
+      ]}
       onPress={() =>
         router.push({
           pathname: "/seeListShelf",
           params: {
-            item: JSON.stringify(item),
+            name: item,
             title: title,
             symbol: symbol,
             color0: colors[0],
             color1: colors[1],
+            dataType: dataType,
+            id: id,
           },
         })
       }
@@ -99,8 +125,15 @@ const ShelfCard = ({ item, colors, symbol, title }) => {
           </View>
         </View> */}
         <View style={{ marginLeft: 15 }}>
-          <Text style={styles.shelfTitle}>{title}</Text>
-          <Text style={styles.shelfSubtitle}>{item.length} books</Text>
+          <Text
+            style={[
+              styles.shelfTitle,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            {title}
+          </Text>
+          <Text style={styles.shelfSubtitle}>{data.length} books</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -110,6 +143,13 @@ const ShelfCard = ({ item, colors, symbol, title }) => {
 export default ShelfCard;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
     //sbackgroundColor: "#a94141",
@@ -132,6 +172,14 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: 15,
     marginBottom: 15,
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
   },
   shelfTitle: {
     fontWeight: "700",

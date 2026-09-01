@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SymbolView } from "expo-symbols";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -5,6 +7,8 @@ import {
   FlatList,
   StyleSheet,
   Text,
+  TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,6 +17,11 @@ import SearchBar from "../../../../components/SearchBar";
 import { COVER_URL } from "../../../../constants/urls";
 import { fetchSearch } from "../../../../services/api";
 import { getYear } from "../../../../services/functions";
+import {
+  clearRecentSearches,
+  deleteSpecificSearch,
+  saveSearch,
+} from "../../../../services/localData";
 
 const Search = () => {
   const [books, setBooks] = useState([]);
@@ -26,18 +35,30 @@ const Search = () => {
   const [offset, setOffset] = useState(0);
   const [entries, setEntries] = useState(0);
 
+  const [history, setHistory] = useState([]);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark"; // colorScheme === "dark";
+
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
       if (searchBook.trim()) {
         setLoading(true);
 
+        await saveSearch(searchBook);
+
         const result = await fetchSearch(searchBook, 0);
+
+        const storedSearches = await AsyncStorage.getItem("@recent_searches");
+        if (storedSearches) {
+          setHistory(JSON.parse(storedSearches));
+        }
 
         setOffset(0);
 
         if (result.success) {
           setBooks(result.data);
-          setEntries(result.data.numFound);
+          setEntries(result.numFound);
         } else {
           Alert.alert("Error", result.error);
         }
@@ -58,9 +79,22 @@ const Search = () => {
     return () => clearTimeout(timeoutId);
   }, [searchBook]);
 
+  useEffect(() => {
+    const loadSearch = async () => {
+      const storedSearches = await AsyncStorage.getItem("@recent_searches");
+      if (storedSearches) {
+        setHistory(JSON.parse(storedSearches));
+      }
+    };
+    loadSearch();
+  }, []);
+
   const loadMoreBooks = async () => {
     if (loadingMore || loading) return;
     if (searchBook.trim() === "") return;
+
+    if (books.length >= entries) return;
+
     setLoadingMore(true);
 
     const newOffset = offset + 10;
@@ -78,16 +112,11 @@ const Search = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeview} edges={["top", "left", "right"]}>
-      <View
-        style={
-          {
-            //marginVertical: 20,
-            //paddingLeft: 16,
-            //paddingRight: 16,
-          }
-        }
-      >
+    <SafeAreaView
+      style={[styles.safeview, isDarkMode ? styles.darkBg : styles.lightBg]}
+    >
+      <View style={{ height: 100 }} />
+      <View>
         <SearchBar
           placeholder="Search books"
           value={searchBook}
@@ -99,59 +128,171 @@ const Search = () => {
       {loading && <ActivityIndicator size="large" />}
 
       {!loading && searchBook.trim() && books?.length > 0 && (
-        <Text style={styles.text1}>
+        <Text
+          style={[
+            styles.text1,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
           Search Result for <Text style={styles.text2}>"{searchBook}"</Text>
         </Text>
       )}
-      <FlatList
-        data={books}
-        ItemSeparatorComponent={() => (
-          <View style={{ backgroundColor: "lightgray", height: 1 }} />
-        )}
-        renderItem={({ item }) => (
-          <BookCard
-            itemKey={item.editions.docs[0].key}
-            coverId={item.editions.docs[0].key.split("/")[2]}
-            urlPoster={`${COVER_URL}/b/olid/${item.editions.docs[0].key.split("/")[2]}-L.jpg`}
-            authorName={item?.author_name ?? [""]}
-            title={item.title}
-            routeUrl={"editions"}
-            orientation={"v"}
-            year={getYear(
-              item?.editions?.docs?.[0]?.publish_year?.[0].toString(),
-            )}
-          />
-        )}
-        keyExtractor={(item) => item.key.toString()}
-        ListEmptyComponent={
-          !loading ? (
-            <View style={styles.containerText}>
-              <Text style={styles.text3}>
-                {searchBook.trim() ? "No books found" : "Search for a book"}
-              </Text>
-            </View>
-          ) : null
-        }
-        onEndReached={loadMoreBooks}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          loadingMore ? (
-            <>
-              <ActivityIndicator />
-              <View style={styles.endContainer} />
-            </>
-          ) : (
-            <View style={styles.endContainer} />
-          )
-        }
 
-        /*onEndReached={
-          (ready || stopMoreBook) && offset + 10 >= entries
-            ? null
-            : loadMoreBooks
-        }
-        onEndReachedThreshold={0.2} // Trigger when 50% from bottom*/
-      />
+      {books.length !== 0 ? (
+        <FlatList
+          data={books}
+          ItemSeparatorComponent={() => (
+            <View
+              style={{
+                backgroundColor: isDarkMode ? "gray" : "lightgray",
+                height: 1,
+              }}
+            />
+          )}
+          renderItem={({ item }) => {
+            const id = item.editions?.docs?.[0]?.key || item.key;
+
+            return (
+              <BookCard
+                itemKey={id}
+                coverId={id.split("/")[2]}
+                urlPoster={`${COVER_URL}/${id[id.length - 1] === "W" ? "w" : "b"}/olid/${id.split("/")[2]}-L.jpg`}
+                authorName={item?.author_name ?? [""]}
+                title={item.title}
+                routeUrl={id[id.length - 1] === "W" ? "books" : "editions"}
+                orientation={"v"}
+                year={getYear(
+                  item?.editions?.docs?.[0]?.publish_year?.[0].toString(),
+                )}
+                searchPress={true}
+              />
+            );
+          }}
+          keyExtractor={(item) => item.key.toString()}
+          ListEmptyComponent={
+            !loading ? (
+              <View style={styles.containerText}>
+                <Text
+                  style={[
+                    styles.text3,
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
+                  {searchBook.trim() ? "No books found" : "Search for a book"}
+                </Text>
+              </View>
+            ) : null
+          }
+          onEndReached={loadMoreBooks}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <>
+                <ActivityIndicator />
+                <View style={styles.endContainer} />
+              </>
+            ) : (
+              <View style={styles.endContainer} />
+            )
+          }
+        />
+      ) : history.length !== 0 && searchBook.trim() === "" ? (
+        <View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingHorizontal: 16,
+              alignItems: "center",
+              //marginTop: 5,
+              marginBottom: 10,
+            }}
+          >
+            <Text
+              style={[
+                styles.bigTitle,
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Recent Searches
+            </Text>
+            <Text
+              style={{ color: "#7663dc" }}
+              onPress={async () => {
+                await clearRecentSearches();
+                setHistory([]);
+              }}
+            >
+              Clear All
+            </Text>
+          </View>
+
+          <View
+            style={[
+              {
+                backgroundColor: "#fff",
+                paddingVertical: 16,
+                marginHorizontal: 16,
+                borderRadius: 15,
+              },
+              isDarkMode ? styles.buttonDark : styles.buttonLight,
+            ]}
+          >
+            {history.map((item, index) => {
+              if (index > 4) return;
+              return (
+                <TouchableOpacity
+                  key={`${item}-${index}`}
+                  style={[
+                    {
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      paddingHorizontal: 20,
+                      paddingVertical: 8,
+                      alignItems: "center",
+                    },
+                    isDarkMode ? styles.buttonDark : styles.buttonLight,
+                  ]}
+                  onPress={() => setSearchBook(item)}
+                >
+                  <Text
+                    style={[
+                      { fontWeight: "300" },
+                      isDarkMode ? styles.lightText : styles.darkText,
+                    ]}
+                  >
+                    {item}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await deleteSpecificSearch(index);
+
+                      const storedSearches =
+                        await AsyncStorage.getItem("@recent_searches");
+                      if (storedSearches) {
+                        setHistory(JSON.parse(storedSearches));
+                      }
+                    }}
+                  >
+                    <SymbolView name={"xmark"} tintColor={"gray"} size={18} />
+                  </TouchableOpacity>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      ) : !loading ? (
+        <View style={styles.containerText}>
+          <Text
+            style={[
+              styles.text3,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            {searchBook.trim() ? "No books found" : "Search for a book"}
+          </Text>
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 };
@@ -159,6 +300,20 @@ const Search = () => {
 export default Search;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  buttonDark: { backgroundColor: "#2f2f2f" },
+  buttonLight: { backgroundColor: "#fff" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
+  bigTitle: {
+    //paddingTop: 10,
+    //paddingBottom: 5,
+    fontSize: 20,
+    //paddingLeft: 16,
+    fontWeight: "600",
+  },
   container: {
     flex: 1,
     //alignItems: "center",
@@ -166,9 +321,9 @@ const styles = StyleSheet.create({
   },
   safeview: {
     flex: 1,
-    marginTop: 100,
-    marginLeft: 15,
-    marginRight: 15,
+    //marginTop: 100,
+    paddingLeft: 15,
+    paddingRight: 15,
   },
   text1: {
     fontWeight: "600",
